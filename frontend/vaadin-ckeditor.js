@@ -13,7 +13,7 @@ class VaadinCkeditor extends LitElement {
         };
     }
 
-    get styles() { return css`
+    static get styles() { return css`
         :host {
             --ck-highlight-marker-blue: #72cdfd;
             --ck-highlight-marker-green: #63f963;
@@ -354,6 +354,7 @@ class VaadinCkeditor extends LitElement {
             padding: 0;
             border-radius: 0;
         }
+        
         @media print {
            
             .ck-content .page-break {
@@ -366,99 +367,100 @@ class VaadinCkeditor extends LitElement {
         }
   `;}
 
-    get properties() { return { mood: String }}
+    static get properties() {
+        return { editorType: String };
+    }
 
     createRenderRoot() {
         return this;
     }
 
     firstUpdated() {
-        ClassicEditor
-            .create( document.querySelector( '#classic-editor' ) )
-            .then( editor => {
-                window.editor = editor;
-            } )
-            .catch( err => {
-                console.error( err.stack );
-            } );
-
-        InlineEditor
-            .create( document.querySelector( '#inline-editor' ) )
-            .then( editor => {
-                window.editor = editor;
-            } )
-            .catch( err => {
-                console.error( err.stack );
-            } );
-
-        BalloonEditor
-            .create( document.querySelector( '#balloon-editor' ) )
-            .then( editor => {
-                window.editor = editor;
-            } )
-            .catch( err => {
-                console.error( err.stack );
-            } );
-
-        DcoupledEditor
-            .create( document.querySelector( '#dcoupled-editor' ) )
-            .then( editor => {
-                window.editor = editor;
-                document.querySelector( '.toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
-                document.querySelector( '.editable-container' ).appendChild( editor.ui.view.editable.element );
-            } )
-            .catch( err => {
-                console.error( err.stack );
-            } );
+        if(this.editorType==='classic') {
+            ClassicEditor
+                .create( document.querySelector( '#classic-editor' ) )
+                .then( editor => {
+                    window.editor = editor;
+                } )
+                .catch( err => {
+                    console.error( err.stack );
+                } );
+        }else if(this.editorType==='inline') {
+            InlineEditor
+                .create( document.querySelector( '#inline-editor' ) )
+                .then( editor => {
+                    window.editor = editor;
+                } )
+                .catch( err => {
+                    console.error( err.stack );
+                } );
+        }else if(this.editorType==='balloon') {
+            BalloonEditor
+                .create( document.querySelector( '#balloon-editor' ) )
+                .then( editor => {
+                    window.editor = editor;
+                } )
+                .catch( err => {
+                    console.error( err.stack );
+                } );
+        }else if(this.editorType==='decoupled') {
+            DcoupledEditor
+                .create( document.querySelector( '#decoupled-editor' ) )
+                .then( editor => {
+                    window.editor = editor;
+                    document.querySelector( '.toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
+                    document.querySelector( '.editable-container' ).appendChild( editor.ui.view.editable.element );
+                } )
+                .catch( err => {
+                    console.error( err.stack );
+                } );
+        }
     }
 
     render() {
-        return html`
-        <div id="classic-editor">
-          This is some sample content.
-        </div>
-        <br/>
-        <div id="inline-editor">
-          This is some sample content.
-        </div>
-        <br/>
-        <div id="balloon-editor">
-          This is some sample content.
-        </div>
-        <br/>
-        <div class="toolbar-container"></div>
-        <div class="editable-container"></div>
-        <style>
-            .editable-container,
-            .toolbar-container {
-                position: relative;
-                border: 1px solid #ddd;
-                background: #eee;
-            }
-    
-            .toolbar-container {
-                padding: 1em;
-            }
-    
-            .editable-container {
-                padding: 3em;
-                overflow-y: scroll;
-                max-height: 500px;
-            }
-    
-            .editable-container .document-editor__editable.ck-editor__editable {
-                min-height: 21cm;
-                padding: 2em;
-                border: 1px #D3D3D3 solid;
-                border-radius: var(--ck-border-radius);
-                background: white;
-                box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-            }
-        </style>
-        <div id="dcoupled-editor" class=${classMap(this.classes)}>
-          This is some sample content.
-        </div>
-      `;
+        if(this.editorType==='decoupled') {
+            return html`
+                <div class="toolbar-container"></div>
+                <div class="editable-container"></div>
+                <style>
+                    .editable-container,
+                    .toolbar-container {
+                        position: relative;
+                        border: 1px solid #ddd;
+                        background: #eee;
+                    }
+            
+                    .toolbar-container {
+                        padding: 1em;
+                    }
+            
+                    .editable-container {
+                        padding: 3em;
+                        overflow-y: scroll;
+                        max-height: 500px;
+                    }
+            
+                    .editable-container .document-editor__editable.ck-editor__editable {
+                        min-height: 21cm;
+                        padding: 2em;
+                        border: 1px #D3D3D3 solid;
+                        border-radius: var(--ck-border-radius);
+                        background: white;
+                        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+                    }
+                </style>
+                <div id="${this.editorType}-editor" class=${classMap(this.classes)}>
+                  This is some sample content for ${this.editorType} editor.
+                </div>
+            `;
+        } else {
+            return html`
+                <div id="${this.editorType}-editor">
+                  This is some sample content for ${this.editorType} editor.
+                </div>
+            `;
+        }
+
     }
 
 }
