@@ -368,17 +368,20 @@ class VaadinCkeditor extends LitElement {
   `;}
 
     static get properties() {
-        return { editorType: String };
+        return { editorType: String,
+                 toolBar: Array};
     }
 
     createRenderRoot() {
         return this;
     }
 
-    firstUpdated() {
+    firstUpdated(changedProperties) {
         if(this.editorType==='classic') {
             ClassicEditor
-                .create( document.querySelector( '#classic-editor' ) )
+                .create( document.querySelector( '#classic-editor' ) , {
+                    toolbar:this.toolBar
+                })
                 .then( editor => {
                     window.editor = editor;
                 } )
