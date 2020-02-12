@@ -378,43 +378,37 @@ class VaadinCkeditor extends LitElement {
 
     firstUpdated(changedProperties) {
         if(this.editorType==='classic') {
-            ClassicEditor
-                .create( document.querySelector( '#classic-editor' ) , {
+            ClassicEditor.create( document.querySelector( '#classic-editor' ) , {
                     toolbar:this.toolBar
-                })
-                .then( editor => {
+                }).then( editor => {
                     window.editor = editor;
-                } )
-                .catch( err => {
+                } ).catch( err => {
                     console.error( err.stack );
                 } );
         }else if(this.editorType==='inline') {
-            InlineEditor
-                .create( document.querySelector( '#inline-editor' ) )
-                .then( editor => {
+            InlineEditor.create( document.querySelector( '#inline-editor' ) , {
+                    toolbar:this.toolBar
+                }).then( editor => {
                     window.editor = editor;
-                } )
-                .catch( err => {
+                } ).catch( err => {
                     console.error( err.stack );
                 } );
         }else if(this.editorType==='balloon') {
-            BalloonEditor
-                .create( document.querySelector( '#balloon-editor' ) )
-                .then( editor => {
+            BalloonEditor.create( document.querySelector( '#balloon-editor' ) , {
+                    toolbar:this.toolBar
+                }).then( editor => {
                     window.editor = editor;
-                } )
-                .catch( err => {
+                } ).catch( err => {
                     console.error( err.stack );
                 } );
         }else if(this.editorType==='decoupled') {
-            DcoupledEditor
-                .create( document.querySelector( '#decoupled-editor' ) )
-                .then( editor => {
+            DcoupledEditor.create( document.querySelector( '#decoupled-editor' ) , {
+                    toolbar:this.toolBar
+                }).then( editor => {
                     window.editor = editor;
                     document.querySelector( '.toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
                     document.querySelector( '.editable-container' ).appendChild( editor.ui.view.editable.element );
-                } )
-                .catch( err => {
+                } ).catch( err => {
                     console.error( err.stack );
                 } );
         }

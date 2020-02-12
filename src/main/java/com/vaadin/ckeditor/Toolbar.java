@@ -2,15 +2,13 @@ package com.vaadin.ckeditor;
 
 public enum Toolbar {
 
+    heading("heading"),
+    pipe("|"),
     blockQuote("blockQuote"),
     bold("bold"),
     italic("italic"),
     ckfinder("ckfinder"),
-    imageTextAlternative("imageTextAlternative"),
     imageUpload("imageUpload"),
-    heading("heading"),
-    imageStyleFull("imageStyle:full"),
-    imageStyleSide("imageStyle:side"),
     indent("indent"),
     outdent("outdent"),
     link("link"),
@@ -19,11 +17,7 @@ public enum Toolbar {
     mediaEmbed("mediaEmbed"),
     undo("undo"),
     redo("redo"),
-    insertTable("insertTable"),
-    tableColumn("tableColumn"),
-    tableRow("tableRow"),
-    pipe("|"),
-    mergeTableCells("mergeTableCells");
+    insertTable("insertTable");
 
     private final String value;
 
