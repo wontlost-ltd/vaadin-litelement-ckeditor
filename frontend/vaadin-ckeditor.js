@@ -2,7 +2,7 @@ import { LitElement, html, css } from "lit-element";
 import { classMap } from 'lit-html/directives/class-map';
 import { ClassicEditor, InlineEditor, BalloonEditor, DcoupledEditor } from "./ckeditor";
 
-class VaadinCkeditor extends LitElement {
+class VaadinCKEditor extends LitElement {
 
     constructor() {
         super();
@@ -369,6 +369,7 @@ class VaadinCkeditor extends LitElement {
 
     static get properties() {
         return { editorType: String,
+                 editorData: String,
                  toolBar: Array};
     }
 
@@ -381,6 +382,11 @@ class VaadinCkeditor extends LitElement {
             ClassicEditor.create( document.querySelector( '#classic-editor' ) , {
                     toolbar:this.toolBar
                 }).then( editor => {
+                    editor.setData(this.editorData);
+                    editor.model.document.on( 'change:data', () => {
+                        this.$server.setEditorData(editor.getData());
+                        console.log( 'The data in ClassicEditor has changed!' );
+                    } );
                     window.editor = editor;
                 } ).catch( err => {
                     console.error( err.stack );
@@ -389,6 +395,11 @@ class VaadinCkeditor extends LitElement {
             InlineEditor.create( document.querySelector( '#inline-editor' ) , {
                     toolbar:this.toolBar
                 }).then( editor => {
+                    editor.setData(this.editorData);
+                    editor.model.document.on( 'change:data', () => {
+                        this.$server.setEditorData(editor.getData());
+                        console.log( 'The data in InlineEditor has changed!' );
+                    } );
                     window.editor = editor;
                 } ).catch( err => {
                     console.error( err.stack );
@@ -397,6 +408,11 @@ class VaadinCkeditor extends LitElement {
             BalloonEditor.create( document.querySelector( '#balloon-editor' ) , {
                     toolbar:this.toolBar
                 }).then( editor => {
+                    editor.setData(this.editorData);
+                    editor.model.document.on( 'change:data', () => {
+                        this.$server.setEditorData(editor.getData());
+                        console.log( 'The data in BalloonEditor has changed!' );
+                    } );
                     window.editor = editor;
                 } ).catch( err => {
                     console.error( err.stack );
@@ -405,6 +421,11 @@ class VaadinCkeditor extends LitElement {
             DcoupledEditor.create( document.querySelector( '#decoupled-editor' ) , {
                     toolbar:this.toolBar
                 }).then( editor => {
+                    editor.setData(this.editorData);
+                    editor.model.document.on( 'change:data', () => {
+                        this.$server.setEditorData(editor.getData());
+                        console.log( 'The data in DcoupledEditor has changed!' );
+                    } );
                     window.editor = editor;
                     document.querySelector( '.toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
                     document.querySelector( '.editable-container' ).appendChild( editor.ui.view.editable.element );
@@ -446,20 +467,21 @@ class VaadinCkeditor extends LitElement {
                         box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
                     }
                 </style>
-                <div id="${this.editorType}-editor" class=${classMap(this.classes)}>
-                  This is some sample content for ${this.editorType} editor.
-                </div>
+                <div id="${this.editorType}-editor" class=${classMap(this.classes)}/>
             `;
         } else {
             return html`
-                <div id="${this.editorType}-editor">
-                  This is some sample content for ${this.editorType} editor.
-                </div>
+                <div id="${this.editorType}-editor"/>
             `;
         }
 
     }
 
+    getData() {
+        alert("getData : "+window.editor.getData());
+        return window.editor.getData();
+    }
+
 }
 
-customElements.define('vaadin-ckeditor', VaadinCkeditor);
+customElements.define('vaadin-ckeditor', VaadinCKEditor);

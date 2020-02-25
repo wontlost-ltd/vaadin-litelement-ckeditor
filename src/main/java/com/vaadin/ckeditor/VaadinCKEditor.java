@@ -1,6 +1,7 @@
 package com.vaadin.ckeditor;
 
 import com.google.gson.Gson;
+import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -15,6 +16,7 @@ import java.util.List;
 @JsModule("./vaadin-ckeditor.js")
 public class VaadinCKEditor extends Component {
 
+    private static String editorData="";
 
     private final static Toolbar[] toolbar = new Toolbar[]{Toolbar.heading, Toolbar.pipe, Toolbar.bold,
             Toolbar.italic, Toolbar.link, Toolbar.bulletedList, Toolbar.numberedList, Toolbar.pipe, Toolbar.indent,
@@ -22,16 +24,21 @@ public class VaadinCKEditor extends Component {
             Toolbar.mediaEmbed, Toolbar.undo, Toolbar.redo};
 
     public VaadinCKEditor() {
-        this(EditorType.CLASSIC, toolbar);
+        this(EditorType.CLASSIC, toolbar, editorData);
     }
 
-    public VaadinCKEditor(EditorType editorType) {
-        this(editorType, toolbar);
+    public VaadinCKEditor(String editorData) {
+        this(EditorType.CLASSIC, toolbar, editorData);
     }
 
-    public VaadinCKEditor(EditorType editorType, Toolbar[] toolbar) {
+    public VaadinCKEditor(EditorType editorType, String editorData) {
+        this(editorType, toolbar, editorData);
+    }
+
+    public VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, String editorData) {
         getElement().setProperty("editorType", editorType.toString());
         getElement().setPropertyJson("toolBar", toJson(toolbar));
+        getElement().setProperty("editorData", editorData);
     }
 
     private JsonArray toJson(Toolbar[] toolbar) {
@@ -43,5 +50,18 @@ public class VaadinCKEditor extends Component {
         String toolbarJson = new Gson().toJson(values);
         return new JreJsonFactory().parse(toolbarJson);
     }
+
+    @ClientCallable
+    public void setEditorData(String editorData) {
+        this.editorData = editorData;
+    }
+
+    public String getEditorData() {
+        getElement().callJsFunction("getData").then(String.class, content-> editorData = content);
+        System.out.println("editorData ：" + editorData);
+        return editorData;
+    }
+
+
 
 }
