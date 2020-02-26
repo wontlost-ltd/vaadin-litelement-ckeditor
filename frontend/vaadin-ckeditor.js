@@ -370,6 +370,8 @@ class VaadinCKEditor extends LitElement {
     static get properties() {
         return { editorType: String,
                  editorData: String,
+                 editorWidth: String,
+                 editorHeight: String,
                  toolBar: Array};
     }
 
@@ -383,9 +385,17 @@ class VaadinCKEditor extends LitElement {
                     toolbar:this.toolBar
                 }).then( editor => {
                     editor.setData(this.editorData);
+                    this.$server.setEditorData(this.editorData);
+                    editor.editing.view.change( writer => {
+                        if(this.editorHeight) {
+                            writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
+                        }
+                        if(this.editorWidth) {
+                            writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
+                        }
+                    } );
                     editor.model.document.on( 'change:data', () => {
                         this.$server.setEditorData(editor.getData());
-                        console.log( 'The data in ClassicEditor has changed!' );
                     } );
                     window.editor = editor;
                 } ).catch( err => {
@@ -396,9 +406,17 @@ class VaadinCKEditor extends LitElement {
                     toolbar:this.toolBar
                 }).then( editor => {
                     editor.setData(this.editorData);
+                    this.$server.setEditorData(this.editorData);
+                    editor.editing.view.change( writer => {
+                        if(this.editorHeight) {
+                            writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
+                        }
+                        if(this.editorWidth) {
+                            writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
+                        }
+                    } );
                     editor.model.document.on( 'change:data', () => {
                         this.$server.setEditorData(editor.getData());
-                        console.log( 'The data in InlineEditor has changed!' );
                     } );
                     window.editor = editor;
                 } ).catch( err => {
@@ -409,9 +427,17 @@ class VaadinCKEditor extends LitElement {
                     toolbar:this.toolBar
                 }).then( editor => {
                     editor.setData(this.editorData);
+                    this.$server.setEditorData(this.editorData);
+                    editor.editing.view.change( writer => {
+                        if(this.editorHeight) {
+                            writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
+                        }
+                        if(this.editorWidth) {
+                            writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
+                        }
+                    } );
                     editor.model.document.on( 'change:data', () => {
                         this.$server.setEditorData(editor.getData());
-                        console.log( 'The data in BalloonEditor has changed!' );
                     } );
                     window.editor = editor;
                 } ).catch( err => {
@@ -422,9 +448,17 @@ class VaadinCKEditor extends LitElement {
                     toolbar:this.toolBar
                 }).then( editor => {
                     editor.setData(this.editorData);
+                    this.$server.setEditorData(this.editorData);
+                    editor.editing.view.change( writer => {
+                        if(this.editorHeight) {
+                            writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
+                        }
+                        if(this.editorWidth) {
+                            writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
+                        }
+                    } );
                     editor.model.document.on( 'change:data', () => {
                         this.$server.setEditorData(editor.getData());
-                        console.log( 'The data in DcoupledEditor has changed!' );
                     } );
                     window.editor = editor;
                     document.querySelector( '.toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
@@ -475,11 +509,6 @@ class VaadinCKEditor extends LitElement {
             `;
         }
 
-    }
-
-    getData() {
-        alert("getData : "+window.editor.getData());
-        return window.editor.getData();
     }
 
 }

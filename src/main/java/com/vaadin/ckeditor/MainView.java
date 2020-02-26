@@ -10,7 +10,7 @@ public class MainView extends VerticalLayout {
 
 	public MainView() {
 		super();
-		VaadinCKEditor editor = new VaadinCKEditor("<p style=\"background:green;\">This is a test.</p>");
+		VaadinCKEditor editor = new VaadinCKEditor("<p style=\"background:green;\">This is a test.</p>", "650px", null);
 		add(editor);
 		add(new Label(""));
 		Button button = new Button("Print");
