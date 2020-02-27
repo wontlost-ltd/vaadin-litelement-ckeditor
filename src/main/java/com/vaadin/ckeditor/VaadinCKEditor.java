@@ -16,51 +16,27 @@ import java.util.List;
 @JsModule("./vaadin-ckeditor.js")
 public class VaadinCKEditor extends Component {
 
-    private static String editorData="";
-    private static String width="650px";
-    private static String height="370px";
+    private String editorData="";
+    private String width="650px";
+    private String height="370px";
 
-    private final static Toolbar[] toolbar = new Toolbar[]{Toolbar.heading, Toolbar.pipe, Toolbar.bold,
+    private Toolbar[] toolbar = new Toolbar[]{Toolbar.heading, Toolbar.pipe, Toolbar.bold,
             Toolbar.italic, Toolbar.link, Toolbar.bulletedList, Toolbar.numberedList, Toolbar.pipe, Toolbar.indent,
             Toolbar.outdent, Toolbar.pipe, Toolbar.imageUpload, Toolbar.blockQuote, Toolbar.insertTable,
             Toolbar.mediaEmbed, Toolbar.undo, Toolbar.redo};
 
-    public VaadinCKEditor() {
-        this(EditorType.CLASSIC, toolbar, editorData, width, height);
-    }
-
-    public VaadinCKEditor(String width, String height) {
-        this(EditorType.CLASSIC, toolbar, editorData, width, height);
-    }
-
-    public VaadinCKEditor(String editorData) {
-        this(EditorType.CLASSIC, toolbar, editorData, width, height);
-    }
-
-    public VaadinCKEditor(String editorData, String width, String height) {
-        this(EditorType.CLASSIC, toolbar, editorData, width, height);
-    }
-
-    public VaadinCKEditor(EditorType editorType, String editorData) {
-        this(editorType, toolbar, editorData, width, height);
-    }
-
-    public VaadinCKEditor(EditorType editorType, String editorData, String width, String height) {
-        this(editorType, toolbar, editorData, width, height);
-    }
-
     public VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, String editorData, String width, String height) {
         getElement().setProperty("editorType", editorType.toString());
         getElement().setPropertyJson("toolBar", toJson(toolbar));
-        getElement().setProperty("editorData", editorData);
-        getElement().setProperty("editorWidth", width);
+        getElement().setProperty("editorData", editorData==null?"":editorData);
+        getElement().setProperty("editorWidth", width==null?"650px":width);
         getElement().setProperty("editorHeight", height);
     }
 
     private JsonArray toJson(Toolbar[] toolbar) {
         List<String> values = new ArrayList<>();
         if(toolbar == null || toolbar.length==0) {
-            toolbar = VaadinCKEditor.toolbar;
+            toolbar = this.toolbar;
         }
         Arrays.stream(toolbar).forEach(item -> values.add(item.getValue()));
         String toolbarJson = new Gson().toJson(values);
@@ -73,7 +49,7 @@ public class VaadinCKEditor extends Component {
     }
 
     public String getEditorData() {
-        return editorData;
+        return this.editorData;
     }
 
 
