@@ -346,7 +346,7 @@ class VaadinCKEditor extends LitElement {
             tab-size: 4;
             white-space: pre-wrap;
             font-style: normal;
-            min-width: 200px;
+            min-width: 100px;
         }
         
         .ck-content pre code {

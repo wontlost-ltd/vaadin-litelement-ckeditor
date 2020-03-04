@@ -4,17 +4,17 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.PWA;
 
 @Route("")
+@PWA(name = "CKEditor", shortName = "CK")
 public class MainView extends VerticalLayout {
 
 	public MainView() {
 		super();
 		VaadinCKEditor editor = new VaadinCKEditorBuilder().with(builder -> {
-			builder.editorData = "<p style=\"background:green;\">This is a test.</p>";
+			builder.editorData = "<p>This is a test.</p>";
 			builder.editorType = EditorType.CLASSIC;
-			builder.width="900px";
-			builder.height="500px";
 		}).createVaadinCKEditor();
 		add(editor);
 		add(new Label(""));
@@ -25,27 +25,27 @@ public class MainView extends VerticalLayout {
 		add(new Label(""));
 		add(label);
 		add(new Label(""));
-		VaadinCKEditor editor1 = new VaadinCKEditorBuilder().with(builder->{
-			builder.editorType=EditorType.BALLOON;
-			builder.editorData="Balloon Editor test";
-		}).createVaadinCKEditor();
-		add(editor1);
-
-		add(new Label(""));
-
-		VaadinCKEditor editor2 = new VaadinCKEditorBuilder().with(builder->{
-			builder.editorType=EditorType.INLINE;
-			builder.editorData="Inline";
-		}).createVaadinCKEditor();
-		add(editor2);
-
-		add(new Label(""));
-
-		VaadinCKEditor editor3 = new VaadinCKEditorBuilder().with(builder->{
-			builder.editorType=EditorType.DECOUPLED;
-			builder.editorData="Dcoupled Editor";
-		}).createVaadinCKEditor();
-		add(editor3);
+//		VaadinCKEditor editor1 = new VaadinCKEditorBuilder().with(builder->{
+//			builder.editorType=EditorType.BALLOON;
+//			builder.editorData="Balloon Editor test";
+//		}).createVaadinCKEditor();
+//		add(editor1);
+//
+//		add(new Label(""));
+//
+//		VaadinCKEditor editor2 = new VaadinCKEditorBuilder().with(builder->{
+//			builder.editorType=EditorType.INLINE;
+//			builder.editorData="Inline";
+//		}).createVaadinCKEditor();
+//		add(editor2);
+//
+//		add(new Label(""));
+//
+//		VaadinCKEditor editor3 = new VaadinCKEditorBuilder().with(builder->{
+//			builder.editorType=EditorType.DECOUPLED;
+//			builder.editorData="Dcoupled Editor";
+//		}).createVaadinCKEditor();
+//		add(editor3);
 
 
 		setAlignItems(Alignment.CENTER);

@@ -17,8 +17,8 @@ import java.util.List;
 public class VaadinCKEditor extends Component {
 
     private String editorData="";
-    private String width="650px";
-    private String height="370px";
+    private String width="auto";
+    private String height="auto";
 
     private Toolbar[] toolbar = new Toolbar[]{Toolbar.heading, Toolbar.pipe, Toolbar.bold,
             Toolbar.italic, Toolbar.link, Toolbar.bulletedList, Toolbar.numberedList, Toolbar.pipe, Toolbar.indent,
@@ -29,8 +29,10 @@ public class VaadinCKEditor extends Component {
         getElement().setProperty("editorType", editorType.toString());
         getElement().setPropertyJson("toolBar", toJson(toolbar));
         getElement().setProperty("editorData", editorData==null?"":editorData);
-        getElement().setProperty("editorWidth", width==null?"650px":width);
+        getElement().setProperty("editorWidth", width==null?"auto":width);
         getElement().setProperty("editorHeight", height);
+        getElement().getStyle().set("width", "-webkit-fill-available");
+        getElement().getStyle().set("margin", "20px");
     }
 
     private JsonArray toJson(Toolbar[] toolbar) {
