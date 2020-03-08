@@ -1,4 +1,4 @@
-package com.vaadin.ckeditor;
+package com.ryanpang.ckeditor;
 
 import com.google.gson.Gson;
 import com.vaadin.flow.component.ClientCallable;

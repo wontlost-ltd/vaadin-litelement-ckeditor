@@ -1,4 +1,4 @@
-package com.vaadin.ckeditor;
+package com.ryanpang.ckeditor;
 
 public enum EditorType {
 

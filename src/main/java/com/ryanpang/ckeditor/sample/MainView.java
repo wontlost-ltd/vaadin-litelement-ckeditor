@@ -1,5 +1,8 @@
-package com.vaadin.ckeditor;
+package com.ryanpang.ckeditor.sample;
 
+import com.ryanpang.ckeditor.EditorType;
+import com.ryanpang.ckeditor.VaadinCKEditor;
+import com.ryanpang.ckeditor.VaadinCKEditorBuilder;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;

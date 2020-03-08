@@ -1,4 +1,4 @@
-package com.vaadin.ckeditor;
+package com.ryanpang.ckeditor;
 
 import java.util.function.Consumer;
 
