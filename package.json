@@ -51,7 +51,7 @@
   },
   "name": "no-name",
   "license": "UNLICENSED",
-  "vaadinAppPackageHash": "37ec07b880bd60215e256aebd86ae01da515ab3a4263fdafa23ee9b21f1e9c6e",
+  "vaadinAppPackageHash": "b0e26c99a50c6379835b776fa9ba1ca1ab35245fd00d9e1f4255a92c2bfb4659",
   "vaadin": {
     "dependencies": {
       "@polymer/polymer": "3.3.1",
