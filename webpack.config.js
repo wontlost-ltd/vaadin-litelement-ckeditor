@@ -7,21 +7,6 @@ const merge = require('webpack-merge');
 const flowDefaults = require('./webpack.generated.js');
 
 module.exports = merge(flowDefaults, {
-	module: {
-		rules: [
-			{
-				test: /\.(jpe?g|png|gif|woff|woff2|eot|ttf|svg)$/,
-				use: [{
-					loader: "url-loader",
-					options: {
-						limit: 100000
-					}
-				}]
-			}
-
-		]
-	}
-
 });
 
 /**

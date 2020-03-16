@@ -10,7 +10,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 
 @Route("")
-@PWA(name = "CKEditor", shortName = "CK")
+@PWA(name = "CKEditor", shortName = "CK", iconPath = "icons/vaadin-ckeditor.png")
 public class MainView extends VerticalLayout {
 
 	public MainView() {

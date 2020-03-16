@@ -38,7 +38,6 @@
     "@vaadin/vaadin-custom-field": "1.0.11",
     "@vaadin/vaadin-form-layout": "2.1.7",
     "@vaadin/vaadin-accordion": "1.0.1",
-    "@polymer/iron-list": "3.1.0",
     "@vaadin/vaadin-list-box": "1.2.0",
     "@vaadin/vaadin-checkbox": "2.2.12",
     "@vaadin/vaadin-details": "1.0.1",
@@ -52,7 +51,7 @@
   },
   "name": "no-name",
   "license": "UNLICENSED",
-  "vaadinAppPackageHash": "92bc89a9c4a03b3e150ad0ae79069103bbbc47a102ed2f7185aca62792511dd1",
+  "vaadinAppPackageHash": "37ec07b880bd60215e256aebd86ae01da515ab3a4263fdafa23ee9b21f1e9c6e",
   "vaadin": {
     "dependencies": {
       "@polymer/polymer": "3.3.1",
@@ -85,7 +84,6 @@
       "@vaadin/vaadin-form-layout": "2.1.7",
       "@vaadin/vaadin-confirm-dialog": "1.1.4",
       "@vaadin/vaadin-accordion": "1.0.1",
-      "@polymer/iron-list": "3.1.0",
       "@vaadin/vaadin-list-box": "1.2.0",
       "@vaadin/vaadin-checkbox": "2.2.12",
       "@vaadin/vaadin-details": "1.0.1",
