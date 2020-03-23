@@ -1,6 +1,6 @@
-import { LitElement, html, css } from "lit-element/lit-element";
+import { LitElement, html, css } from "lit-element";
 import { classMap } from 'lit-html/directives/class-map';
-import { ClassicEditor, InlineEditor, BalloonEditor, DcoupledEditor } from "ckeditor.js";
+import { ClassicEditor, InlineEditor, BalloonEditor, DcoupledEditor } from "./ckeditor";
 
 class VaadinCKEditor extends LitElement {
 

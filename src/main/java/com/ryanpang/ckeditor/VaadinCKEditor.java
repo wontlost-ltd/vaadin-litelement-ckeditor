@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Tag("vaadin-ckeditor")
-@JsModule("./src/vaadin-ckeditor.js")
+@JsModule("./vaadin-ckeditor.js")
 public class VaadinCKEditor extends Component {
 
     private String editorData="";
