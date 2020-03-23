@@ -513,4 +513,4 @@ class VaadinCKEditor extends LitElement {
 
 }
 
-customElements.define('vaadin-ckeditor', VaadinCKEditor);
+customElements.get('vaadin-ckeditor') || customElements.define('vaadin-ckeditor', VaadinCKEditor);
