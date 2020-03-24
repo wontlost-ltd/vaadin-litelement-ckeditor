@@ -1,13 +1,13 @@
-package com.ryanpang.ckeditor.sample;
+package com.wontlost.ckeditor.sample;
 
-import com.ryanpang.ckeditor.EditorType;
-import com.ryanpang.ckeditor.VaadinCKEditor;
-import com.ryanpang.ckeditor.VaadinCKEditorBuilder;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
+import com.wontlost.ckeditor.EditorType;
+import com.wontlost.ckeditor.VaadinCKEditor;
+import com.wontlost.ckeditor.VaadinCKEditorBuilder;
 
 @Route("")
 @PWA(name = "CKEditor", shortName = "CK")
