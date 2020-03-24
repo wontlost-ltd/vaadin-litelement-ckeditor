@@ -4,10 +4,10 @@ import java.util.function.Consumer;
 
 public class VaadinCKEditorBuilder {
 
-    private String editorData;
+    public String editorData;
     public String width;
     public String height;
-    private EditorType editorType = EditorType.CLASSIC;
+    public EditorType editorType = EditorType.CLASSIC;
     public Toolbar[] toolbar = new Toolbar[]{Toolbar.heading, Toolbar.pipe, Toolbar.bold,
             Toolbar.italic, Toolbar.link, Toolbar.bulletedList, Toolbar.numberedList, Toolbar.pipe, Toolbar.indent,
             Toolbar.outdent, Toolbar.pipe, Toolbar.imageUpload, Toolbar.blockQuote, Toolbar.insertTable,
