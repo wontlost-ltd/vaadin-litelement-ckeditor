@@ -5,7 +5,7 @@
 
     <groupId>com.vaadin</groupId>
     <artifactId>ckeditor-vaadin</artifactId>
-    <version>0.0.1-beta</version>
+    <version>1.0.0</version>
     <name>CKEditorVaadin</name>
     <description>Integration of CKEditor 5 for Vaadin 14</description>
     <scm>
@@ -14,7 +14,7 @@
         <developerConnection>scm:git:git@https://github.com/eroself/vaadin-litelement-ckeditor.git</developerConnection>
     </scm>
     <properties>
-        <vaadin.version>14.1.19</vaadin.version>
+        <vaadin.version>14.1.20</vaadin.version>
         <vaadin-applayout-addon.version>4.0.0.rc5</vaadin-applayout-addon.version>
 
         <maven.compiler.source>11</maven.compiler.source>
@@ -24,7 +24,7 @@
 
         <drivers.dir>${project.basedir}/drivers</drivers.dir>
 
-        <jetty.version>9.4.15.v20190215</jetty.version>
+        <jetty.version>9.4.27.v20200227</jetty.version>
     </properties>
     <organization>
         <name>Vaadin Visitor</name>
@@ -153,11 +153,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-testbench</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.github.appreciated</groupId>
             <artifactId>app-layout-addon</artifactId>
             <scope>test</scope>
@@ -283,7 +278,6 @@
                         </executions>
                         <configuration>
                             <quiet>true</quiet>
-                            <additionalparam>-Xdoclint:none</additionalparam>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -410,6 +404,7 @@
                             <enableAssertions>true</enableAssertions>
                             <systemPropertyVariables>
                                 <!-- Pass location of downloaded webdrivers to the tests -->
+                                <!--suppress UnresolvedMavenProperty -->
                                 <webdriver.chrome.driver>
                                     ${webdriver.chrome.driver}
                                 </webdriver.chrome.driver>
