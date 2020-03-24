@@ -1,13 +1,13 @@
-package com.ryanpang.ckeditor;
+package com.wontlost.ckeditor;
 
 import java.util.function.Consumer;
 
 public class VaadinCKEditorBuilder {
 
-    public String editorData;
+    private String editorData;
     public String width;
     public String height;
-    public EditorType editorType = EditorType.CLASSIC;
+    private EditorType editorType = EditorType.CLASSIC;
     public Toolbar[] toolbar = new Toolbar[]{Toolbar.heading, Toolbar.pipe, Toolbar.bold,
             Toolbar.italic, Toolbar.link, Toolbar.bulletedList, Toolbar.numberedList, Toolbar.pipe, Toolbar.indent,
             Toolbar.outdent, Toolbar.pipe, Toolbar.imageUpload, Toolbar.blockQuote, Toolbar.insertTable,

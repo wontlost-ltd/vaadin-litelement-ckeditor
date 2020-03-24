@@ -1,4 +1,4 @@
-package com.ryanpang.ckeditor;
+package com.wontlost.ckeditor;
 
 import com.google.gson.Gson;
 import com.vaadin.flow.component.ClientCallable;
@@ -12,9 +12,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Used in @VaadinCKEditorBuilder.
+ */
 @Tag("vaadin-ckeditor")
 @JsModule("./vaadin-ckeditor.js")
-public class VaadinCKEditor extends Component {
+class VaadinCKEditor extends Component {
 
     private String editorData="";
     private String width="auto";
@@ -25,7 +28,15 @@ public class VaadinCKEditor extends Component {
             Toolbar.outdent, Toolbar.pipe, Toolbar.imageUpload, Toolbar.blockQuote, Toolbar.insertTable,
             Toolbar.mediaEmbed, Toolbar.undo, Toolbar.redo};
 
-    public VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, String editorData, String width, String height) {
+    /**
+     * Constructor of VaadinCKEditor.
+     * @param editorType  Type of Editor, refer to enum @EditorType.
+     * @param toolbar   Toolbar of Editor, refer to enum @Toolbar.
+     * @param editorData Content of editor.
+     * @param width   Width of editor.
+     * @param height  Height of editor.
+     */
+    VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, String editorData, String width, String height) {
         getElement().setProperty("editorType", editorType.toString());
         getElement().setPropertyJson("toolBar", toJson(toolbar));
         getElement().setProperty("editorData", editorData==null?"":editorData);
@@ -35,6 +46,10 @@ public class VaadinCKEditor extends Component {
         getElement().getStyle().set("margin", "20px");
     }
 
+    /**
+     * @param toolbar Toolbar of Editor, refer to enum @Toolbar
+     * @return JsonArray
+     */
     private JsonArray toJson(Toolbar[] toolbar) {
         List<String> values = new ArrayList<>();
         if(toolbar == null || toolbar.length==0) {
@@ -45,15 +60,21 @@ public class VaadinCKEditor extends Component {
         return new JreJsonFactory().parse(toolbarJson);
     }
 
+    /**
+     * Set content of editor.
+     * @param editorData  Data in editor text area.
+     */
     @ClientCallable
     public void setEditorData(String editorData) {
         this.editorData = editorData;
     }
 
+    /**
+     * Get content of editor.
+     * @return Data in editor text area.
+     */
     public String getEditorData() {
         return this.editorData;
     }
-
-
 
 }

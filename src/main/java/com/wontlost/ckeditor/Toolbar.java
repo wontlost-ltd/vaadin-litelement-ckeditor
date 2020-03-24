@@ -1,5 +1,9 @@
-package com.ryanpang.ckeditor;
+package com.wontlost.ckeditor;
 
+/**
+ * Toolbar that applied to editor. Items like headin, pipe, blockQuote and etc can be used.
+ * Editor can have one or more toolbar items.
+ */
 public enum Toolbar {
 
     heading("heading"),
