@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Tag("vaadin-ckeditor")
 @JsModule("./vaadin-ckeditor.js")
-class VaadinCKEditor extends Component {
+public class VaadinCKEditor extends Component {
 
     private String editorData="";
     private String width="auto";
@@ -33,8 +33,8 @@ class VaadinCKEditor extends Component {
      * @param editorType  Type of Editor, refer to enum @EditorType.
      * @param toolbar   Toolbar of Editor, refer to enum @Toolbar.
      * @param editorData Content of editor.
-     * @param width   Width of editor.
-     * @param height  Height of editor.
+     * @param width   Width of editor, default value is 'auto'.
+     * @param height  Height of editor, default value is 'auto'.
      */
     VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, String editorData, String width, String height) {
         getElement().setProperty("editorType", editorType.toString());
