@@ -1,4 +1,4 @@
-package com.ryanpang.ckeditor;
+package com.wontlost.ckeditor;
 
 public enum Toolbar {
 
