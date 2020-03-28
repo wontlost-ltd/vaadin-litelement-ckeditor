@@ -37,27 +37,27 @@ public class MainView extends VerticalLayout {
 				"<img alt=\"\" border=\"0\" src=\"https://www.paypal.com/en_NZ/i/scr/pixel.gif\" width=\"1\" height=\"1\" />"+
 				"</form> ");
 		add(div);
-//		VaadinCKEditor editor1 = new VaadinCKEditorBuilder().with(builder->{
-//			builder.editorType=EditorType.BALLOON;
-//			builder.editorData="Balloon Editor test";
-//		}).createVaadinCKEditor();
-//		add(editor1);
-//
-//		add(new Label(""));
-//
-//		VaadinCKEditor editor2 = new VaadinCKEditorBuilder().with(builder->{
-//			builder.editorType=EditorType.INLINE;
-//			builder.editorData="Inline";
-//		}).createVaadinCKEditor();
-//		add(editor2);
-//
-//		add(new Label(""));
-//
-//		VaadinCKEditor editor3 = new VaadinCKEditorBuilder().with(builder->{
-//			builder.editorType=EditorType.DECOUPLED;
-//			builder.editorData="Dcoupled Editor";
-//		}).createVaadinCKEditor();
-//		add(editor3);
+		VaadinCKEditor editor1 = new VaadinCKEditorBuilder().with(builder->{
+			builder.editorType=EditorType.BALLOON;
+			builder.editorData="Balloon Editor test";
+		}).createVaadinCKEditor();
+		add(editor1);
+
+		add(new Label(""));
+
+		VaadinCKEditor editor2 = new VaadinCKEditorBuilder().with(builder->{
+			builder.editorType=EditorType.INLINE;
+			builder.editorData="Inline";
+		}).createVaadinCKEditor();
+		add(editor2);
+
+		add(new Label(""));
+
+		VaadinCKEditor editor3 = new VaadinCKEditorBuilder().with(builder->{
+			builder.editorType=EditorType.DECOUPLED;
+			builder.editorData="Dcoupled Editor";
+		}).createVaadinCKEditor();
+		add(editor3);
 
 
 		setAlignItems(Alignment.CENTER);
