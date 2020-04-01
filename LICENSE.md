@@ -18,4 +18,4 @@ BSD 3-Clause "New" or "Revised" License
 
 Vaadin LitElement CKEditor - https://github.com/eroself/vaadin-litelement-ckeditor
 
-MIT License
+Apache License 2.0 or CVAL 3.0 depending on the component
