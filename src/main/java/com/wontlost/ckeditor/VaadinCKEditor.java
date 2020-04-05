@@ -20,13 +20,13 @@ import java.util.List;
 public class VaadinCKEditor extends Component {
 
     private String editorData="";
-    private String width="auto";
-    private String height="auto";
 
-    private Toolbar[] toolbar = new Toolbar[]{Toolbar.heading, Toolbar.pipe, Toolbar.bold,
-            Toolbar.italic, Toolbar.link, Toolbar.bulletedList, Toolbar.numberedList, Toolbar.pipe, Toolbar.indent,
-            Toolbar.outdent, Toolbar.pipe, Toolbar.imageUpload, Toolbar.blockQuote, Toolbar.insertTable,
-            Toolbar.mediaEmbed, Toolbar.undo, Toolbar.redo};
+    public Toolbar[] toolbar = new Toolbar[]{Toolbar.heading, Toolbar.pipe, Toolbar.bold, Toolbar.italic,
+           Toolbar.underline, Toolbar.strikethrough, Toolbar.subscript, Toolbar.superscript, Toolbar.highlight,
+           Toolbar.removeFormat, Toolbar.pipe, Toolbar.horizontalLine, Toolbar.pageBreak, Toolbar.link,
+           Toolbar.bulletedList, Toolbar.numberedList, Toolbar.alignment, Toolbar.todoList, Toolbar.indent,
+           Toolbar.outdent, Toolbar.code, Toolbar.codeBlock, Toolbar.pipe, Toolbar.specialCharacters,
+           Toolbar.imageUpload, Toolbar.blockQuote, Toolbar.insertTable, Toolbar.mediaEmbed, Toolbar.undo, Toolbar.redo};
 
     /**
      * Constructor of VaadinCKEditor.
@@ -41,7 +41,7 @@ public class VaadinCKEditor extends Component {
         getElement().setPropertyJson("toolBar", toJson(toolbar));
         getElement().setProperty("editorData", editorData==null?"":editorData);
         getElement().setProperty("editorWidth", width==null?"auto":width);
-        getElement().setProperty("editorHeight", height);
+        getElement().setProperty("editorHeight", height==null?"auto":height);
         getElement().getStyle().set("width", "-webkit-fill-available");
         getElement().getStyle().set("margin", "20px");
     }

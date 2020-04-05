@@ -21,6 +21,20 @@ public enum Toolbar {
     mediaEmbed("mediaEmbed"),
     undo("undo"),
     redo("redo"),
+    underline("underline"),
+    strikethrough("strikethrough"),
+    code("code"),
+    subscript("subscript"),
+    superscript("superscript"),
+    removeFormat("removeFormat"),
+    horizontalLine("horizontalLine"),
+    pageBreak("pageBreak"),
+    specialCharacters("specialCharacters"),
+    alignment("alignment"),
+    codeBlock("codeBlock"),
+    highlight("highlight"),
+    restrictedEditingException("restrictedEditingException"),
+    todoList("todoList"),
     insertTable("insertTable");
 
     private final String value;
