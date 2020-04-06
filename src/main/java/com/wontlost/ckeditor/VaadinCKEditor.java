@@ -36,10 +36,14 @@ public class VaadinCKEditor extends Component {
      * @param width   Width of editor, default value is 'auto'.
      * @param height  Height of editor, default value is 'auto'.
      */
-    VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, String editorData, String width, String height) {
+    VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, Theme theme, String editorData, String width, String height) {
         getElement().setProperty("editorType", editorType.toString());
         getElement().setPropertyJson("toolBar", toJson(toolbar));
         getElement().setProperty("editorData", editorData==null?"":editorData);
+        getElement().setProperty("themeBackground", theme.getBackground());
+        getElement().setProperty("themeForeground", theme.getForeground());
+        getElement().setProperty("themeBorder", theme.getBorder());
+        getElement().setProperty("themeWhite", theme.getWhite());
         getElement().setProperty("editorWidth", width==null?"auto":width);
         getElement().setProperty("editorHeight", height==null?"auto":height);
         getElement().getStyle().set("width", "-webkit-fill-available");

@@ -11,6 +11,10 @@ class VaadinCKEditor extends LitElement {
             'document-editor__editable'  : true,
             'ck-editor__editable' : true
         };
+        this.themeBackground=css`hsl(270, 1%, 29%)`;
+        this.themeForeground=css`hsl(255, 3%, 18%)`;
+        this.themeBorder=css`hsl(300, 1%, 22%)`;
+        this.themeWhite=css`hsl(0, 0%, 100%)`;
     }
 
     static get styles() { return css`
@@ -25,10 +29,10 @@ class VaadinCKEditor extends LitElement {
             --ck-todo-list-checkmark-size: 16px;
             --ck-border-radius: 4px;
             --ck-font-size-base: 14px;
-            --ck-custom-background: hsl(270, 1%, 29%);
-            --ck-custom-foreground: hsl(255, 3%, 18%);
-            --ck-custom-border: hsl(300, 1%, 22%);
-            --ck-custom-white: hsl(0, 0%, 100%);
+            --ck-custom-background: ${this.themeBackground};
+            --ck-custom-foreground: ${this.themeForeground};
+            --ck-custom-border: ${this.themeBorder};
+            --ck-custom-white: ${this.themeWhite};
             --ck-color-base-foreground: var(--ck-custom-background);
             --ck-color-focus-border: hsl(208, 90%, 62%);
             --ck-color-text: hsl(0, 0%, 98%);
@@ -372,6 +376,10 @@ class VaadinCKEditor extends LitElement {
                  editorData: String,
                  editorWidth: String,
                  editorHeight: String,
+                 themeBackground: String,
+                 themeForeground: String,
+                 themeBorder: String,
+                 themeWhite: String,
                  toolBar: Array};
     }
 
