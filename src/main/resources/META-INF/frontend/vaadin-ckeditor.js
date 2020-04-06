@@ -1,4 +1,4 @@
-import { LitElement, html, css } from "lit-element";
+import { LitElement, html, css, unsafeCSS } from "lit-element";
 import { classMap } from 'lit-html/directives/class-map';
 import { ClassicEditor, InlineEditor, BalloonEditor, DcoupledEditor } from "./ckeditor";
 
@@ -29,10 +29,10 @@ class VaadinCKEditor extends LitElement {
             --ck-todo-list-checkmark-size: 16px;
             --ck-border-radius: 4px;
             --ck-font-size-base: 14px;
-            --ck-custom-background: ${this.themeBackground};
-            --ck-custom-foreground: ${this.themeForeground};
-            --ck-custom-border: ${this.themeBorder};
-            --ck-custom-white: ${this.themeWhite};
+            --ck-custom-background: ${unsafeCSS(this.themeBackground)};
+            --ck-custom-foreground: ${unsafeCSS(this.themeForeground)};
+            --ck-custom-border: ${unsafeCSS(this.themeBorder)};
+            --ck-custom-white: ${unsafeCSS(this.themeWhite)};
             --ck-color-base-foreground: var(--ck-custom-background);
             --ck-color-focus-border: hsl(208, 90%, 62%);
             --ck-color-text: hsl(0, 0%, 98%);
