@@ -40,10 +40,7 @@ public class VaadinCKEditor extends Component {
         getElement().setProperty("editorType", editorType.toString());
         getElement().setPropertyJson("toolBar", toJson(toolbar));
         getElement().setProperty("editorData", editorData==null?"":editorData);
-        getElement().setProperty("themeBackground", theme.getBackground());
-        getElement().setProperty("themeForeground", theme.getForeground());
-        getElement().setProperty("themeBorder", theme.getBorder());
-        getElement().setProperty("themeWhite", theme.getWhite());
+        getElement().setProperty("themeStyles", theme.getStyles());
         getElement().setProperty("editorWidth", width==null?"auto":width);
         getElement().setProperty("editorHeight", height==null?"auto":height);
         getElement().getStyle().set("width", "-webkit-fill-available");

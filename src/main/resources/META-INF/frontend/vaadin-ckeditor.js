@@ -1,5 +1,6 @@
-import { LitElement, html, css, unsafeCSS } from "lit-element";
+import { LitElement, html, css } from "lit-element";
 import { classMap } from 'lit-html/directives/class-map';
+import { styleMap } from 'lit-html/directives/style-map';
 import { ClassicEditor, InlineEditor, BalloonEditor, DcoupledEditor } from "./ckeditor";
 
 class VaadinCKEditor extends LitElement {
@@ -11,10 +12,12 @@ class VaadinCKEditor extends LitElement {
             'document-editor__editable'  : true,
             'ck-editor__editable' : true
         };
-        this.themeBackground=css`hsl(270, 1%, 29%)`;
-        this.themeForeground=css`hsl(255, 3%, 18%)`;
-        this.themeBorder=css`hsl(300, 1%, 22%)`;
-        this.themeWhite=css`hsl(0, 0%, 100%)`;
+        this.themeStyles = {
+            '--ck-custom-background' : 'hsl(270, 1%, 29%)',
+            '--ck-custom-foreground' : 'hsl(255, 3%, 18%)',
+            '--ck-custom-border' : 'hsl(300, 1%, 22%)',
+            '--ck-custom-white' : 'hsl(0, 0%, 100%)'
+        };
     }
 
     static get styles() { return css`
@@ -29,10 +32,10 @@ class VaadinCKEditor extends LitElement {
             --ck-todo-list-checkmark-size: 16px;
             --ck-border-radius: 4px;
             --ck-font-size-base: 14px;
-            --ck-custom-background: ${unsafeCSS(this.themeBackground)};
-            --ck-custom-foreground: ${unsafeCSS(this.themeForeground)};
-            --ck-custom-border: ${unsafeCSS(this.themeBorder)};
-            --ck-custom-white: ${unsafeCSS(this.themeWhite)};
+            --ck-custom-background: hsl(270, 1%, 29%);
+            --ck-custom-foreground: hsl(255, 3%, 18%);
+            --ck-custom-border: hsl(300, 1%, 22%);
+            --ck-custom-white: hsl(0, 0%, 100%);
             --ck-color-base-foreground: var(--ck-custom-background);
             --ck-color-focus-border: hsl(208, 90%, 62%);
             --ck-color-text: hsl(0, 0%, 98%);
@@ -376,10 +379,7 @@ class VaadinCKEditor extends LitElement {
                  editorData: String,
                  editorWidth: String,
                  editorHeight: String,
-                 themeBackground: String,
-                 themeForeground: String,
-                 themeBorder: String,
-                 themeWhite: String,
+                 themeStyles: String,
                  toolBar: Array};
     }
 
@@ -509,11 +509,11 @@ class VaadinCKEditor extends LitElement {
                         box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
                     }
                 </style>
-                <div id="${this.editorType}-editor" class=${classMap(this.classes)}/>
+                <div id="${this.editorType}-editor" class=${classMap(this.classes)} style=${styleMap(this.themeStyles)}/>
             `;
         } else {
             return html`
-                <div id="${this.editorType}-editor"/>
+                <div id="${this.editorType}-editor" style=${styleMap(this.themeStyles)}/>
             `;
         }
 

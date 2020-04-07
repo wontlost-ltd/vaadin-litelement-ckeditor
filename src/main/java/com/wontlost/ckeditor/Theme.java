@@ -22,26 +22,14 @@ public class Theme {
     }
 
     public Theme(String background, String foreground, String border, String white) {
-        this.background = "css`" + background + "`";
-        this.foreground = "css`" + foreground + "`";
-        this.border = "css`" + border + "`";
-        this.white = "css`" + white + "`";
+        this.background = "'--ck-custom-background' : '"+background+"',";
+        this.foreground = "'--ck-custom-foreground' : '"+foreground+"',";
+        this.border = "'--ck-custom-border' : '"+border+"',";
+        this.white = "'--ck-custom-white' : '"+white+"'";
     }
 
-    public String getBackground() {
-        return background;
-    }
-
-    public String getForeground() {
-        return foreground;
-    }
-
-    public String getBorder() {
-        return border;
-    }
-
-    public String getWhite() {
-        return white;
+    public String getStyles() {
+        return background+foreground+border+white;
     }
 
 }
