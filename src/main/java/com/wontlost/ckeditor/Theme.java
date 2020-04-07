@@ -29,7 +29,7 @@ public class Theme {
     }
 
     public String getStyles() {
-        return background+foreground+border+white;
+        return "{"+background+foreground+border+white+"}";
     }
 
 }
