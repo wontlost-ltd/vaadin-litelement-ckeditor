@@ -509,11 +509,36 @@ class VaadinCKEditor extends LitElement {
                         box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
                     }
                 </style>
-                <div id="${this.editorType}-editor" class=${classMap(this.classes)} style=${styleMap(this.themeStyles)}/>
+                <div id="${this.editorType}-editor" class=${classMap(this.classes)}/>
             `;
         } else {
             return html`
-                <div id="${this.editorType}-editor" style=${styleMap(this.themeStyles)}/>
+                <style>
+                    .ckeditor {
+                        --ck-color-base-foreground: var(--ck-custom-background);
+                        --ck-color-button-default-background: var(--ck-custom-background);
+                        --ck-color-button-default-disabled-background: var(--ck-custom-background);
+                        --ck-color-button-on-background: var(--ck-custom-foreground);
+                        --ck-color-button-on-disabled-background: var(--ck-custom-foreground);
+                        --ck-color-button-action-text: var(--ck-custom-white);
+                        --ck-color-dropdown-panel-background: var(--ck-custom-background);
+                        --ck-color-dropdown-panel-border: var(--ck-custom-foreground);
+                        --ck-color-split-button-hover-background: var(--ck-color-button-default-hover-background);
+                        --ck-color-split-button-hover-border: var(--ck-custom-foreground);
+                        --ck-color-input-background: var(--ck-custom-foreground);
+                        --ck-color-list-background: var(--ck-custom-background);
+                        --ck-color-list-button-hover-background: var(--ck-color-base-foreground);
+                        --ck-color-list-button-on-background: var(--ck-color-base-active);
+                        --ck-color-list-button-on-background-focus: var(--ck-color-base-active-focus);
+                        --ck-color-list-button-on-text: var(--ck-color-base-background);
+                        --ck-color-panel-b  ckground: var(--ck-custom-background);
+                        --ck-color-panel-border: var(--ck-custom-border);
+                        --ck-color-toolbar-background: var(--ck-custom-background);
+                        --ck-color-toolbar-border: var(--ck-custom-border);
+                        --ck-color-widget-editable-focus-background: var(--ck-custom-white);
+                    }
+                </style>
+                <div id="${this.editorType}-editor" class="ckeditor"/>
             `;
         }
 
