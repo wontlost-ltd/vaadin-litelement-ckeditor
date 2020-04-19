@@ -36,14 +36,14 @@ public class VaadinCKEditor extends CustomField<String> {
      * @param width   Width of editor, default value is 'auto'.
      * @param height  Height of editor, default value is 'auto'.
      */
-    VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, Theme theme, String editorData, String width, String height) {
+    VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, Theme theme, String editorData, String width, String height, Boolean isReadOnly) {
         getElement().setProperty("editorType", editorType.toString());
         getElement().setPropertyJson("toolBar", toJson(toolbar));
         getElement().setProperty("editorData", editorData==null?"":editorData);
         getElement().setProperty("themeStyles", theme.getStyles());
         getElement().setProperty("editorWidth", width==null?"auto":width);
         getElement().setProperty("editorHeight", height==null?"auto":height);
-        getElement().setProperty("isReadOnly", isReadOnly());
+        getElement().setProperty("isReadOnly", isReadOnly==null?false:isReadOnly);
         getElement().getStyle().set("width", "-webkit-fill-available");
         getElement().getStyle().set("margin", "20px");
     }
@@ -82,9 +82,16 @@ public class VaadinCKEditor extends CustomField<String> {
      * Set content of editor.
      * @param value  Data in editor text area.
      */
-    @ClientCallable
+
     public void setValue(String value) {
         this.editorData = value;
+        setEditorData(value);
+    }
+
+    @ClientCallable
+    private void setEditorData(String editorData) {
+        this.editorData = editorData;
+        setValue(editorData);
     }
 
 }

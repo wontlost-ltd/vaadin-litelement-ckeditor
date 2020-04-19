@@ -395,7 +395,7 @@ class VaadinCKEditor extends LitElement {
                 }).then( editor => {
                     editor.isReadOnly = this.isReadOnly;
                     editor.setData(this.editorData);
-                    this.$server.setValue(this.editorData);
+                    this.$server.setEditorData(this.editorData);
                     editor.editing.view.change( writer => {
                         if(this.editorHeight) {
                             writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
@@ -405,7 +405,7 @@ class VaadinCKEditor extends LitElement {
                         }
                     } );
                     editor.model.document.on( 'change:data', () => {
-                        this.$server.setValue(editor.getData());
+                        this.$server.setEditorData(editor.getData());
                     } );
                     window.editor = editor;
                 } ).catch( err => {
@@ -417,7 +417,7 @@ class VaadinCKEditor extends LitElement {
                 }).then( editor => {
                     editor.isReadOnly = this.isReadOnly;
                     editor.setData(this.editorData);
-                    this.$server.setValue(this.editorData);
+                    this.$server.setEditorData(this.editorData);
                     editor.editing.view.change( writer => {
                         if(this.editorHeight) {
                             writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
@@ -427,7 +427,7 @@ class VaadinCKEditor extends LitElement {
                         }
                     } );
                     editor.model.document.on( 'change:data', () => {
-                        this.$server.setValue(editor.getData());
+                        this.$server.setEditorData(editor.getData());
                     } );
                     window.editor = editor;
                 } ).catch( err => {
@@ -439,7 +439,7 @@ class VaadinCKEditor extends LitElement {
                 }).then( editor => {
                     editor.isReadOnly = this.isReadOnly;
                     editor.setData(this.editorData);
-                    this.$server.setValue(this.editorData);
+                    this.$server.setEditorData(this.editorData);
                     editor.editing.view.change( writer => {
                         if(this.editorHeight) {
                             writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
@@ -449,7 +449,7 @@ class VaadinCKEditor extends LitElement {
                         }
                     } );
                     editor.model.document.on( 'change:data', () => {
-                        this.$server.setValue(editor.getData());
+                        this.$server.setEditorData(editor.getData());
                     } );
                     window.editor = editor;
                 } ).catch( err => {
@@ -461,7 +461,7 @@ class VaadinCKEditor extends LitElement {
                 }).then( editor => {
                     editor.isReadOnly = this.isReadOnly;
                     editor.setData(this.editorData);
-                    this.$server.setValue(this.editorData);
+                    this.$server.setEditorData(this.editorData);
                     editor.editing.view.change( writer => {
                         if(this.editorHeight) {
                             writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
@@ -471,7 +471,7 @@ class VaadinCKEditor extends LitElement {
                         }
                     } );
                     editor.model.document.on( 'change:data', () => {
-                        this.$server.setValue(editor.getData());
+                        this.$server.setEditorData(editor.getData());
                     } );
                     window.editor = editor;
                     document.querySelector( '.toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
