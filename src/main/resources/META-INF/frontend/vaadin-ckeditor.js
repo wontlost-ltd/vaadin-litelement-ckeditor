@@ -376,7 +376,7 @@ class VaadinCKEditor extends LitElement {
 
     static get properties() {
         return { editorType: String,
-                 value: String,
+                 editorData: String,
                  editorWidth: String,
                  editorHeight: String,
                  themeStyles: String,
@@ -394,8 +394,8 @@ class VaadinCKEditor extends LitElement {
                     toolbar:this.toolBar
                 }).then( editor => {
                     editor.isReadOnly = this.isReadOnly;
-                    editor.setData(this.value);
-                    this.$server.setValue(this.value);
+                    editor.setData(this.editorData);
+                    this.$server.setValue(this.editorData);
                     editor.editing.view.change( writer => {
                         if(this.editorHeight) {
                             writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
@@ -416,8 +416,8 @@ class VaadinCKEditor extends LitElement {
                     toolbar:this.toolBar
                 }).then( editor => {
                     editor.isReadOnly = this.isReadOnly;
-                    editor.setData(this.value);
-                    this.$server.setValue(this.value);
+                    editor.setData(this.editorData);
+                    this.$server.setValue(this.editorData);
                     editor.editing.view.change( writer => {
                         if(this.editorHeight) {
                             writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
@@ -438,8 +438,8 @@ class VaadinCKEditor extends LitElement {
                     toolbar:this.toolBar
                 }).then( editor => {
                     editor.isReadOnly = this.isReadOnly;
-                    editor.setData(this.value);
-                    this.$server.setValue(this.value);
+                    editor.setData(this.editorData);
+                    this.$server.setValue(this.editorData);
                     editor.editing.view.change( writer => {
                         if(this.editorHeight) {
                             writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
@@ -460,8 +460,8 @@ class VaadinCKEditor extends LitElement {
                     toolbar:this.toolBar
                 }).then( editor => {
                     editor.isReadOnly = this.isReadOnly;
-                    editor.setData(this.value);
-                    this.$server.setValue(this.value);
+                    editor.setData(this.editorData);
+                    this.$server.setValue(this.editorData);
                     editor.editing.view.change( writer => {
                         if(this.editorHeight) {
                             writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());

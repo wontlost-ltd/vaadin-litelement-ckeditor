@@ -19,7 +19,7 @@ import java.util.List;
 @JsModule("./vaadin-ckeditor.js")
 public class VaadinCKEditor extends CustomField<String> {
 
-    private String value="";
+    private String editorData="";
 
     public Toolbar[] toolbar = new Toolbar[]{Toolbar.heading, Toolbar.pipe, Toolbar.bold, Toolbar.italic,
            Toolbar.underline, Toolbar.strikethrough, Toolbar.subscript, Toolbar.superscript, Toolbar.highlight,
@@ -32,14 +32,14 @@ public class VaadinCKEditor extends CustomField<String> {
      * Constructor of VaadinCKEditor.
      * @param editorType  Type of Editor, refer to enum @EditorType.
      * @param toolbar   Toolbar of Editor, refer to enum @Toolbar.
-     * @param value Content of editor.
+     * @param editorData Content of editor.
      * @param width   Width of editor, default value is 'auto'.
      * @param height  Height of editor, default value is 'auto'.
      */
-    VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, Theme theme, String value, String width, String height) {
+    VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, Theme theme, String editorData, String width, String height) {
         getElement().setProperty("editorType", editorType.toString());
         getElement().setPropertyJson("toolBar", toJson(toolbar));
-        getElement().setProperty("editorData", value==null?"":value);
+        getElement().setProperty("editorData", editorData==null?"":editorData);
         getElement().setProperty("themeStyles", theme.getStyles());
         getElement().setProperty("editorWidth", width==null?"auto":width);
         getElement().setProperty("editorHeight", height==null?"auto":height);
@@ -63,11 +63,11 @@ public class VaadinCKEditor extends CustomField<String> {
     }
 
     protected String generateModelValue() {
-        return value;
+        return editorData;
     }
 
     protected void setPresentationValue(String newPresentationValue) {
-        this.value = newPresentationValue;
+        this.editorData = newPresentationValue;
     }
 
     /**
@@ -75,7 +75,7 @@ public class VaadinCKEditor extends CustomField<String> {
      * @return Data in editor text area.
      */
     public String getValue() {
-        return value;
+        return editorData;
     }
 
     /**
@@ -84,7 +84,7 @@ public class VaadinCKEditor extends CustomField<String> {
      */
     @ClientCallable
     public void setValue(String value) {
-        this.value = value;
+        this.editorData = value;
     }
 
 }
