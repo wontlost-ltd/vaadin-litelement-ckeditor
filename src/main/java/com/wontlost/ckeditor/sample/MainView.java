@@ -41,8 +41,8 @@ public class MainView extends VerticalLayout {
 		add(new Label(""));
 		add(saveButton);
 		Button button = new Button("Print");
-		Label label = new Label(editor.getEditorData());
-		button.addClickListener(e->label.setText(editor.getEditorData()));
+		Label label = new Label(editor.getValue());
+		button.addClickListener(e->label.setText(editor.getValue()));
 		add(button);
 		add(new Label(""));
 		add(label);
