@@ -85,7 +85,6 @@ public class VaadinCKEditor extends CustomField<String> {
 
     public void setValue(String value) {
         this.editorData = value;
-        setEditorData(value);
     }
 
     @ClientCallable
