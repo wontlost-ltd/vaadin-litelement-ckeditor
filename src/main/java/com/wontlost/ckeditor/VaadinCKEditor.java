@@ -2,8 +2,8 @@ package com.wontlost.ckeditor;
 
 import com.google.gson.Gson;
 import com.vaadin.flow.component.ClientCallable;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
+import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.dependency.JsModule;
 import elemental.json.JsonArray;
 import elemental.json.impl.JreJsonFactory;
@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Tag("vaadin-ckeditor")
 @JsModule("./vaadin-ckeditor.js")
-public class VaadinCKEditor extends Component {
+public class VaadinCKEditor extends CustomField<String> {
 
     private String editorData="";
 
@@ -43,6 +43,7 @@ public class VaadinCKEditor extends Component {
         getElement().setProperty("themeStyles", theme.getStyles());
         getElement().setProperty("editorWidth", width==null?"auto":width);
         getElement().setProperty("editorHeight", height==null?"auto":height);
+        getElement().setProperty("isReadOnly", isReadOnly());
         getElement().getStyle().set("width", "-webkit-fill-available");
         getElement().getStyle().set("margin", "20px");
     }
@@ -68,6 +69,7 @@ public class VaadinCKEditor extends Component {
     @ClientCallable
     public void setEditorData(String editorData) {
         this.editorData = editorData;
+        setValue(editorData);
     }
 
     /**
@@ -76,6 +78,26 @@ public class VaadinCKEditor extends Component {
      */
     public String getEditorData() {
         return this.editorData;
+    }
+
+    @Override
+    protected String generateModelValue() {
+        return editorData;
+    }
+
+    @Override
+    protected void setPresentationValue(String newPresentationValue) {
+        this.editorData = newPresentationValue;
+    }
+
+    @Override
+    public String getValue() {
+        return editorData;
+    }
+
+    @Override
+    public void setValue(String value) {
+        this.editorData = value;
     }
 
 }
