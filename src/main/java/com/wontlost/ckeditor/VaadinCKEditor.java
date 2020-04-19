@@ -46,6 +46,8 @@ public class VaadinCKEditor extends CustomField<String> {
         getElement().setProperty("isReadOnly", isReadOnly==null?false:isReadOnly);
         getElement().getStyle().set("width", "-webkit-fill-available");
         getElement().getStyle().set("margin", "20px");
+        getElement().addPropertyChangeListener("change:data",
+                event -> System.out.println("change:data: " + getValue()));
     }
 
     /**
