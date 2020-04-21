@@ -5,8 +5,6 @@ import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.dependency.JsModule;
-import com.vaadin.flow.server.VaadinSession;
-import com.vaadin.flow.server.WebBrowser;
 import elemental.json.JsonArray;
 import elemental.json.impl.JreJsonFactory;
 
@@ -47,15 +45,9 @@ public class VaadinCKEditor extends CustomField<String> {
         getElement().setProperty("editorWidth", width==null?"auto":width);
         getElement().setProperty("editorHeight", height==null?"auto":height);
         getElement().setProperty("isReadOnly", isReadOnly==null?false:isReadOnly);
-
-        WebBrowser browser = VaadinSession.getCurrent().getBrowser();
-        if(browser.isChrome())
-            getElement().getStyle().set("width", "-webkit-fill-available");//Chrome
-        else if(browser.isFirefox())
-            getElement().getStyle().set("width", "-moz-available");//Firefox
-        else
-            getElement().getStyle().set("width", "100%");
-
+//        getElement().getStyle().set("width", "100%");
+//        getElement().getStyle().set("width", "-webkit-fill-available");//Chrome
+//        getElement().getStyle().set("width", "-moz-available");//Firefox
         getElement().getStyle().set("margin", "20px");
         getElement().addPropertyChangeListener("change:data",
                 event -> System.out.println("change:data: " + getValue()));

@@ -396,6 +396,7 @@ class VaadinCKEditor extends LitElement {
                     editor.isReadOnly = this.isReadOnly;
                     editor.setData(this.editorData);
                     this.$server.setEditorData(this.editorData);
+                    editor.style="width: -webkit-fill-available";
                     editor.editing.view.change( writer => {
                         if(this.editorHeight) {
                             writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
