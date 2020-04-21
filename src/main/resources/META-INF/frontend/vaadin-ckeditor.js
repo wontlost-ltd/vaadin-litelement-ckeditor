@@ -400,11 +400,11 @@ class VaadinCKEditor extends LitElement {
                     editor.setData(this.editorData);
                     this.$server.setEditorData(this.editorData);
                     if(this.isChrome)
-                        editor.sourceElement.style.width='-webkit-fill-available';
+                        this.style.width='-webkit-fill-available';
                     else if(this.isFirefox)
-                        editor.sourceElement.style.width='-moz-available';
+                        this.style.width='-moz-available';
                     else
-                        editor.sourceElement.style.width='100%';
+                        this.style.width='100%';
                     editor.editing.view.change( writer => {
                         if(this.editorHeight) {
                             writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
