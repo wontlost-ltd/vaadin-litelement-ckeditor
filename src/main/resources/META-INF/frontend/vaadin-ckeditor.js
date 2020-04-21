@@ -5,6 +5,9 @@ import { ClassicEditor, InlineEditor, BalloonEditor, DcoupledEditor } from "./ck
 
 class VaadinCKEditor extends LitElement {
 
+    isFirefox = typeof InstallTrigger !== 'undefined';
+    isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+
     constructor() {
         super();
         this.classes = {
@@ -396,7 +399,12 @@ class VaadinCKEditor extends LitElement {
                     editor.isReadOnly = this.isReadOnly;
                     editor.setData(this.editorData);
                     this.$server.setEditorData(this.editorData);
-                    editor.style="width: -webkit-fill-available";
+                    if(this.isChrome)
+                        editor.sourceElement.style.width='-webkit-fill-available';
+                    else if(this.isFirefox)
+                        editor.sourceElement.style.width='-moz-available';
+                    else
+                        editor.sourceElement.style.width='100%';
                     editor.editing.view.change( writer => {
                         if(this.editorHeight) {
                             writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
