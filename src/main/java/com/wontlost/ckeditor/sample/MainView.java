@@ -32,8 +32,8 @@ public class MainView extends VerticalLayout {
 		Button saveButton = new Button("Save",
 				event -> {
 					try {
-						System.out.println(comment.getMessage());
 						binder.writeBean(comment);
+						System.out.println("--------->"+comment.getMessage());
 					} catch (ValidationException e) {
 						System.out.println(e.getMessage());
 					}
