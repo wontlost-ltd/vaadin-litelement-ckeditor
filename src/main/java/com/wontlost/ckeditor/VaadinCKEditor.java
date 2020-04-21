@@ -45,10 +45,10 @@ public class VaadinCKEditor extends CustomField<String> {
         getElement().setProperty("editorWidth", width==null?"auto":width);
         getElement().setProperty("editorHeight", height==null?"auto":height);
         getElement().setProperty("isReadOnly", isReadOnly==null?false:isReadOnly);
-//        getElement().getStyle().set("width", "100%");//Chrome
-//        getElement().getStyle().set("width", "-webkit-fill-available");//Chrome
-//        getElement().getStyle().set("width", "-moz-available");//Firefox
-//        getElement().getStyle().set("margin", "20px");
+        getElement().getStyle().set("width", "100%");
+        getElement().getStyle().set("width", "-webkit-fill-available");//Chrome
+        getElement().getStyle().set("width", "-moz-available");//Firefox
+        getElement().getStyle().set("margin", "20px");
         getElement().addPropertyChangeListener("change:data",
                 event -> System.out.println("change:data: " + getValue()));
     }
