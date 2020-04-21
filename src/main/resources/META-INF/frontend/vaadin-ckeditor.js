@@ -1,11 +1,8 @@
-import {LitElement, html, css, property} from "lit-element";
+import {LitElement, html, css} from "lit-element";
 import { classMap } from 'lit-html/directives/class-map';
 import { ClassicEditor, InlineEditor, BalloonEditor, DcoupledEditor } from "./ckeditor";
 
 class VaadinCKEditor extends LitElement {
-
-    @property({type : Boolean}) isFirefox = typeof InstallTrigger !== 'undefined';
-    @property({type : Boolean}) isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
 
     constructor() {
         super();
@@ -20,6 +17,8 @@ class VaadinCKEditor extends LitElement {
             '--ck-custom-border' : 'hsl(300, 1%, 22%)',
             '--ck-custom-white' : 'hsl(0, 0%, 100%)'
         };
+        this.isFirefox = typeof InstallTrigger !== 'undefined';
+        this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
     }
 
     static get styles() { return css`
@@ -383,6 +382,8 @@ class VaadinCKEditor extends LitElement {
                  editorHeight: String,
                  themeStyles: String,
                  isReadOnly: Boolean,
+                 isFirefox:Boolean,
+                 isChrome:Boolean,
                  toolBar: Array};
     }
 
