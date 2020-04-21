@@ -1,12 +1,11 @@
-import { LitElement, html, css } from "lit-element";
+import {LitElement, html, css, property} from "lit-element";
 import { classMap } from 'lit-html/directives/class-map';
-import { styleMap } from 'lit-html/directives/style-map';
 import { ClassicEditor, InlineEditor, BalloonEditor, DcoupledEditor } from "./ckeditor";
 
 class VaadinCKEditor extends LitElement {
 
-    isFirefox = typeof InstallTrigger !== 'undefined';
-    isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+    @property({type : Boolean}) isFirefox = typeof InstallTrigger !== 'undefined';
+    @property({type : Boolean}) isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
 
     constructor() {
         super();
