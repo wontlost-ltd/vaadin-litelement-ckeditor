@@ -514,11 +514,11 @@ class VaadinCKEditor extends LitElement {
                         box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
                     }
                 </style>
-                <div id="${this.editorType}-editor" class=${classMap(this.classes)}/>
+                <div id="${this.editorType}-editor" class=${classMap(this.classes)} style="width:100%; width: -webkit-fill-available; width: -moz-available;"/>
             `;
         } else {
             return html`
-                <div id="${this.editorType}-editor" class="ckeditor"/>
+                <div id="${this.editorType}-editor" style="width:100%; width: -webkit-fill-available; width: -moz-available;"/>
             `;
         }
 
