@@ -37,7 +37,7 @@ public class VaadinCKEditor extends CustomField<String> {
      * @param height  Height of editor, default value is 'auto'.
      * @param isReadOnly Make editor readonly
      */
-    VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, Theme theme, String editorData, String width, String height, Boolean isReadOnly) {
+    VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, Theme theme, String editorData, String width, String height, String margin, Boolean isReadOnly) {
         getElement().setProperty("editorType", editorType.toString());
         getElement().setPropertyJson("toolBar", toJson(toolbar));
         getElement().setProperty("editorData", editorData==null?"":editorData);
@@ -45,11 +45,8 @@ public class VaadinCKEditor extends CustomField<String> {
         getElement().setProperty("editorWidth", width==null?"auto":width);
         getElement().setProperty("editorHeight", height==null?"auto":height);
         getElement().setProperty("isReadOnly", isReadOnly==null?false:isReadOnly);
-//        getElement().getStyle().set("width", "100%");
-//        getElement().getStyle().set("width", "-webkit-fill-available");//Chrome
-//        getElement().getStyle().set("width", "-moz-available");//Firefox
-        getElement().getStyle().set("margin", "20px");
-        getElement().addPropertyChangeListener("change:data",
+        getElement().getStyle().set("margin", margin==null?"20px":margin);
+        getElement().addEventListener("change:data",
                 event -> System.out.println("change:data: " + getValue()));
     }
 

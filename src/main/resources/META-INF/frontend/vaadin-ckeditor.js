@@ -427,6 +427,12 @@ class VaadinCKEditor extends LitElement {
                     editor.isReadOnly = this.isReadOnly;
                     editor.setData(this.editorData);
                     this.$server.setEditorData(this.editorData);
+                    if(this.isChrome)
+                        this.style.width='-webkit-fill-available';
+                    else if(this.isFirefox)
+                        this.style.width='-moz-available';
+                    else
+                        this.style.width='100%';
                     editor.editing.view.change( writer => {
                         if(this.editorHeight) {
                             writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
@@ -449,6 +455,12 @@ class VaadinCKEditor extends LitElement {
                     editor.isReadOnly = this.isReadOnly;
                     editor.setData(this.editorData);
                     this.$server.setEditorData(this.editorData);
+                    if(this.isChrome)
+                        this.style.width='-webkit-fill-available';
+                    else if(this.isFirefox)
+                        this.style.width='-moz-available';
+                    else
+                        this.style.width='100%';
                     editor.editing.view.change( writer => {
                         if(this.editorHeight) {
                             writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
@@ -471,6 +483,12 @@ class VaadinCKEditor extends LitElement {
                     editor.isReadOnly = this.isReadOnly;
                     editor.setData(this.editorData);
                     this.$server.setEditorData(this.editorData);
+                    if(this.isChrome)
+                        this.style.width='-webkit-fill-available';
+                    else if(this.isFirefox)
+                        this.style.width='-moz-available';
+                    else
+                        this.style.width='100%';
                     editor.editing.view.change( writer => {
                         if(this.editorHeight) {
                             writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
