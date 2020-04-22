@@ -18,12 +18,15 @@ public class MainView extends VerticalLayout {
 
 	public MainView() {
 		super();
-		VaadinCKEditor editor = new VaadinCKEditorBuilder().with(builder -> builder.editorType = EditorType.CLASSIC).createVaadinCKEditor();
-		add(new Label(""));
 		Comment comment = new Comment();
 		comment.setMessage("Message");
+		VaadinCKEditor editor = new VaadinCKEditorBuilder().with(builder -> {
+			builder.editorType = EditorType.CLASSIC;
+			builder.editorData = comment.getMessage();
+		}).createVaadinCKEditor();
+		add(new Label(""));
+
 		Binder<Comment> binder = new Binder<>(Comment.class);
-		editor.setReadOnly(true);
 		binder.forField(editor).bind(Comment::getMessage, Comment::setMessage);
 		binder.readBean(comment);
 		editor.addValueChangeListener(event -> System.out.println(editor.getValue()));
