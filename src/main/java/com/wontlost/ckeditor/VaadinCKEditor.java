@@ -48,11 +48,6 @@ public class VaadinCKEditor extends CustomField<String> {
         getElement().setProperty("editorHeight", height==null?"auto":height);
         getElement().setProperty("isReadOnly", isReadOnly==null?false:isReadOnly);
         getElement().getStyle().set("margin", margin==null?"20px":margin);
-
-        getElement().addPropertyChangeListener("checked",
-                event -> System.out.println("change:data: " + getValue()));
-        getElement().addEventListener("change:data",
-                event -> System.out.println("change:data: " + getValue()));
     }
 
     /**
@@ -92,18 +87,13 @@ public class VaadinCKEditor extends CustomField<String> {
 
     public void setValue(String value) {
         this.editorData = value;
-        fireEvent(new ChangeEvent(this, false));
+        fireEvent(new ComponentValueChangeEvent<>(this, this, getValue(),false));
     }
 
     @ClientCallable
     private void setEditorData(String editorData) {
         this.editorData = editorData;
         setValue(editorData);
-    }
-
-    public Registration addDataChangeListener(
-            ComponentEventListener<ChangeEvent> listener) {
-        return addListener(ChangeEvent.class, listener);
     }
 
 }
