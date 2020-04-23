@@ -2,9 +2,12 @@ package com.wontlost.ckeditor;
 
 import com.google.gson.Gson;
 import com.vaadin.flow.component.ClientCallable;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.dom.DisabledUpdateMode;
+import com.vaadin.flow.shared.Registration;
 import elemental.json.JsonArray;
 import elemental.json.impl.JreJsonFactory;
 
@@ -46,6 +49,9 @@ public class VaadinCKEditor extends CustomField<String> {
         getElement().setProperty("editorHeight", height==null?"auto":height);
         getElement().setProperty("isReadOnly", isReadOnly==null?false:isReadOnly);
         getElement().getStyle().set("margin", margin==null?"20px":margin);
+
+        getElement().addPropertyChangeListener("checked",
+                event -> System.out.println("change:data: " + getValue()));
         getElement().addEventListener("change:data",
                 event -> System.out.println("change:data: " + getValue()));
     }
@@ -87,12 +93,18 @@ public class VaadinCKEditor extends CustomField<String> {
 
     public void setValue(String value) {
         this.editorData = value;
+        fireEvent(new ChangeEvent(this, false));
     }
 
     @ClientCallable
     private void setEditorData(String editorData) {
         this.editorData = editorData;
         setValue(editorData);
+    }
+
+    public Registration addValueChangeListener(
+            ComponentEventListener<ChangeEvent> listener) {
+        return addListener(ChangeEvent.class, listener);
     }
 
 }

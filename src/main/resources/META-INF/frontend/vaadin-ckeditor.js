@@ -392,6 +392,7 @@ class VaadinCKEditor extends LitElement {
     }
 
     firstUpdated(changedProperties) {
+        super.firstUpdated(changedProperties);
         if(this.editorType==='classic') {
             ClassicEditor.create( document.querySelector( '#classic-editor' ) , {
                     toolbar:this.toolBar
@@ -416,6 +417,7 @@ class VaadinCKEditor extends LitElement {
                     editor.model.document.on( 'change:data', () => {
                         this.$server.setEditorData(editor.getData());
                     } );
+                    this.addEventListener("dirty", e => {console.log("editor is dirty...")})
                     window.editor = editor;
                 } ).catch( err => {
                     console.error( err.stack );
