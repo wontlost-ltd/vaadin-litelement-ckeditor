@@ -6,7 +6,6 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.dependency.JsModule;
-import com.vaadin.flow.dom.DisabledUpdateMode;
 import com.vaadin.flow.shared.Registration;
 import elemental.json.JsonArray;
 import elemental.json.impl.JreJsonFactory;
@@ -102,7 +101,7 @@ public class VaadinCKEditor extends CustomField<String> {
         setValue(editorData);
     }
 
-    public Registration addValueChangeListener(
+    public Registration addDataChangeListener(
             ComponentEventListener<ChangeEvent> listener) {
         return addListener(ChangeEvent.class, listener);
     }
