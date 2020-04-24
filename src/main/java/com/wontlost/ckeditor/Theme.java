@@ -7,10 +7,10 @@ import com.vaadin.flow.component.charts.model.style.Color;
  */
 public class Theme {
 
-    private String background;
-    private String foreground;
-    private String border;
-    private String white;
+    private final String background;
+    private final String foreground;
+    private final String border;
+    private final String white;
 
     public Theme(){
         this("hsl(270, 1%, 29%)", "hsl(255, 3%, 18%)",
