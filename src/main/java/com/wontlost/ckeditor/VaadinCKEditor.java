@@ -2,11 +2,9 @@ package com.wontlost.ckeditor;
 
 import com.google.gson.Gson;
 import com.vaadin.flow.component.ClientCallable;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.dependency.JsModule;
-import com.vaadin.flow.shared.Registration;
 import elemental.json.JsonArray;
 import elemental.json.impl.JreJsonFactory;
 
@@ -86,13 +84,13 @@ public class VaadinCKEditor extends CustomField<String> {
      */
 
     public void setValue(String value) {
-        fireEvent(new ComponentValueChangeEvent<>(this, this, getValue(),false));
+        String oldEditorData = this.editorData;
+        fireEvent(new ComponentValueChangeEvent<>(this, this, oldEditorData,false));
         this.editorData = value;
     }
 
     @ClientCallable
     private void setEditorData(String editorData) {
-        this.editorData = editorData;
         setValue(editorData);
     }
 
