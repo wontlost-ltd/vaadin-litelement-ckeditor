@@ -417,7 +417,6 @@ class VaadinCKEditor extends LitElement {
                     editor.model.document.on( 'change:data', () => {
                         this.$server.setEditorData(editor.getData());
                     } );
-                    this.addEventListener("dirty", e => {console.log("editor is dirty...")})
                     window.editor = editor;
                 } ).catch( err => {
                     console.error( err.stack );

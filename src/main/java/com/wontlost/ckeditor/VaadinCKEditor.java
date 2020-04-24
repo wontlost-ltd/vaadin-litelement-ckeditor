@@ -86,8 +86,8 @@ public class VaadinCKEditor extends CustomField<String> {
      */
 
     public void setValue(String value) {
-        this.editorData = value;
         fireEvent(new ComponentValueChangeEvent<>(this, this, getValue(),false));
+        this.editorData = value;
     }
 
     @ClientCallable
