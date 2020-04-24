@@ -30,10 +30,8 @@ public class MainView extends VerticalLayout {
 		binder.forField(editor).bind(Comment::getMessage, Comment::setMessage);
 		binder.readBean(comment);
 		editor.addValueChangeListener(event -> {
-			System.out.println("editor value -> "+editor.getValue());
-			System.out.println("event value -> "+event.getValue());
+			System.out.println("new value -> "+event.getValue());
 			System.out.println("old value -> "+event.getOldValue());
-			System.out.println("event source -> "+event.getSource());
 		});
 		add(editor);
 
