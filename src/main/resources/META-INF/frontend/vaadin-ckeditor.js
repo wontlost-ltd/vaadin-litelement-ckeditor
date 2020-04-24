@@ -414,8 +414,7 @@ class VaadinCKEditor extends LitElement {
                             writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
                         }
                     } );
-                    editor.model.document.on( 'change:data', (event) => {
-                        alert(event);
+                    editor.model.document.on( 'change:data', (event, batch) => {
                         this.$server.setEditorData(editor.getData());
                     } );
                     window.editor = editor;
