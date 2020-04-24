@@ -399,7 +399,7 @@ class VaadinCKEditor extends LitElement {
                 }).then( editor => {
                     editor.isReadOnly = this.isReadOnly;
                     editor.setData(this.editorData);
-                    this.$server.setEditorData(this.editorData);
+                    // this.$server.setEditorData(this.editorData);
                     if(this.isChrome)
                         this.style.width='-webkit-fill-available';
                     else if(this.isFirefox)
@@ -414,7 +414,8 @@ class VaadinCKEditor extends LitElement {
                             writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
                         }
                     } );
-                    editor.model.document.on( 'change:data', () => {
+                    editor.model.document.on( 'change:data', (event) => {
+                        alert(event);
                         this.$server.setEditorData(editor.getData());
                     } );
                     window.editor = editor;
