@@ -7,8 +7,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
-import com.vaadin.flow.theme.Theme;
-import com.wontlost.ckeditor.CKEditorTheme;
 import com.wontlost.ckeditor.EditorType;
 import com.wontlost.ckeditor.VaadinCKEditor;
 import com.wontlost.ckeditor.VaadinCKEditorBuilder;
@@ -23,6 +21,7 @@ public class MainView extends VerticalLayout {
 		comment.setMessage("Message");
 		VaadinCKEditor editor = new VaadinCKEditorBuilder().with(builder -> {
 			builder.editorType = EditorType.CLASSIC;
+			builder.isReadOnly = true;
 			builder.editorData = comment.getMessage();
 		}).createVaadinCKEditor();
 		add(new Label(""));
