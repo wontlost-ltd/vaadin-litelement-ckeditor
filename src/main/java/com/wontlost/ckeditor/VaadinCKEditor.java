@@ -38,7 +38,7 @@ public class VaadinCKEditor extends CustomField<String> {
      * @param margin Margin of editor, default value is '20px'.
      * @param isReadOnly Make editor readonly
      */
-    VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, Theme theme, String editorData, String width, String height, String margin, Boolean isReadOnly) {
+    VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, String editorData, String width, String height, String margin, Boolean isReadOnly) {
         getElement().setProperty("editorType", editorType.toString());
         getElement().setPropertyJson("toolBar", toJson(toolbar));
         getElement().setProperty("editorData", editorData==null?"":editorData);
@@ -46,13 +46,6 @@ public class VaadinCKEditor extends CustomField<String> {
         getElement().setProperty("editorHeight", height==null?"auto":height);
         getElement().setProperty("isReadOnly", isReadOnly==null?false:isReadOnly);
         getElement().getStyle().set("margin", margin==null?"20px":margin);
-
-
-        getElement().getStyle().set("--ck-custom-background", "hsl(270, 1%, 29%)");
-        getElement().getStyle().set("--ck-custom-foreground", "hsl(255, 3%, 18%)");
-        getElement().getStyle().set("--ck-custom-border", "hsl(300, 1%, 22%)");
-        getElement().getStyle().set("--ck-custom-white", "hsl(0, 0%, 100%)");
-
     }
 
     /**

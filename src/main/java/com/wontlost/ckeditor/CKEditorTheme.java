@@ -11,7 +11,7 @@ import java.util.Map;
  * Theme class
  */
 @JsModule("@vaadin/vaadin-lumo-styles/color.js")
-public class Theme implements AbstractTheme {
+public class CKEditorTheme implements AbstractTheme {
 
     public String getBaseUrl() {
         return "/src/";
