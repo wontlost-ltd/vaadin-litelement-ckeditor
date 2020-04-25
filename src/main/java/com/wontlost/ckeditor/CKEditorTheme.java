@@ -2,6 +2,7 @@ package com.wontlost.ckeditor;
 
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.theme.AbstractTheme;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -10,8 +11,11 @@ import java.util.Map;
 /**
  * Theme class
  */
-@JsModule("@vaadin/vaadin-lumo-styles/color.js")
+@JsModule("./theme/vaadin-ckeditor.js")
 public class CKEditorTheme implements AbstractTheme {
+
+    public static final String LIGHT = "light";
+    public static final String DARK = "dark";
 
     public String getBaseUrl() {
         return "/src/";
@@ -24,19 +28,25 @@ public class CKEditorTheme implements AbstractTheme {
 
     public List<String> getHeaderInlineContents() {
         return Collections.singletonList("<custom-style>\n"
-                + "<style include=\"lumo-color lumo-typography\">"
+                + "<style include=\"ckeditor-color ckeditor-typography\">"
                 + "</style>\n"
                 + "</custom-style>");
     }
 
     public Map<String, String> getHtmlAttributes(String variant) {
-        if ("dark".equals(variant)) {
-            // the <body> element will have the "theme"
-            // attribute set to "dark" when the dark variant
-            // is used
-            return Collections.singletonMap("theme", "dark");
+        switch (variant) {
+            case LIGHT:
+                return Collections.singletonMap("theme", LIGHT);
+            case DARK:
+                return Collections.singletonMap("theme", DARK);
+            default:
+                if (!variant.isEmpty()) {
+                    LoggerFactory.getLogger(getClass().getName()).warn(
+                            "Material theme variant not recognized: '{}'. Using no variant.",
+                            variant);
+                }
+                return Collections.emptyMap();
         }
-        return Collections.emptyMap();
     }
 
 }
