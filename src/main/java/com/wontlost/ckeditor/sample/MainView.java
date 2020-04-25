@@ -15,7 +15,6 @@ import com.wontlost.ckeditor.VaadinCKEditorBuilder;
 
 @Route("")
 @PWA(name = "CKEditor", shortName = "CK")
-@Theme(value = CKEditorTheme.class, variant = "dark")
 public class MainView extends VerticalLayout {
 
 	public MainView() {
