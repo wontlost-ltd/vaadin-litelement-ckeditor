@@ -39,8 +39,4 @@ public class CKEditorTheme implements AbstractTheme {
         return Collections.emptyMap();
     }
 
-    public String translateUrl(String url) {
-        return null;
-    }
-
 }
