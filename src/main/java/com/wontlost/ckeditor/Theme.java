@@ -1,35 +1,46 @@
 package com.wontlost.ckeditor;
 
-import com.vaadin.flow.component.charts.model.style.Color;
+import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.theme.AbstractTheme;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Theme class
  */
-public class Theme {
+@JsModule("@vaadin/vaadin-lumo-styles/color.js")
+public class Theme implements AbstractTheme {
 
-    private final String background;
-    private final String foreground;
-    private final String border;
-    private final String white;
-
-    public Theme(){
-        this("hsl(270, 1%, 29%)", "hsl(255, 3%, 18%)",
-                 "hsl(300, 1%, 22%)", "hsl(0, 0%, 100%)");
+    public String getBaseUrl() {
+        return "/src/";
     }
 
-    public Theme(Color background, Color foreground, Color border, Color white) {
-        this(background.toString(), foreground.toString(), border.toString(), white.toString());
+
+    public String getThemeUrl() {
+        return "/theme/";
     }
 
-    public Theme(String background, String foreground, String border, String white) {
-        this.background = "'--ck-custom-background' : '"+background+"',";
-        this.foreground = "'--ck-custom-foreground' : '"+foreground+"',";
-        this.border = "'--ck-custom-border' : '"+border+"',";
-        this.white = "'--ck-custom-white' : '"+white+"'";
+    public List<String> getHeaderInlineContents() {
+        return Collections.singletonList("<custom-style>\n"
+                + "<style include=\"lumo-color lumo-typography\">"
+                + "</style>\n"
+                + "</custom-style>");
     }
 
-    public String getStyles() {
-        return "{"+background+foreground+border+white+"}";
+    public Map<String, String> getHtmlAttributes(String variant) {
+        if ("dark".equals(variant)) {
+            // the <body> element will have the "theme"
+            // attribute set to "dark" when the dark variant
+            // is used
+            return Collections.singletonMap("theme", "dark");
+        }
+        return Collections.emptyMap();
+    }
+
+    public String translateUrl(String url) {
+        return null;
     }
 
 }

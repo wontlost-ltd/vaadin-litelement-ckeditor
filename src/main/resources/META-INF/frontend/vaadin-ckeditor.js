@@ -11,12 +11,6 @@ class VaadinCKEditor extends LitElement {
             'document-editor__editable'  : true,
             'ck-editor__editable' : true
         };
-        this.themeStyles = {
-            '--ck-custom-background' : 'hsl(270, 1%, 29%)',
-            '--ck-custom-foreground' : 'hsl(255, 3%, 18%)',
-            '--ck-custom-border' : 'hsl(300, 1%, 22%)',
-            '--ck-custom-white' : 'hsl(0, 0%, 100%)'
-        };
         this.isFirefox = typeof InstallTrigger !== 'undefined';
         this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
     }
@@ -380,7 +374,6 @@ class VaadinCKEditor extends LitElement {
                  editorData: String,
                  editorWidth: String,
                  editorHeight: String,
-                 themeStyles: String,
                  isReadOnly: Boolean,
                  isFirefox:Boolean,
                  isChrome:Boolean,
@@ -399,7 +392,6 @@ class VaadinCKEditor extends LitElement {
                 }).then( editor => {
                     editor.isReadOnly = this.isReadOnly;
                     editor.setData(this.editorData);
-                    // this.$server.setEditorData(this.editorData);
                     if(this.isChrome)
                         this.style.width='-webkit-fill-available';
                     else if(this.isFirefox)
@@ -427,7 +419,6 @@ class VaadinCKEditor extends LitElement {
                 }).then( editor => {
                     editor.isReadOnly = this.isReadOnly;
                     editor.setData(this.editorData);
-                    this.$server.setEditorData(this.editorData);
                     if(this.isChrome)
                         this.style.width='-webkit-fill-available';
                     else if(this.isFirefox)
@@ -455,7 +446,6 @@ class VaadinCKEditor extends LitElement {
                 }).then( editor => {
                     editor.isReadOnly = this.isReadOnly;
                     editor.setData(this.editorData);
-                    this.$server.setEditorData(this.editorData);
                     if(this.isChrome)
                         this.style.width='-webkit-fill-available';
                     else if(this.isFirefox)
@@ -483,7 +473,6 @@ class VaadinCKEditor extends LitElement {
                 }).then( editor => {
                     editor.isReadOnly = this.isReadOnly;
                     editor.setData(this.editorData);
-                    this.$server.setEditorData(this.editorData);
                     if(this.isChrome)
                         this.style.width='-webkit-fill-available';
                     else if(this.isFirefox)

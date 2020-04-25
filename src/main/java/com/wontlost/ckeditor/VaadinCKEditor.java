@@ -42,7 +42,6 @@ public class VaadinCKEditor extends CustomField<String> {
         getElement().setProperty("editorType", editorType.toString());
         getElement().setPropertyJson("toolBar", toJson(toolbar));
         getElement().setProperty("editorData", editorData==null?"":editorData);
-        getElement().setProperty("themeStyles", theme.getStyles());
         getElement().setProperty("editorWidth", width==null?"auto":width);
         getElement().setProperty("editorHeight", height==null?"auto":height);
         getElement().setProperty("isReadOnly", isReadOnly==null?false:isReadOnly);
