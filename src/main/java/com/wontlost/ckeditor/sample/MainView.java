@@ -21,7 +21,6 @@ public class MainView extends VerticalLayout {
 		comment.setMessage("Message");
 		VaadinCKEditor editor = new VaadinCKEditorBuilder().with(builder -> {
 			builder.editorType = EditorType.CLASSIC;
-			builder.isReadOnly = true;
 			builder.editorData = comment.getMessage();
 		}).createVaadinCKEditor();
 		add(new Label(""));
