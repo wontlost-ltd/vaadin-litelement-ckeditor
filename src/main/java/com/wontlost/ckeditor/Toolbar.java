@@ -33,6 +33,10 @@ public enum Toolbar {
     alignment("alignment"),
     codeBlock("codeBlock"),
     highlight("highlight"),
+    fontSize("fontSize"),
+    fontFamily("fontFamily"),
+    fontColor("fontColor"),
+    fontBackgroundColor("fontBackgroundColor"),
     restrictedEditingException("restrictedEditingException"),
     todoList("todoList"),
     insertTable("insertTable");
