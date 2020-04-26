@@ -16,7 +16,7 @@ class VaadinCKEditor extends LitElement {
     }
 
     static get styles() { return css`
-        :host {
+        :root {
             --ck-highlight-marker-blue: #72cdfd;
             --ck-highlight-marker-green: #63f963;
             --ck-highlight-marker-pink: #fc7999;
@@ -535,21 +535,6 @@ class VaadinCKEditor extends LitElement {
             `;
         } else {
             return html`
-                <style>
-                  html { 
-                    --ck-custom-background: hsl(270, 1%, 29%);
-                    --ck-custom-foreground: hsl(255, 3%, 18%);
-                    --ck-custom-border: hsl(300, 1%, 22%);
-                    --ck-custom-white: hsl(0, 0%, 100%);
-                  }
-                  
-                  /*vaadin-ckeditor {*/
-                  /*  --ck-custom-background: hsl(270, 1%, 29%);*/
-                  /*  --ck-custom-foreground: hsl(255, 3%, 18%);*/
-                  /*  --ck-custom-border: hsl(300, 1%, 22%);*/
-                  /*  --ck-custom-white: hsl(0, 0%, 100%);*/
-                  /*}*/
-                </style>
                 <div id="${this.editorType}-editor"/>
             `;
         }
