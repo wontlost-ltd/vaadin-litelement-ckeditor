@@ -39,7 +39,7 @@ public class VaadinCKEditor extends CustomField<String> {
      * @param margin Margin of editor, default value is '20px'.
      * @param isReadOnly Make editor readonly
      */
-    VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, String editorData, String width, String height, String margin, Boolean isReadOnly) {
+    VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, Theme theme, String editorData, String width, String height, String margin, Boolean isReadOnly) {
         getElement().setProperty("editorType", editorType.toString());
         getElement().setPropertyJson("toolBar", toJson(toolbar));
         getElement().setProperty("editorData", editorData==null?"":editorData);
@@ -47,6 +47,81 @@ public class VaadinCKEditor extends CustomField<String> {
         getElement().setProperty("editorHeight", height==null?"auto":height);
         getElement().setProperty("isReadOnly", isReadOnly==null?false:isReadOnly);
         getElement().getStyle().set("margin", margin==null?"20px":margin);
+        initTheme(theme);
+    }
+
+    private void initTheme(Theme theme) {
+        if(theme ==null || Theme.Type.LIGHT.equals(theme.getThemeType())) {
+            getElement().getStyle().set("--ck-custom-radius", "");
+            getElement().getStyle().set("--ck-custom-background", "");
+            getElement().getStyle().set("--ck-custom-foreground", "");
+            getElement().getStyle().set("--ck-custom-border", "");
+            getElement().getStyle().set("--ck-custom-white", "");
+            getElement().getStyle().set("--ck-custom-focus-border", "");
+            getElement().getStyle().set("--ck-custom-color-text", "");
+            getElement().getStyle().set("--ck-custom-shadow-drop", "");
+            getElement().getStyle().set("--ck-custom-shadow-inner", "");
+            getElement().getStyle().set("--ck-custom-default-hover-background", "");
+            getElement().getStyle().set("--ck-custom-default-active-background", "");
+            getElement().getStyle().set("--ck-custom-default-active-shadow", "");
+            getElement().getStyle().set("--ck-custom-on-hover-background", "");
+            getElement().getStyle().set("--ck-custom-on-active-background", "");
+            getElement().getStyle().set("--ck-custom-on-active-shadow", "");
+            getElement().getStyle().set("--ck-custom-action-background", "");
+            getElement().getStyle().set("--ck-custom-action-hover-background", "");
+            getElement().getStyle().set("--ck-custom-action-active-background", "");
+            getElement().getStyle().set("--ck-custom-action-active-shadow", "");
+            getElement().getStyle().set("--ck-custom-action-disabled-background", "");
+            getElement().getStyle().set("--ck-custom-save", "");
+            getElement().getStyle().set("--ck-custom-cancel", "");
+            getElement().getStyle().set("--ck-custom-input-border", "");
+            getElement().getStyle().set("--ck-custom-input-text", "");
+            getElement().getStyle().set("--ck-custom-input-disabled-background", "");
+            getElement().getStyle().set("--ck-custom-input-disabled-border", "");
+            getElement().getStyle().set("--ck-custom-input-disabled-text", "");
+            getElement().getStyle().set("--ck-custom-tooltip-background", "");
+            getElement().getStyle().set("--ck-custom-tooltip-text", "");
+            getElement().getStyle().set("--ck-custom-image-caption-background", "");
+            getElement().getStyle().set("--ck-custom-image-caption-text", "");
+            getElement().getStyle().set("--ck-custom-widget-blurred-border", "");
+            getElement().getStyle().set("--ck-custom-widget-hover-border", "");
+            getElement().getStyle().set("--ck-custom-link-default", "");
+        } else {
+            getElement().getStyle().set("--ck-custom-radius", theme.getRadius());
+            getElement().getStyle().set("--ck-custom-background", theme.getBackground());
+            getElement().getStyle().set("--ck-custom-foreground", theme.getForeground());
+            getElement().getStyle().set("--ck-custom-border", theme.getBorder());
+            getElement().getStyle().set("--ck-custom-white", theme.getWhite());
+            getElement().getStyle().set("--ck-custom-focus-border", theme.getFocusBorder());
+            getElement().getStyle().set("--ck-custom-color-text", theme.getColorText());
+            getElement().getStyle().set("--ck-custom-shadow-drop", theme.getShadowDrop());
+            getElement().getStyle().set("--ck-custom-shadow-inner", theme.getShadowInner());
+            getElement().getStyle().set("--ck-custom-default-hover-background", theme.getDefaultHoverBackground());
+            getElement().getStyle().set("--ck-custom-default-active-background", theme.getDefaultActiveBackground());
+            getElement().getStyle().set("--ck-custom-default-active-shadow", theme.getDefaultActiveShadow());
+            getElement().getStyle().set("--ck-custom-on-hover-background", theme.getOnHoverBackground());
+            getElement().getStyle().set("--ck-custom-on-active-background", theme.getOnActiveBackground());
+            getElement().getStyle().set("--ck-custom-on-active-shadow", theme.getOnActiveShadow());
+            getElement().getStyle().set("--ck-custom-action-background", theme.getActionBackground());
+            getElement().getStyle().set("--ck-custom-action-hover-background", theme.getActionHoverBackground());
+            getElement().getStyle().set("--ck-custom-action-active-background", theme.getActionActiveBackground());
+            getElement().getStyle().set("--ck-custom-action-active-shadow", theme.getActionActiveShadow());
+            getElement().getStyle().set("--ck-custom-action-disabled-background", theme.getActionDisabledBackground());
+            getElement().getStyle().set("--ck-custom-save", theme.getSave());
+            getElement().getStyle().set("--ck-custom-cancel", theme.getCancel());
+            getElement().getStyle().set("--ck-custom-input-border", theme.getInputBorder());
+            getElement().getStyle().set("--ck-custom-input-text", theme.getInputText());
+            getElement().getStyle().set("--ck-custom-input-disabled-background", theme.getInputDisabledBackground());
+            getElement().getStyle().set("--ck-custom-input-disabled-border", theme.getInputDisabledBorder());
+            getElement().getStyle().set("--ck-custom-input-disabled-text", theme.getInputDisabledText());
+            getElement().getStyle().set("--ck-custom-tooltip-background", theme.getTooltipBackground());
+            getElement().getStyle().set("--ck-custom-tooltip-text", theme.getTooltipText());
+            getElement().getStyle().set("--ck-custom-image-caption-background", theme.getImageCaptionBackground());
+            getElement().getStyle().set("--ck-custom-image-caption-text", theme.getImageCaptionText());
+            getElement().getStyle().set("--ck-custom-widget-blurred-border", theme.getWidgetBlurredBorder());
+            getElement().getStyle().set("--ck-custom-widget-hover-border", theme.getWidgetHoverBorder());
+            getElement().getStyle().set("--ck-custom-link-default", theme.getLinkDefault());
+        }
     }
 
     /**
