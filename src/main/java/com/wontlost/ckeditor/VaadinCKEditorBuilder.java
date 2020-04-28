@@ -9,7 +9,7 @@ public class VaadinCKEditorBuilder {
     public String height;
     public String margin;
     public EditorType editorType = EditorType.CLASSIC;
-    public Theme theme;
+    public ThemeType theme;
     public Boolean isReadOnly = false;
     public Toolbar[] toolbar = new Toolbar[]{Toolbar.heading, Toolbar.pipe, Toolbar.fontSize, Toolbar.fontFamily,
            Toolbar.fontColor, Toolbar.fontBackgroundColor, Toolbar.pipe, Toolbar.bold, Toolbar.italic,

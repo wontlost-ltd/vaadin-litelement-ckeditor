@@ -20,6 +20,7 @@ class VaadinCKEditor extends LitElement {
                  editorData: String,
                  editorWidth: String,
                  editorHeight: String,
+                 themeType: String,
                  isReadOnly: Boolean,
                  isFirefox:Boolean,
                  isChrome:Boolean,
@@ -181,7 +182,7 @@ class VaadinCKEditor extends LitElement {
             `;
         } else {
             return html`
-                <link rel="stylesheet" href="./theme/custom.css">
+                <link rel="stylesheet" href="${this.themeType==='dark'?'./theme/custom.css':''}">
                 <div id="${this.editorType}-editor"/>
             `;
         }
