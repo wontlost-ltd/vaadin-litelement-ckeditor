@@ -14,130 +14,6 @@ class VaadinCKEditor extends LitElement {
         };
         this.isFirefox = typeof InstallTrigger !== 'undefined';
         this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
-
-        this.themeCss=css`
-            :root {
-                /* Overrides the default font size in the theme. */
-                --ck-font-size-base: 14px;
-
-                /* Helper variables to avoid duplication in the colors. */
-                --ck-custom-radius:2px;
-                --ck-custom-background: hsl(270, 1%, 29%);
-                --ck-custom-foreground: hsl(255, 3%, 18%);
-                --ck-custom-border: hsl(300, 1%, 22%);
-                --ck-custom-white: hsl(0, 0%, 100%);
-                --ck-custom-focus-border: hsl(208, 90%, 62%);
-                --ck-custom-color-text:hsl(0, 0%, 98%);
-                --ck-custom-shadow-drop:hsla(0, 0%, 0%, 0.2);
-                --ck-custom-shadow-inner:hsla(0, 0%, 0%, 0.1);
-                --ck-custom-default-hover-background:hsl(270, 1%, 22%);
-                --ck-custom-default-active-background:hsl(270, 2%, 20%);
-                --ck-custom-default-active-shadow:hsl(270, 2%, 23%);
-                --ck-custom-on-hover-background:hsl(255, 4%, 16%);
-                --ck-custom-on-active-background: hsl(255, 4%, 14%);
-                --ck-custom-on-active-shadow: hsl(240, 3%, 19%);
-                --ck-custom-action-background: hsl(168, 76%, 42%);
-                --ck-custom-action-hover-background: hsl(168, 76%, 38%);
-                --ck-custom-action-active-background: hsl(168, 76%, 36%);
-                --ck-custom-action-active-shadow: hsl(168, 75%, 34%);
-                --ck-custom-action-disabled-background: hsl(168, 76%, 42%);
-                --ck-custom-save: hsl(120, 100%, 46%);
-                --ck-custom-cancel: hsl(15, 100%, 56%);
-                --ck-custom-input-border: hsl(257, 3%, 43%);
-                --ck-custom-input-text: hsl(0, 0%, 98%);
-                --ck-custom-input-disabled-background: hsl(255, 4%, 21%);
-                --ck-custom-input-disabled-border: hsl(250, 3%, 38%);
-                --ck-custom-input-disabled-text: hsl(0, 0%, 46%);
-                --ck-custom-tooltip-background: hsl(252, 7%, 14%);
-                --ck-custom-tooltip-text: hsl(0, 0%, 93%);
-                --ck-custom-image-caption-background: hsl(0, 0%, 97%);
-                --ck-custom-image-caption-text: hsl(0, 0%, 20%);
-                --ck-custom-widget-blurred-border: hsl(0, 0%, 87%);
-                --ck-custom-widget-hover-border: hsl(43, 100%, 68%);
-                --ck-custom-link-default: hsl(190, 100%, 75%);
-
-                /* Overrides the border radius setting in the theme. */
-                --ck-border-radius: var(--ck-custom-radius, 2px);
-
-                /* -- Overrides generic colors. ------------------------------------------------------------- */
-                --ck-color-base-foreground: var(--ck-custom-background, #fafafa);
-                --ck-color-focus-border: var(--ck-custom-focus-border, #1f89e5);
-                --ck-color-text: var(--ck-custom-color-text, #333);
-                --ck-color-shadow-drop: var(--ck-custom-shadow-drop, rgba(0,0,0,0.15));
-                --ck-color-shadow-inner: var(--ck-custom-shadow-inner, rgba(0,0,0,0.1));
-
-                /* -- Overrides the default .ck-button class colors. ---------------------------------------- */
-                --ck-color-button-default-background: var(--ck-custom-background, transparent);
-                --ck-color-button-default-hover-background: var(--ck-custom-default-hover-background, #e6e6e6);
-                --ck-color-button-default-active-background: var(--ck-custom-default-active-background, #d9d9d9);
-                --ck-color-button-default-active-shadow: var(--ck-custom-default-active-shadow, #bfbfbf);
-                --ck-color-button-default-disabled-background: var(--ck-custom-background, transparent);
-
-                --ck-color-button-on-background: var(--ck-custom-foreground, #dedede);
-                --ck-color-button-on-hover-background: var(--ck-custom-on-hover-background, #c4c4c4);
-                --ck-color-button-on-active-background: var(--ck-custom-on-active-background, #bababa);
-                --ck-color-button-on-active-shadow: var(--ck-custom-on-active-shadow, #a1a1a1);
-                --ck-color-button-on-disabled-background: var(--ck-custom-foreground, #dedede);
-
-                --ck-color-button-action-background: var(--ck-custom-action-background, #61b045);
-                --ck-color-button-action-hover-background: var(--ck-custom-action-hover-background, #579e3d);
-                --ck-color-button-action-active-background: var(--ck-custom-action-active-background, #53973b);
-                --ck-color-button-action-active-shadow: var(--ck-custom-action-active-shadow, #498433);
-                --ck-color-button-action-disabled-background: var(--ck-custom-action-disabled-background, #7ec365);
-                --ck-color-button-action-text: var(--ck-custom-white);
-
-                --ck-color-button-save: var(--ck-custom-save, #008a00);
-                --ck-color-button-cancel: var(--ck-custom-cancel, #db3700);
-
-                /* -- Overrides the default .ck-dropdown class colors. -------------------------------------- */
-                --ck-color-dropdown-panel-background: var(--ck-custom-background, #fff);
-                --ck-color-dropdown-panel-border: var(--ck-custom-foreground, #c4c4c4);
-
-                /* -- Overrides the default .ck-splitbutton class colors. ----------------------------------- */
-                --ck-color-split-button-hover-background: var(--ck-color-button-default-hover-background, #ebebeb);
-                --ck-color-split-button-hover-border: var(--ck-custom-foreground, #b3b3b3);
-
-                /* -- Overrides the default .ck-input class colors. ----------------------------------------- */
-                --ck-color-input-background: var(--ck-custom-foreground, #fff);
-                --ck-color-input-border: var(--ck-custom-input-border, #c7c7c7);
-                --ck-color-input-text: var(--ck-custom-input-text, #333);
-                --ck-color-input-disabled-background: var(--ck-custom-input-disabled-background, #f2f2f2);
-                --ck-color-input-disabled-border: var(--ck-custom-input-disabled-border, #c7c7c7);
-                --ck-color-input-disabled-text: var(--ck-custom-input-disabled-text, #5c5c5c);
-
-                /* -- Overrides the default .ck-list class colors. ------------------------------------------ */
-                --ck-color-list-background: var(--ck-custom-background, #fff);
-                --ck-color-list-button-hover-background: var(--ck-color-base-foreground, #e6e6e6);
-                --ck-color-list-button-on-background: var(--ck-color-base-active, #198cf0);
-                --ck-color-list-button-on-background-focus: var(--ck-color-base-active-focus, #0e7fe1);
-                --ck-color-list-button-on-text: var(--ck-color-base-background, #fff);
-
-                /* -- Overrides the default .ck-balloon-panel class colors. --------------------------------- */
-                --ck-color-panel-background: var(--ck-custom-background, #fff);
-                --ck-color-panel-border: var(--ck-custom-border, #c4c4c4);
-
-                /* -- Overrides the default .ck-toolbar class colors. --------------------------------------- */
-                --ck-color-toolbar-background: var(--ck-custom-background, #fafafa);
-                --ck-color-toolbar-border: var(--ck-custom-border, #c4c4c4);
-
-                /* -- Overrides the default .ck-tooltip class colors. --------------------------------------- */
-                --ck-color-tooltip-background: var(--ck-custom-tooltip-background, #333);
-                --ck-color-tooltip-text: var(--ck-custom-tooltip-text, #fff);
-
-                /* -- Overrides the default colors used by the ckeditor5-image package. --------------------- */
-                --ck-color-image-caption-background: var(--ck-custom-image-caption-background, #333);
-                --ck-color-image-caption-text: var(--ck-custom-image-caption-text, #fff);
-
-                /* -- Overrides the default colors used by the ckeditor5-widget package. -------------------- */
-                --ck-color-widget-blurred-border: var(--ck-custom-widget-blurred-border, #dedede);
-                --ck-color-widget-hover-border: var(--ck-custom-widget-hover-border, #ffc83d);
-                --ck-color-widget-editable-focus-background: var(--ck-custom-white);
-
-                /* -- Overrides the default colors used by the ckeditor5-link package. ---------------------- */
-                --ck-color-link-default: var(--ck-custom-link-default);
-            }
-        `;
-        registerStyles('vaadin-ckeditor', this.themeCss);
     }
 
     static get properties() {
@@ -157,8 +33,62 @@ class VaadinCKEditor extends LitElement {
         return this;
     }
 
+    initDarkTheme() {
+        let darkStyle = document.querySelector(':root').style;
+        darkStyle.setProperty('--ck-color-base-foreground', 'hsl(270, 1%, 29%)');
+        darkStyle.setProperty('--ck-color-focus-border', 'hsl(208, 90%, 62%)');
+        darkStyle.setProperty('--ck-color-text', 'hsl(0, 0%, 98%)');
+        darkStyle.setProperty('--ck-color-shadow-drop', 'hsla(0, 0%, 0%, 0.2)');
+        darkStyle.setProperty('--ck-color-shadow-inner', 'hsla(0, 0%, 0%, 0.1)');
+        darkStyle.setProperty('--ck-color-button-default-background', 'hsl(270, 1%, 29%)');
+        darkStyle.setProperty('--ck-color-button-default-hover-background', 'hsl(270, 1%, 22%)');
+        darkStyle.setProperty('--ck-color-button-default-active-background', 'hsl(270, 2%, 20%)');
+        darkStyle.setProperty('--ck-color-button-default-active-shadow', 'hsl(270, 2%, 23%)');
+        darkStyle.setProperty('--ck-color-button-default-disabled-background', 'hsl(270, 1%, 29%)');
+        darkStyle.setProperty('--ck-color-button-on-background', 'hsl(255, 3%, 18%)');
+        darkStyle.setProperty('--ck-color-button-on-hover-background', 'hsl(255, 4%, 16%)');
+        darkStyle.setProperty('--ck-color-button-on-active-background', 'hsl(255, 4%, 14%)');
+        darkStyle.setProperty('--ck-color-button-on-active-shadow', 'hsl(240, 3%, 19%)');
+        darkStyle.setProperty('--ck-color-button-on-disabled-background', 'hsl(255, 3%, 18%)');
+        darkStyle.setProperty('--ck-color-button-action-background', 'hsl(168, 76%, 42%)');
+        darkStyle.setProperty('--ck-color-button-action-hover-background', 'hsl(168, 76%, 38%)');
+        darkStyle.setProperty('--ck-color-button-action-active-background', 'hsl(168, 76%, 36%)');
+        darkStyle.setProperty('--ck-color-button-action-active-shadow', 'hsl(168, 75%, 34%)');
+        darkStyle.setProperty('--ck-color-button-action-disabled-background', 'hsl(168, 76%, 42%)');
+        darkStyle.setProperty('--ck-color-button-action-text', 'hsl(0, 0%, 100%)');
+        darkStyle.setProperty('--ck-color-button-save', 'hsl(120, 100%, 46%)');
+        darkStyle.setProperty('--ck-color-button-cancel', 'hsl(15, 100%, 56%)');
+        darkStyle.setProperty('--ck-color-dropdown-panel-background', 'hsl(270, 1%, 29%)');
+        darkStyle.setProperty('--ck-color-dropdown-panel-border', 'hsl(255, 3%, 18%)');
+        darkStyle.setProperty('--ck-color-split-button-hover-border', 'hsl(255, 3%, 18%)');
+        darkStyle.setProperty('--ck-color-input-background', 'hsl(255, 3%, 18%)');
+        darkStyle.setProperty('--ck-color-input-border', 'hsl(257, 3%, 43%)');
+        darkStyle.setProperty('--ck-color-input-text', 'hsl(0, 0%, 98%)');
+        darkStyle.setProperty('--ck-color-input-disabled-background', 'hsl(255, 4%, 21%)');
+        darkStyle.setProperty('--ck-color-input-disabled-border', 'hsl(250, 3%, 38%)');
+        darkStyle.setProperty('--ck-color-input-disabled-text', 'hsl(0, 0%, 46%)');
+        darkStyle.setProperty('--ck-color-list-background', 'hsl(270, 1%, 29%)');
+        darkStyle.setProperty('--ck-color-panel-background', 'hsl(270, 1%, 29%)');
+        darkStyle.setProperty('--ck-color-panel-border', 'hsl(300, 1%, 22%)');
+        darkStyle.setProperty('--ck-color-toolbar-background', 'hsl(270, 1%, 29%)');
+        darkStyle.setProperty('--ck-color-toolbar-border', 'hsl(300, 1%, 22%)');
+        darkStyle.setProperty('--ck-color-tooltip-background', 'hsl(252, 7%, 14%)');
+        darkStyle.setProperty('--ck-color-tooltip-text', 'hsl(0, 0%, 93%)');
+        darkStyle.setProperty('--ck-color-image-caption-background', 'hsl(0, 0%, 97%)');
+        darkStyle.setProperty('--ck-color-image-caption-text', 'hsl(0, 0%, 20%)');
+        darkStyle.setProperty('--ck-color-widget-blurred-border', 'hsl(0, 0%, 87%)');
+        darkStyle.setProperty('--ck-color-widget-hover-border', 'hsl(43, 100%, 68%)');
+        darkStyle.setProperty('--ck-color-widget-editable-focus-background', 'hsl(0, 0%, 100%)');
+        darkStyle.setProperty('--ck-color-link-default', 'hsl(190, 100%, 75%)');
+    }
+
     firstUpdated(changedProperties) {
         super.firstUpdated(changedProperties);
+
+        if(this.themeType==='dark') {
+            this.initDarkTheme();
+        }
+
         if(this.editorType==='classic') {
             ClassicEditor.create( document.querySelector( '#classic-editor' ) , {
                     toolbar:this.toolBar
