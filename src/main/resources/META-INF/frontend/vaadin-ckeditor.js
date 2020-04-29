@@ -36,6 +36,7 @@ class VaadinCKEditor extends LitElement {
     initDarkTheme() {
         let darkStyle = document.querySelector(':root').style;
         darkStyle.setProperty('--ck-color-base-foreground', 'hsl(270, 1%, 29%)');
+        darkStyle.setProperty('--ck-color-base-background', 'hsl(0, 0%, 77%)');
         darkStyle.setProperty('--ck-color-focus-border', 'hsl(208, 90%, 62%)');
         darkStyle.setProperty('--ck-color-text', 'hsl(0, 0%, 98%)');
         darkStyle.setProperty('--ck-color-shadow-drop', 'hsla(0, 0%, 0%, 0.2)');
