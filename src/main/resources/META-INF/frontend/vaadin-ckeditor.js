@@ -17,7 +17,7 @@ class VaadinCKEditor extends LitElement {
 
     static get styles() {
         return css`
-            :root {
+            :host {
                 /* Overrides the default font size in the theme. */
                 --ck-font-size-base: 14px;
 
@@ -152,9 +152,9 @@ class VaadinCKEditor extends LitElement {
                  toolBar: Array};
     }
 
-    createRenderRoot() {
-        return this;
-    }
+    // createRenderRoot() {// Comment out to use shadow dom
+    //     return this;
+    // }
 
     firstUpdated(changedProperties) {
         super.firstUpdated(changedProperties);
