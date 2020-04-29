@@ -5,6 +5,7 @@ import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.dom.ShadowRoot;
 import elemental.json.JsonArray;
 import elemental.json.impl.JreJsonFactory;
 
@@ -40,6 +41,7 @@ public class VaadinCKEditor extends CustomField<String> {
      * @param isReadOnly Make editor readonly
      */
     VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, ThemeType theme, String editorData, String width, String height, String margin, Boolean isReadOnly) {
+        ShadowRoot shadowRoot = getElement().attachShadow();
         getElement().setProperty("editorType", editorType.toString());
         getElement().setPropertyJson("toolBar", toJson(toolbar));
         getElement().setProperty("editorData", editorData==null?"":editorData);
@@ -48,6 +50,7 @@ public class VaadinCKEditor extends CustomField<String> {
         getElement().setProperty("isReadOnly", isReadOnly==null?false:isReadOnly);
         getElement().setProperty("themeType", theme==null?ThemeType.LIGHT.toString():theme.toString());
         getElement().getStyle().set("margin", margin==null?"20px":margin);
+        shadowRoot.appendChild(getElement());
     }
 
     /**

@@ -152,9 +152,9 @@ class VaadinCKEditor extends LitElement {
                  toolBar: Array};
     }
 
-    // createRenderRoot() {// Comment out to use shadow dom
-    //     return this;
-    // }
+    createRenderRoot() {
+        return this;
+    }
 
     firstUpdated(changedProperties) {
         super.firstUpdated(changedProperties);
