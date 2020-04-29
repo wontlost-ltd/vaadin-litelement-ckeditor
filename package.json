@@ -1,5 +1,7 @@
 {
   "devDependencies": {
+    "@vaadin/vaadin-themable-mixin": "^1.6.1",
+    "compression-webpack-plugin": "3.0.1",
     "copy-webpack-plugin": "5.1.0",
     "css-loader": "^3.4.2",
     "raw-loader": "3.0.0",
@@ -9,8 +11,7 @@
     "webpack-babel-multi-target-plugin": "2.3.3",
     "webpack-cli": "3.3.10",
     "webpack-dev-server": "3.9.0",
-    "webpack-merge": "4.2.2",
-    "compression-webpack-plugin": "3.0.1"
+    "webpack-merge": "4.2.2"
   },
   "dependencies": {
     "@polymer/polymer": "3.2.0",

@@ -1,5 +1,6 @@
-import {LitElement, html, css} from "lit-element";
+import {LitElement, html} from "lit-element";
 import { classMap } from 'lit-html/directives/class-map';
+import { registerStyles, css } from '@vaadin/vaadin-themable-mixin/register-styles.js';
 import { ClassicEditor, InlineEditor, BalloonEditor, DcoupledEditor } from "./ckeditor";
 
 class VaadinCKEditor extends LitElement {
@@ -13,11 +14,9 @@ class VaadinCKEditor extends LitElement {
         };
         this.isFirefox = typeof InstallTrigger !== 'undefined';
         this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
-    }
 
-    static get styles() {
-        return css`
-            :host {
+        this.themeCss=css`
+            :root {
                 /* Overrides the default font size in the theme. */
                 --ck-font-size-base: 14px;
 
@@ -136,8 +135,9 @@ class VaadinCKEditor extends LitElement {
 
                 /* -- Overrides the default colors used by the ckeditor5-link package. ---------------------- */
                 --ck-color-link-default: var(--ck-custom-link-default);
-            }   
+            }
         `;
+        registerStyles('vaadin-ckeditor', this.themeCss);
     }
 
     static get properties() {
@@ -146,6 +146,7 @@ class VaadinCKEditor extends LitElement {
                  editorWidth: String,
                  editorHeight: String,
                  themeType: String,
+                 themeCss: String,
                  isReadOnly: Boolean,
                  isFirefox:Boolean,
                  isChrome:Boolean,

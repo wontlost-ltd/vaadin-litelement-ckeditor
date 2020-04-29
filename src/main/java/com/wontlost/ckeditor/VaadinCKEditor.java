@@ -49,7 +49,6 @@ public class VaadinCKEditor extends CustomField<String> {
         getElement().setProperty("isReadOnly", isReadOnly==null?false:isReadOnly);
         getElement().setProperty("themeType", theme==null?ThemeType.LIGHT.toString():theme.toString());
         getElement().getStyle().set("margin", margin==null?"20px":margin);
-        getElement().attachShadow();
     }
 
     /**
