@@ -91,10 +91,6 @@ class VaadinCKEditor extends LitElement {
         }
         initHighlighting();
         initHighlightingOnLoad();
-        document.querySelectorAll('pre code').forEach((block) => {
-            highlightBlock(block);
-        });
-        highlightAuto('<span>Hello World!</span>');
         if(this.editorType==='classic') {
             ClassicEditor.create( document.querySelector( '#classic-editor' ) , {
                     toolbar:this.toolBar
@@ -117,6 +113,9 @@ class VaadinCKEditor extends LitElement {
                     } );
                     editor.model.document.on( 'change:data', (event, batch) => {
                         this.$server.setEditorData(editor.getData());
+                        document.querySelectorAll('pre code').forEach((block) => {
+                            highlightBlock(block);
+                        });
                     } );
                     window.editor = editor;
                 } ).catch( err => {
