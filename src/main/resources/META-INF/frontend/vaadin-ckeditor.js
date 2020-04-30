@@ -93,19 +93,11 @@ class VaadinCKEditor extends LitElement {
         if(this.themeType==='dark') {
             this.initDarkTheme();
         }
-        schema.register( 'paragraph', {
-            inheritAllFrom: '$block'
-        } );
+
         if(this.editorType==='classic') {
             ClassicEditor.create( document.querySelector( '#classic-editor' ) , {
                     toolbar:this.toolBar,
                     preCodeBlock :{
-                        languages: _code_languages.map( _language => {return{
-                            language: _language,
-                            title: _language=="cs"?"c#":_language
-                        };}),
-                        toolbar: [ 'EditLanguage', '|', 'SelectLanguage' , '|', 'HighlightCodeBlock', '|', 'CloseCodeBlock'],
-                        noOfSpaceForTabKey: 4,
                         highlightConfig:{
                             // this function is called whenever syntax highlighting is requested.
                             // the highlighting pre element and language will be the arguments for this function
