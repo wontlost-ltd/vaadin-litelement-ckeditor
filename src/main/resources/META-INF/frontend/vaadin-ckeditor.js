@@ -98,10 +98,6 @@ class VaadinCKEditor extends LitElement {
                     toolbar:this.toolBar,
                     preCodeBlock :{
 
-                        languages: _code_languages.map( _language => {return{
-                            language: _language,
-                            title: _language=="cs"?"c#":_language
-                        };}),
                         toolbar: [ 'EditLanguage', '|', 'SelectLanguage' , '|', 'HighlightCodeBlock', '|', 'CloseCodeBlock'],
                         noOfSpaceForTabKey: 4,
                         highlightConfig:{
