@@ -7,10 +7,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
-import com.wontlost.ckeditor.EditorType;
-import com.wontlost.ckeditor.ThemeType;
-import com.wontlost.ckeditor.VaadinCKEditor;
-import com.wontlost.ckeditor.VaadinCKEditorBuilder;
+import com.wontlost.ckeditor.*;
 
 @Route("")
 @PWA(name = "CKEditor", shortName = "CK")
@@ -29,9 +26,10 @@ public class MainView extends VerticalLayout {
 
 		Binder<Comment> binder = new Binder<>(Comment.class);
 		binder.forField(editor).bind(Comment::getMessage, Comment::setMessage);
+		binder.setBean(comment);
 		binder.readBean(comment);
 		editor.addValueChangeListener(event -> {
-			System.out.println("Value is changing from ["+event.getOldValue()+"] to ["+event.getValue()+"]");
+			System.out.println(binder.getBean().getMessage());
 		});
 		add(editor);
 
