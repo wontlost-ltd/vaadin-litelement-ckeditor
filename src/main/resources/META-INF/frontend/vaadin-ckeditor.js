@@ -1,6 +1,6 @@
-import {LitElement, html} from "lit-element";
+import { LitElement, html } from "lit-element";
 import { classMap } from 'lit-html/directives/class-map';
-import { registerStyles, css } from '@vaadin/vaadin-themable-mixin/register-styles.js';
+import { hljs } from 'highlight.js';
 import { ClassicEditor, InlineEditor, BalloonEditor, DcoupledEditor } from "./ckeditor";
 
 class VaadinCKEditor extends LitElement {
@@ -89,7 +89,7 @@ class VaadinCKEditor extends LitElement {
         if(this.themeType==='dark') {
             this.initDarkTheme();
         }
-
+        hljs.initHighlightingOnLoad();
         if(this.editorType==='classic') {
             ClassicEditor.create( document.querySelector( '#classic-editor' ) , {
                     toolbar:this.toolBar
