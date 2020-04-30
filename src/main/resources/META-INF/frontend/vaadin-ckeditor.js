@@ -96,23 +96,7 @@ class VaadinCKEditor extends LitElement {
 
         if(this.editorType==='classic') {
             ClassicEditor.create( document.querySelector( '#classic-editor' ) , {
-                    toolbar:this.toolBar,
-                    preCodeBlock :{
-                        highlightConfig:{
-                            // this function is called whenever syntax highlighting is requested.
-                            // the highlighting pre element and language will be the arguments for this function
-                            // this function should return syntax highlighted block.
-                            // below example uses highlightjs as syntax highlighter
-                            highlighter:( pre_block, language )=>{
-
-                                // to undo highlighting simply uncomment below two lines and return pre_block as is
-                                // or you can select plain/text/nohighlight option from language if highlighter supports
-                                pre_block.innerHTML = pre_block.innerHTML.replace(/<br[ \/]*>/gi, '\n');
-                                hljs.highlightBlock(pre_block); // refer https://github.com/highlightjs/highlight.js
-                                return pre_block; // return highlighted pre block to plugin
-                            }
-                        }
-                    }
+                    toolbar:this.toolBar
                 }).then( editor => {
                     editor.isReadOnly = this.isReadOnly;
                     editor.setData(this.editorData);
