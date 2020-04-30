@@ -1,6 +1,6 @@
 import { LitElement, html } from "lit-element";
 import { classMap } from 'lit-html/directives/class-map';
-import { hljs } from 'highlight.js';
+import { initHighlightingOnLoad,highlightAuto,highlightBlock,initHighlighting } from 'highlight.js';
 import { ClassicEditor, InlineEditor, BalloonEditor, DcoupledEditor } from "./ckeditor";
 
 class VaadinCKEditor extends LitElement {
@@ -89,7 +89,12 @@ class VaadinCKEditor extends LitElement {
         if(this.themeType==='dark') {
             this.initDarkTheme();
         }
-        hljs.initHighlightingOnLoad();
+        initHighlighting();
+        initHighlightingOnLoad();
+        document.querySelectorAll('pre code').forEach((block) => {
+            highlightBlock(block);
+        });
+        highlightAuto('<span>Hello World!</span>');
         if(this.editorType==='classic') {
             ClassicEditor.create( document.querySelector( '#classic-editor' ) , {
                     toolbar:this.toolBar
