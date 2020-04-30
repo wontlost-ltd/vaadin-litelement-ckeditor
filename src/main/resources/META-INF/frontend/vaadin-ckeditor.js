@@ -93,8 +93,6 @@ class VaadinCKEditor extends LitElement {
         if(this.themeType==='dark') {
             this.initDarkTheme();
         }
-        initHighlighting();
-        initHighlightingOnLoad();
         if(this.editorType==='classic') {
             ClassicEditor.create( document.querySelector( '#classic-editor' ) , {
                     toolbar:this.toolBar,
