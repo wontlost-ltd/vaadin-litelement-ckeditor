@@ -31,6 +31,7 @@ public enum Toolbar {
     pageBreak("pageBreak"),
     specialCharacters("specialCharacters"),
     alignment("alignment"),
+    pre("pre"),
     codeBlock("codeBlock"),
     highlight("highlight"),
     fontSize("fontSize"),

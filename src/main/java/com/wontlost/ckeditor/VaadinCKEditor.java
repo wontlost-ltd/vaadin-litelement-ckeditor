@@ -22,12 +22,12 @@ public class VaadinCKEditor extends CustomField<String> {
 
     private String editorData="";
 
-    private final Toolbar[] toolbar = new Toolbar[]{Toolbar.heading, Toolbar.pipe, Toolbar.fontSize, Toolbar.fontFamily,
+    public static final Toolbar[] TOOLBAR = new Toolbar[]{Toolbar.heading, Toolbar.pipe, Toolbar.fontSize, Toolbar.fontFamily,
            Toolbar.fontColor, Toolbar.fontBackgroundColor, Toolbar.pipe, Toolbar.bold, Toolbar.italic,
            Toolbar.underline, Toolbar.strikethrough, Toolbar.subscript, Toolbar.superscript, Toolbar.highlight,
            Toolbar.removeFormat, Toolbar.pipe, Toolbar.horizontalLine, Toolbar.pageBreak, Toolbar.link,
            Toolbar.bulletedList, Toolbar.numberedList, Toolbar.alignment, Toolbar.todoList, Toolbar.indent,
-           Toolbar.outdent, Toolbar.code, Toolbar.codeBlock, Toolbar.pipe, Toolbar.specialCharacters,
+           Toolbar.outdent, Toolbar.code, Toolbar.pre, Toolbar.codeBlock, Toolbar.pipe, Toolbar.specialCharacters,
            Toolbar.imageUpload, Toolbar.blockQuote, Toolbar.insertTable, Toolbar.mediaEmbed, Toolbar.undo, Toolbar.redo};
 
     /**
@@ -58,7 +58,7 @@ public class VaadinCKEditor extends CustomField<String> {
     private JsonArray toJson(Toolbar[] toolbar) {
         List<String> values = new ArrayList<>();
         if(toolbar == null || toolbar.length==0) {
-            toolbar = this.toolbar;
+            toolbar = VaadinCKEditor.TOOLBAR;
         }
         Arrays.stream(toolbar).forEach(item -> values.add(item.getValue()));
         String toolbarJson = new Gson().toJson(values);
