@@ -2,11 +2,6 @@ import { LitElement, html } from "lit-element";
 import { classMap } from 'lit-html/directives/class-map';
 import { ClassicEditor, InlineEditor, BalloonEditor, DcoupledEditor } from "./ckeditor";
 
-const hljs = require('highlight.js');
-// Or using the CommonJS version:
-// const ClassicEditor = require( '@ckeditor/ckeditor5-build-classic' );
-let _code_languages = ["plain","c","cs","cpp","html","xml","css","javascript","python","sql","php","perl","ruby","markdown","auto"];
-
 class VaadinCKEditor extends LitElement {
 
     constructor() {
@@ -116,9 +111,6 @@ class VaadinCKEditor extends LitElement {
                     } );
                     editor.model.document.on( 'change:data', (event, batch) => {
                         this.$server.setEditorData(editor.getData());
-                        document.querySelectorAll('pre code').forEach((block) => {
-                            highlightBlock(block);
-                        });
                     } );
                     window.editor = editor;
                 } ).catch( err => {
