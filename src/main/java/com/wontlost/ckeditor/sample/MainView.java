@@ -20,7 +20,7 @@ public class MainView extends VerticalLayout {
 		VaadinCKEditor editor = new VaadinCKEditorBuilder().with(builder -> {
 			builder.editorType = EditorType.CLASSIC;
 			builder.editorData = comment.getMessage();
-			builder.theme= ThemeType.DARK;
+//			builder.theme= ThemeType.DARK;
 		}).createVaadinCKEditor();
 		add(new Label(""));
 
