@@ -41,6 +41,7 @@ public class VaadinCKEditor extends CustomField<String> {
      * @param isReadOnly Make editor readonly
      */
     VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, ThemeType theme, String editorData, String width, String height, String margin, Boolean isReadOnly) {
+        this.editorData = editorData;
         getElement().setProperty("editorType", editorType.toString());
         getElement().setPropertyJson("toolBar", toJson(toolbar));
         getElement().setProperty("editorData", editorData==null?"":editorData);
