@@ -5,13 +5,10 @@ import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.dependency.JsModule;
-import com.vaadin.flow.dom.ShadowRoot;
 import elemental.json.JsonArray;
 import elemental.json.impl.JreJsonFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Used in @VaadinCKEditorBuilder.
@@ -20,7 +17,7 @@ import java.util.List;
 @JsModule("./vaadin-ckeditor.js")
 public class VaadinCKEditor extends CustomField<String> {
 
-    private String editorData="";
+    private String editorData;
 
     public static final Toolbar[] TOOLBAR = new Toolbar[]{Toolbar.heading, Toolbar.pipe, Toolbar.fontSize, Toolbar.fontFamily,
            Toolbar.fontColor, Toolbar.fontBackgroundColor, Toolbar.pipe, Toolbar.bold, Toolbar.italic,
@@ -32,24 +29,11 @@ public class VaadinCKEditor extends CustomField<String> {
 
     /**
      * Constructor of VaadinCKEditor.
-     * @param editorType  Type of Editor, refer to enum @EditorType.
-     * @param toolbar   Toolbar of Editor, refer to enum @Toolbar.
      * @param editorData Content of editor.
-     * @param width   Width of editor, default value is 'auto'.
-     * @param height  Height of editor, default value is 'auto'.
-     * @param margin Margin of editor, default value is '20px'.
-     * @param isReadOnly Make editor readonly
      */
-    VaadinCKEditor(EditorType editorType, Toolbar[] toolbar, ThemeType theme, String editorData, String width, String height, String margin, Boolean isReadOnly) {
+    VaadinCKEditor(String editorData) {
         this.editorData = editorData;
-        getElement().setProperty("editorType", editorType.toString());
-        getElement().setPropertyJson("toolBar", toJson(toolbar));
         getElement().setProperty("editorData", editorData==null?"":editorData);
-        getElement().setProperty("editorWidth", width==null?"auto":width);
-        getElement().setProperty("editorHeight", height==null?"auto":height);
-        getElement().setProperty("isReadOnly", isReadOnly==null?false:isReadOnly);
-        getElement().setProperty("themeType", theme==null?ThemeType.LIGHT.toString():theme.toString());
-        getElement().getStyle().set("margin", margin==null?"20px":margin);
     }
 
     /**
@@ -74,6 +58,14 @@ public class VaadinCKEditor extends CustomField<String> {
         this.editorData = newPresentationValue;
     }
 
+    public void setId(String id) {
+        getElement().setProperty("editorId", id==null? "editor-"+Math.abs(new Random().nextInt()): id);
+    }
+
+    public Optional<String> getId() {
+        return Optional.of(getElement().getProperty("editorId"));
+    }
+
     /**
      * Get content of editor.
      * @return Data in editor text area.
@@ -95,6 +87,62 @@ public class VaadinCKEditor extends CustomField<String> {
     @ClientCallable
     private void setEditorData(String editorData) {
         setValue(editorData);
+    }
+
+    /**
+     * @param placeHolder Place holder of Editor
+     */
+    void setPlaceHolder(String placeHolder){
+        getElement().setProperty("placeHolder", placeHolder==null?"Type the content here!":placeHolder);
+    }
+
+    /**
+     * @param editorType  Type of Editor, refer to enum @EditorType.
+     */
+    void setEditorType(EditorType editorType) {
+        getElement().setProperty("editorType", editorType.toString());
+    }
+
+    /**
+     * @param editorToolBar   Toolbar of Editor, refer to enum @Toolbar.
+     */
+    void setEditorToolBar(Toolbar[] editorToolBar) {
+        getElement().setPropertyJson("toolBar", toJson(editorToolBar));
+    }
+
+    /**
+     * @param editorWidth   Width of editor, default value is 'auto'.
+     */
+    public void setWidth(String editorWidth) {
+        getElement().setProperty("editorWidth", editorWidth==null?"auto":editorWidth);
+    }
+
+    /**
+     * @param editorHeight  Height of editor, default value is 'auto'.
+     */
+    public void setHeight(String editorHeight) {
+        getElement().setProperty("editorHeight", editorHeight==null?"auto":editorHeight);
+    }
+
+    /**
+     * @param readOnly Make editor readonly
+     */
+    public void setReadOnly(boolean readOnly) {
+        getElement().setProperty("isReadOnly", readOnly);
+    }
+
+    /**
+     * @param theme  Theme of Editor, refer to enum @ThemeType.
+     */
+    void setEditorTheme(ThemeType theme) {
+        getElement().setProperty("themeType", theme==null?ThemeType.LIGHT.toString():theme.toString());
+    }
+
+    /**
+     * @param margin Margin of editor, default value is '20px'.
+     */
+    void setEditorMargin(String margin) {
+        getElement().getStyle().set("margin", margin==null?"20px":margin);
     }
 
 }

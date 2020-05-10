@@ -4,13 +4,15 @@ import java.util.function.Consumer;
 
 public class VaadinCKEditorBuilder {
 
+    public String editorId;
     public String editorData;
     public String width;
     public String height;
     public String margin;
     public EditorType editorType = EditorType.CLASSIC;
     public ThemeType theme;
-    public Boolean isReadOnly = false;
+    public Boolean readOnly = false;
+    public String placeHolder;
     public Toolbar[] toolbar = VaadinCKEditor.TOOLBAR;
 
     public VaadinCKEditorBuilder with(Consumer<VaadinCKEditorBuilder> builderFunction) {
@@ -19,7 +21,19 @@ public class VaadinCKEditorBuilder {
     }
 
     public VaadinCKEditor createVaadinCKEditor() {
-        return new VaadinCKEditor(editorType, toolbar, theme, editorData, width, height, margin, isReadOnly);
+        VaadinCKEditor editor = new VaadinCKEditor(editorData);
+        editor.setId(editorId);
+        editor.setWidth(width);
+        editor.setHeight(height);
+        editor.setEditorMargin(margin);
+        editor.setEditorTheme(theme);
+        editor.setEditorToolBar(toolbar);
+        editor.setReadOnly(readOnly);
+        editor.setEditorType(editorType);
+        if(editorData == null) {
+            editor.setPlaceHolder(placeHolder);
+        }
+        return editor;
     }
 
 }

@@ -11,20 +11,24 @@ class VaadinCKEditor extends LitElement {
             'document-editor__editable'  : true,
             'ck-editor__editable' : true
         };
+        this.editorMap = {};
         this.isFirefox = typeof InstallTrigger !== 'undefined';
         this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
     }
 
     static get properties() {
-        return { editorType: String,
+        return { editorId: String,
+                 editorType: String,
                  editorData: String,
                  editorWidth: String,
                  editorHeight: String,
                  themeType: String,
                  themeCss: String,
+                 placeHolder: String,
                  isReadOnly: Boolean,
-                 isFirefox:Boolean,
-                 isChrome:Boolean,
+                 isFirefox: Boolean,
+                 isChrome: Boolean,
+                 editorMap: Object,
                  toolBar: Array};
     }
 
@@ -89,117 +93,54 @@ class VaadinCKEditor extends LitElement {
             this.initDarkTheme();
         }
 
-        if(this.editorType==='classic') {
-            ClassicEditor.create( document.querySelector( '#classic-editor' ) , {
-                    toolbar:this.toolBar
-                }).then( editor => {
-                    editor.isReadOnly = this.isReadOnly;
-                    editor.setData(this.editorData);
-                    if(this.isChrome)
-                        this.style.width='-webkit-fill-available';
-                    else if(this.isFirefox)
-                        this.style.width='-moz-available';
-                    else
-                        this.style.width='100%';
-                    editor.editing.view.change( writer => {
-                        if(this.editorHeight) {
-                            writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
-                        }
-                        if(this.editorWidth) {
-                            writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
-                        }
-                    } );
-                    editor.model.document.on( 'change:data', (event, batch) => {
-                        this.$server.setEditorData(editor.getData());
-                    } );
-                    window.editor = editor;
-                } ).catch( err => {
-                    console.error( err.stack );
-                } );
-        }else if(this.editorType==='inline') {
-            InlineEditor.create( document.querySelector( '#inline-editor' ) , {
-                    toolbar:this.toolBar
-                }).then( editor => {
-                    editor.isReadOnly = this.isReadOnly;
-                    editor.setData(this.editorData);
-                    if(this.isChrome)
-                        this.style.width='-webkit-fill-available';
-                    else if(this.isFirefox)
-                        this.style.width='-moz-available';
-                    else
-                        this.style.width='100%';
-                    editor.editing.view.change( writer => {
-                        if(this.editorHeight) {
-                            writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
-                        }
-                        if(this.editorWidth) {
-                            writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
-                        }
-                    } );
-                    editor.model.document.on( 'change:data', () => {
-                        this.$server.setEditorData(editor.getData());
-                    } );
-                    window.editor = editor;
-                } ).catch( err => {
-                    console.error( err.stack );
-                } );
-        }else if(this.editorType==='balloon') {
-            BalloonEditor.create( document.querySelector( '#balloon-editor' ) , {
-                    toolbar:this.toolBar
-                }).then( editor => {
-                    editor.isReadOnly = this.isReadOnly;
-                    editor.setData(this.editorData);
-                    if(this.isChrome)
-                        this.style.width='-webkit-fill-available';
-                    else if(this.isFirefox)
-                        this.style.width='-moz-available';
-                    else
-                        this.style.width='100%';
-                    editor.editing.view.change( writer => {
-                        if(this.editorHeight) {
-                            writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
-                        }
-                        if(this.editorWidth) {
-                            writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
-                        }
-                    } );
-                    editor.model.document.on( 'change:data', () => {
-                        this.$server.setEditorData(editor.getData());
-                    } );
-                    window.editor = editor;
-                } ).catch( err => {
-                    console.error( err.stack );
-                } );
-        }else if(this.editorType==='decoupled') {
-            DcoupledEditor.create( document.querySelector( '#decoupled-editor' ) , {
-                    toolbar:this.toolBar
-                }).then( editor => {
-                    editor.isReadOnly = this.isReadOnly;
-                    editor.setData(this.editorData);
-                    if(this.isChrome)
-                        this.style.width='-webkit-fill-available';
-                    else if(this.isFirefox)
-                        this.style.width='-moz-available';
-                    else
-                        this.style.width='100%';
-                    editor.editing.view.change( writer => {
-                        if(this.editorHeight) {
-                            writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
-                        }
-                        if(this.editorWidth) {
-                            writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
-                        }
-                    } );
-                    editor.model.document.on( 'change:data', () => {
-                        this.$server.setEditorData(editor.getData());
-                    } );
-                    window.editor = editor;
-                    document.querySelector( '.toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
-                    document.querySelector( '.editable-container' ).appendChild( editor.ui.view.editable.element );
-                } ).catch( err => {
-                    console.error( err.stack );
-                } );
+        this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , {
+            toolbar:this.toolBar,
+            placeholder:this.placeHolder
+        }).then( editor => {
+            editor.isReadOnly = this.isReadOnly;
+            editor.setData(this.editorData);
+            if(this.isChrome)
+                this.style.width='-webkit-fill-available';
+            else if(this.isFirefox)
+                this.style.width='-moz-available';
+            else
+                this.style.width='100%';
+            this.style.height='100%';
+            editor.editing.view.change( writer => {
+                if(this.editorHeight) {
+                    writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
+                }
+                if(this.editorWidth) {
+                    writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
+                }
+            } );
+            editor.model.document.on( 'change:data', (event, batch) => {
+                this.$server.setEditorData(editor.getData());
+            } );
+            this.editorMap[this.editorId] = editor;
+            if(this.editorType==='decoupled') {
+                document.querySelector( '.toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
+                document.querySelector( '.editable-container' ).appendChild( editor.ui.view.editable.element );
+            }
+        } ).catch( err => {
+            console.error( err.stack );
+        } );
+
+    }
+
+    getEditorByType(editorType) {
+        if(editorType==='decoupled'){
+            return DcoupledEditor;
+        }else if(editorType==='balloon') {
+            return BalloonEditor;
+        }else if(editorType==='inline') {
+            return InlineEditor;
         }
+        return ClassicEditor;
+    }
+
+    setEditorValue(editorId, value) {
+        this.editorMap[editorId].setData(value);
     }
 
     render() {
@@ -234,11 +175,11 @@ class VaadinCKEditor extends LitElement {
                         box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
                     }
                 </style>
-                <div id="${this.editorType}-editor" class=${classMap(this.classes)}/>
+                <div id="${this.editorId}" class=${classMap(this.classes)}/>
             `;
         } else {
             return html`
-                <div id="${this.editorType}-editor"/>
+                <div id="${this.editorId}"/>
             `;
         }
 
