@@ -5,6 +5,8 @@ import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.dom.PropertyChangeEvent;
+import com.vaadin.flow.dom.PropertyChangeListener;
 import elemental.json.JsonArray;
 import elemental.json.impl.JreJsonFactory;
 
@@ -75,7 +77,7 @@ public class VaadinCKEditor extends CustomField<String> {
     }
 
     /**
-     * Set content of editor.
+     * Set value of editor.
      * @param value  Data in editor text area.
      */
     public void setValue(String value) {
@@ -87,6 +89,16 @@ public class VaadinCKEditor extends CustomField<String> {
     @ClientCallable
     private void setEditorData(String editorData) {
         setValue(editorData);
+    }
+
+    /**
+     * Method calls client js funtion
+     * @param content
+     */
+    public void setEditorContent(String content) {
+        if(getId().isPresent()) {
+            getElement().executeJs("this.setEditorContent($0, $1)", getId().get(), content);
+        }
     }
 
     /**
