@@ -7,11 +7,12 @@
     "raw-loader": "3.0.0",
     "ts-loader": "^6.2.1",
     "url-loader": "^3.0.0",
-    "webpack": "4.30.0",
+    "webpack": "4.42.0",
     "webpack-babel-multi-target-plugin": "2.3.3",
     "webpack-cli": "3.3.10",
     "webpack-dev-server": "3.9.0",
-    "webpack-merge": "4.2.2"
+    "webpack-merge": "4.2.2",
+    "terser": "4.6.7"
   },
   "dependencies": {
     "@polymer/iron-icon": "3.0.1",
@@ -25,5 +26,5 @@
   },
   "name": "no-name",
   "license": "UNLICENSED",
-  "vaadinAppPackageHash": "92bc89a9c4a03b3e150ad0ae79069103bbbc47a102ed2f7185aca62792511dd1"
+  "vaadinAppPackageHash": "Main dependencies updated, force install"
 }

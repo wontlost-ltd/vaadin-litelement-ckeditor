@@ -93,7 +93,7 @@ public class VaadinCKEditor extends CustomField<String> {
 
     /**
      * Method calls client js funtion
-     * @param content
+     * @param content editor content
      */
     public void setEditorContent(String content) {
         if(getId().isPresent()) {
