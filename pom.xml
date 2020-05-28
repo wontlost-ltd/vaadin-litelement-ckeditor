@@ -64,7 +64,7 @@
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>ckeditor-vaadin</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.4</version>
         </dependency>
     </dependencies>
     <build>
