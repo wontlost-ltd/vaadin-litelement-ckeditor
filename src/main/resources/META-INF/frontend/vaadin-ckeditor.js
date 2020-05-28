@@ -139,7 +139,7 @@ class VaadinCKEditor extends LitElement {
         return ClassicEditor;
     }
 
-    setEditorContent(editorId, value) {
+    updateData(editorId, value) {
         this.editorMap[editorId].setData(value);
     }
 

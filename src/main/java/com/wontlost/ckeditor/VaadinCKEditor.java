@@ -78,6 +78,7 @@ public class VaadinCKEditor extends CustomField<String> {
 
     /**
      * Set value of editor.
+     * Together with calling updateValue method to refresh editor content
      * @param value  Data in editor text area.
      */
     public void setValue(String value) {
@@ -95,10 +96,20 @@ public class VaadinCKEditor extends CustomField<String> {
      * Method calls client js funtion
      * @param content editor content
      */
-    public void setEditorContent(String content) {
+    private void updateValue(String content) {
         if(getId().isPresent()) {
-            getElement().executeJs("this.setEditorContent($0, $1)", getId().get(), content);
+            getElement().executeJs("this.updateData($0, $1)", getId().get(), content);
         }
+    }
+
+    public void updateValue() {
+        super.updateValue();
+        updateValue(this.editorData);
+    }
+
+    public void doSetUpdate(String editorContent) {
+        setValue(editorContent);
+        updateValue();
     }
 
     /**
