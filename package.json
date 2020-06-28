@@ -1,27 +1,27 @@
 {
   "devDependencies": {
     "@vaadin/vaadin-themable-mixin": "^1.6.1",
-    "compression-webpack-plugin": "3.0.1",
-    "copy-webpack-plugin": "5.1.0",
-    "css-loader": "^3.4.2",
-    "raw-loader": "3.0.0",
-    "ts-loader": "^6.2.1",
-    "url-loader": "^3.0.0",
+    "compression-webpack-plugin": "4.0.0",
+    "copy-webpack-plugin": "6.0.2",
+    "css-loader": "^3.6.0",
+    "raw-loader": "4.0.1",
+    "ts-loader": "^7.0.5",
+    "url-loader": "^4.1.0",
     "webpack": "4.42.0",
     "webpack-babel-multi-target-plugin": "2.3.3",
-    "webpack-cli": "3.3.10",
-    "webpack-dev-server": "3.9.0",
+    "webpack-cli": "3.3.12",
+    "webpack-dev-server": "3.11.0",
     "webpack-merge": "4.2.2",
-    "terser": "4.6.7"
+    "terser": "4.8.0",
+    "chokidar": "^3.4.0"
   },
   "dependencies": {
     "@polymer/iron-icon": "3.0.1",
     "@polymer/polymer": "3.2.0",
-    "@vaadin/flow-deps": "./target/frontend",
     "@webcomponents/webcomponentsjs": "^2.2.10",
-    "highlight.js": "^10.0.1",
-    "lit-element": "=2.2.1",
-    "lit-html": "^1.1.2",
+    "highlight.js": "^10.1.1",
+    "lit-element": "=2.3.1",
+    "lit-html": "^1.2.1",
     "resize-observer-polyfill": "^1.5.1"
   },
   "name": "no-name",
@@ -39,9 +39,10 @@
       "raw-loader": "3.1.0",
       "webpack-cli": "3.3.11",
       "webpack": "4.42.0",
-      "terser": "4.6.7",
+      "terser": "4.8.0",
       "webpack-merge": "4.2.2",
-      "webpack-dev-server": "3.10.3"
+      "webpack-dev-server": "3.10.3",
+      "chokidar": "^3.4.0"
     },
     "hash": ""
   }

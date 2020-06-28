@@ -39,6 +39,7 @@ public enum Toolbar {
     fontBackgroundColor("fontBackgroundColor"),
     restrictedEditingException("restrictedEditingException"),
     todoList("todoList"),
+    exportPdf("exportPdf"),
     insertTable("insertTable");
 
     private final String value;
