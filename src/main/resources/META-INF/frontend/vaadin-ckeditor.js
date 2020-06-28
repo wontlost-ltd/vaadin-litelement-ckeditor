@@ -93,7 +93,7 @@ class VaadinCKEditor extends LitElement {
             this.initDarkTheme();
         }
 
-        CKEDITOR.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , {
+        this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , {
             toolbar:this.toolBar,
             placeholder:this.placeHolder
         }).then( editor => {
@@ -130,13 +130,13 @@ class VaadinCKEditor extends LitElement {
 
     getEditorByType(editorType) {
         if(editorType==='decoupled'){
-            return DcoupledEditor;
+            return CKEDITOR.DcoupledEditor;
         }else if(editorType==='balloon') {
-            return BalloonEditor;
+            return CKEDITOR.BalloonEditor;
         }else if(editorType==='inline') {
-            return InlineEditor;
+            return CKEDITOR.InlineEditor;
         }
-        return ClassicEditor;
+        return CKEDITOR.ClassicEditor;
     }
 
     updateData(editorId, value) {
