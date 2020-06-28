@@ -1,6 +1,6 @@
 import { LitElement, html } from "lit-element";
 import { classMap } from 'lit-html/directives/class-map';
-import { CKEDITOR } from "./ckeditor";
+import { ClassicEditor, InlineEditor, BalloonEditor, DcoupledEditor} from "./ckeditor";
 
 class VaadinCKEditor extends LitElement {
 
@@ -93,7 +93,7 @@ class VaadinCKEditor extends LitElement {
             this.initDarkTheme();
         }
 
-        CKEDITOR.ClassicEditor.create(document.querySelector( "#"+this.editorId ) , {
+        CKEDITOR.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , {
             toolbar:this.toolBar,
             placeholder:this.placeHolder
         }).then( editor => {
@@ -130,13 +130,13 @@ class VaadinCKEditor extends LitElement {
 
     getEditorByType(editorType) {
         if(editorType==='decoupled'){
-            return CKEDITOR.DcoupledEditor;
+            return DcoupledEditor;
         }else if(editorType==='balloon') {
-            return CKEDITOR.BalloonEditor;
+            return BalloonEditor;
         }else if(editorType==='inline') {
-            return CKEDITOR.InlineEditor;
+            return InlineEditor;
         }
-        return CKEDITOR.ClassicEditor;
+        return ClassicEditor;
     }
 
     updateData(editorId, value) {
