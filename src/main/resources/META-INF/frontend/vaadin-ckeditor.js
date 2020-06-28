@@ -93,7 +93,7 @@ class VaadinCKEditor extends LitElement {
             this.initDarkTheme();
         }
 
-        this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , {
+        CKEDITOR.ClassicEditor.create(document.querySelector( "#"+this.editorId ) , {
             toolbar:this.toolBar,
             placeholder:this.placeHolder
         }).then( editor => {
