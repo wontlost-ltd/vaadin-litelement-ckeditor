@@ -1,24 +1,24 @@
 {
   "devDependencies": {
-    "copy-webpack-plugin": "5.1.0",
-    "css-loader": "^3.4.2",
-    "raw-loader": "3.0.0",
-    "ts-loader": "^6.2.1",
-    "url-loader": "^3.0.0",
-    "webpack": "4.30.0",
-    "webpack-babel-multi-target-plugin": "2.3.3",
-    "webpack-cli": "3.3.10",
-    "webpack-dev-server": "3.9.0",
-    "webpack-merge": "4.2.2",
-    "compression-webpack-plugin": "3.0.1"
+    "copy-webpack-plugin": "^6.0.2",
+    "css-loader": "^3.6.0",
+    "raw-loader": "^4.0.1",
+    "ts-loader": "^7.0.5",
+    "url-loader": "^4.1.0",
+    "webpack": "^4.43.0",
+    "webpack-babel-multi-target-plugin": "^2.3.3",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0",
+    "webpack-merge": "^4.2.2",
+    "compression-webpack-plugin": "^4.0.0"
   },
   "dependencies": {
-    "@polymer/polymer": "3.2.0",
-    "@webcomponents/webcomponentsjs": "^2.2.10",
-    "lit-element": "=2.2.1",
-    "lit-html": "^1.1.2",
+    "@polymer/polymer": "^3.4.1",
+    "@webcomponents/webcomponentsjs": "^2.4.3",
+    "lit-element": "^2.3.1",
+    "lit-html": "^1.2.1",
     "resize-observer-polyfill": "^1.5.1",
-    "@polymer/iron-icon": "3.0.1"
+    "@polymer/iron-icon": "^3.0.1"
   },
   "name": "no-name",
   "license": "UNLICENSED",
