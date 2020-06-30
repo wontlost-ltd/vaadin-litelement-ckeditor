@@ -1,6 +1,9 @@
 import { LitElement, html } from "lit-element";
 import { classMap } from 'lit-html/directives/class-map';
-import { ClassicEditor, InlineEditor, DcoupledEditor, BalloonEditor } from "./ckeditor";
+const ClassicEditor = require("./ckeditor");
+const InlineEditor = require("./ckeditor");
+const DcoupledEditor = require("./ckeditor");
+const BalloonEditor = require("./ckeditor");
 
 class VaadinCKEditor extends LitElement {
 
