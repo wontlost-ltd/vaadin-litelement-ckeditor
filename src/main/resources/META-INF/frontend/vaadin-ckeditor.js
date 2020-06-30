@@ -1,9 +1,6 @@
 import { LitElement, html } from "lit-element";
 import { classMap } from 'lit-html/directives/class-map';
-const ClassicEditor = require("./ckeditor");
-const InlineEditor = require("./ckeditor");
-const DcoupledEditor = require("./ckeditor");
-const BalloonEditor = require("./ckeditor");
+const EDITOR = require("./ckeditor");
 
 class VaadinCKEditor extends LitElement {
 
@@ -133,13 +130,13 @@ class VaadinCKEditor extends LitElement {
 
     getEditorByType(editorType) {
         if(editorType==='decoupled'){
-            return DcoupledEditor;
+            return EDITOR.DcoupledEditor;
         }else if(editorType==='balloon') {
-            return BalloonEditor;
+            return EDITOR.BalloonEditor;
         }else if(editorType==='inline') {
-            return InlineEditor;
+            return EDITOR.InlineEditor;
         }
-        return ClassicEditor;
+        return EDITOR.ClassicEditor;
     }
 
     updateData(editorId, value) {
