@@ -1,6 +1,6 @@
 import { LitElement, html } from "lit-element";
 import { classMap } from 'lit-html/directives/class-map';
-const CKEDITOR = require("./ckeditor");
+const CKEDITOR = require("./ckeditor").default();
 
 class VaadinCKEditor extends LitElement {
 
