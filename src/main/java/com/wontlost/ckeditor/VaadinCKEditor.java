@@ -3,6 +3,7 @@ package com.wontlost.ckeditor;
 import com.google.gson.Gson;
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Tag;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.dom.PropertyChangeEvent;
@@ -170,10 +171,12 @@ public class VaadinCKEditor extends CustomField<String> {
 
     void setUILanguage(String uiLanguage) {
         getElement().setProperty("uiLanguage", uiLanguage==null?"en":uiLanguage);
+        UI.getCurrent().getPage().addJavaScript("./translations/"+uiLanguage+".js");
     }
 
     void setContentLanguage(String contentLanguage) {
         getElement().setProperty("contentLanguage", contentLanguage==null?"en":contentLanguage);
+        UI.getCurrent().getPage().addJavaScript("./translations/"+contentLanguage+".js");
     }
 
 }
