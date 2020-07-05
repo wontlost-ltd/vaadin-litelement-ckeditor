@@ -13,6 +13,8 @@ public class VaadinCKEditorBuilder {
     public ThemeType theme;
     public Boolean readOnly = false;
     public String placeHolder;
+    public String uiLanguage;
+    public String contentLanguage;
     public Toolbar[] toolbar = VaadinCKEditor.TOOLBAR;
 
     public VaadinCKEditorBuilder with(Consumer<VaadinCKEditorBuilder> builderFunction) {
@@ -30,6 +32,8 @@ public class VaadinCKEditorBuilder {
         editor.setEditorToolBar(toolbar);
         editor.setReadOnly(readOnly);
         editor.setEditorType(editorType);
+        editor.setUILanguage(uiLanguage);
+        editor.setContentLanguage(contentLanguage);
         if(editorData == null) {
             editor.setPlaceHolder(placeHolder);
         }
