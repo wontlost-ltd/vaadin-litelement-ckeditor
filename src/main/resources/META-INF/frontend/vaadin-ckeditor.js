@@ -25,6 +25,8 @@ class VaadinCKEditor extends LitElement {
                  themeType: String,
                  themeCss: String,
                  placeHolder: String,
+                 uiLanguage: String,
+                 contentLanguage: String,
                  isReadOnly: Boolean,
                  isFirefox: Boolean,
                  isChrome: Boolean,
@@ -95,7 +97,11 @@ class VaadinCKEditor extends LitElement {
 
         this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , {
             toolbar:this.toolBar,
-            placeholder:this.placeHolder
+            placeholder:this.placeHolder,
+            language: {
+                ui: this.uiLanguage,
+                content: this.contentLanguage
+            }
         }).then( editor => {
             editor.isReadOnly = this.isReadOnly;
             editor.setData(this.editorData);
@@ -135,7 +141,7 @@ class VaadinCKEditor extends LitElement {
                    'balloon'===editorType?CKEDITOR.BalloonEditor:
                    'decoupled'===editorType?CKEDITOR.DcoupledEditor:CKEDITOR.ClassicEditor;
         }catch (e) {//for development mode
-            console.log("Error: " + e );
+            console.log("development mode: " + e );
             return 'classic'===editorType?EDITOR.ClassicEditor:
                    'inline'===editorType?EDITOR.InlineEditor:
                    'balloon'===editorType?EDITOR.BalloonEditor:
