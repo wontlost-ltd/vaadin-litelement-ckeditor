@@ -14,7 +14,6 @@ public class VaadinCKEditorBuilder {
     public Boolean readOnly = false;
     public String placeHolder;
     public String uiLanguage;
-    public String contentLanguage;
     public Toolbar[] toolbar = VaadinCKEditor.TOOLBAR;
 
     public VaadinCKEditorBuilder with(Consumer<VaadinCKEditorBuilder> builderFunction) {
