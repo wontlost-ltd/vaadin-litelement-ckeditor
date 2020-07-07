@@ -16,6 +16,22 @@ class VaadinCKEditor extends LitElement {
         this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
     }
 
+    loadLanguage(scriptUrl) {
+        let script = document.createElement('script');
+        script.src = scriptUrl;
+        if(document.querySelectorAll('[src="' + scriptUrl + '"]').length === 0) {
+            document.head.appendChild(script);
+        }
+        return new Promise((success, failed) => {
+            script.onload = function() {
+                success();
+            }
+            script.onerror = function () {
+                failed();
+            }
+        });
+    }
+
     static get properties() {
         return { editorId: String,
                  editorType: String,
@@ -26,7 +42,6 @@ class VaadinCKEditor extends LitElement {
                  themeCss: String,
                  placeHolder: String,
                  uiLanguage: String,
-                 contentLanguage: String,
                  isReadOnly: Boolean,
                  isFirefox: Boolean,
                  isChrome: Boolean,
@@ -95,42 +110,44 @@ class VaadinCKEditor extends LitElement {
             this.initDarkTheme();
         }
 
-        this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , {
-            toolbar:this.toolBar,
-            placeholder:this.placeHolder,
-            language: {
-                ui: this.uiLanguage,
-                content: this.contentLanguage
-            }
-        }).then( editor => {
-            editor.isReadOnly = this.isReadOnly;
-            editor.setData(this.editorData);
-            if(this.isChrome)
-                this.style.width='-webkit-fill-available';
-            else if(this.isFirefox)
-                this.style.width='-moz-available';
-            else
-                this.style.width='100%';
-            this.style.height='100%';
-            editor.editing.view.change( writer => {
-                if(this.editorHeight) {
-                    writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
+        this.loadLanguage('https://www.wontlost.com/translations/'+this.uiLanguage+'.js').then(() => {
+            console.log('Language \''+this.uiLanguage+'\' loaded! Initilizing the ckeditor...');
+            this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , {
+                toolbar:this.toolBar,
+                placeholder:this.placeHolder,
+                language: this.uiLanguage
+            }).then( editor => {
+                editor.isReadOnly = this.isReadOnly;
+                editor.setData(this.editorData);
+                if(this.isChrome)
+                    this.style.width='-webkit-fill-available';
+                else if(this.isFirefox)
+                    this.style.width='-moz-available';
+                else
+                    this.style.width='100%';
+                this.style.height='100%';
+                editor.editing.view.change( writer => {
+                    if(this.editorHeight) {
+                        writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
+                    }
+                    if(this.editorWidth) {
+                        writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
+                    }
+                } );
+                editor.model.document.on( 'change:data', (event, batch) => {
+                    this.$server.setEditorData(editor.getData());
+                } );
+                this.editorMap[this.editorId] = editor;
+                if(this.editorType==='decoupled') {
+                    document.querySelector( '.toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
+                    document.querySelector( '.editable-container' ).appendChild( editor.ui.view.editable.element );
                 }
-                if(this.editorWidth) {
-                    writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
-                }
+            } ).catch( err => {
+                console.error( err.stack );
             } );
-            editor.model.document.on( 'change:data', (event, batch) => {
-                this.$server.setEditorData(editor.getData());
-            } );
-            this.editorMap[this.editorId] = editor;
-            if(this.editorType==='decoupled') {
-                document.querySelector( '.toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
-                document.querySelector( '.editable-container' ).appendChild( editor.ui.view.editable.element );
-            }
-        } ).catch( err => {
-            console.error( err.stack );
-        } );
+        }).catch(() => {
+            console.error('Language loading failed!');
+        });
 
     }
 

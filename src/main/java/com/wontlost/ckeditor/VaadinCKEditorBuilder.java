@@ -33,7 +33,6 @@ public class VaadinCKEditorBuilder {
         editor.setReadOnly(readOnly);
         editor.setEditorType(editorType);
         editor.setUILanguage(uiLanguage);
-        editor.setContentLanguage(contentLanguage);
         if(editorData == null) {
             editor.setPlaceHolder(placeHolder);
         }

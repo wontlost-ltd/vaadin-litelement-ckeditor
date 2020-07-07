@@ -171,12 +171,6 @@ public class VaadinCKEditor extends CustomField<String> {
 
     void setUILanguage(String uiLanguage) {
         getElement().setProperty("uiLanguage", uiLanguage==null?"en":uiLanguage);
-        UI.getCurrent().getPage().addJavaScript("./translations/"+uiLanguage+".js");
-    }
-
-    void setContentLanguage(String contentLanguage) {
-        getElement().setProperty("contentLanguage", contentLanguage==null?"en":contentLanguage);
-        UI.getCurrent().getPage().addJavaScript("./translations/"+contentLanguage+".js");
     }
 
 }
