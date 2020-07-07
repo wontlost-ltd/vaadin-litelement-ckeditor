@@ -19,9 +19,7 @@ class VaadinCKEditor extends LitElement {
     loadLanguage(scriptUrl) {
         let script = document.createElement('script');
         script.src = scriptUrl;
-        if(document.querySelectorAll('[src="' + scriptUrl + '"]').length === 0) {
-            document.head.appendChild(script);
-        }
+        document.head.appendChild(script);
         return new Promise((success, failed) => {
             script.onload = function() {
                 success();
@@ -110,44 +108,17 @@ class VaadinCKEditor extends LitElement {
             this.initDarkTheme();
         }
 
-        this.loadLanguage('https://www.wontlost.com/translations/'+this.uiLanguage+'.js').then(() => {
-            console.log('Language \''+this.uiLanguage+'\' loaded! Initilizing the ckeditor...');
-            this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , {
-                toolbar:this.toolBar,
-                placeholder:this.placeHolder,
-                language: this.uiLanguage
-            }).then( editor => {
-                editor.isReadOnly = this.isReadOnly;
-                editor.setData(this.editorData);
-                if(this.isChrome)
-                    this.style.width='-webkit-fill-available';
-                else if(this.isFirefox)
-                    this.style.width='-moz-available';
-                else
-                    this.style.width='100%';
-                this.style.height='100%';
-                editor.editing.view.change( writer => {
-                    if(this.editorHeight) {
-                        writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
-                    }
-                    if(this.editorWidth) {
-                        writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
-                    }
-                } );
-                editor.model.document.on( 'change:data', (event, batch) => {
-                    this.$server.setEditorData(editor.getData());
-                } );
-                this.editorMap[this.editorId] = editor;
-                if(this.editorType==='decoupled') {
-                    document.querySelector( '.toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
-                    document.querySelector( '.editable-container' ).appendChild( editor.ui.view.editable.element );
-                }
-            } ).catch( err => {
-                console.error( err.stack );
-            } );
-        }).catch(() => {
-            console.error('Language loading failed!');
-        });
+        let scriptUrl = 'https://www.wontlost.com/translations/'+this.uiLanguage+'.js';
+        if('en'!==this.uiLanguage && document.querySelectorAll('[src="' + scriptUrl + '"]').length === 0) {
+            this.loadLanguage(scriptUrl).then(() => {
+                console.log('Language \''+this.uiLanguage+'\' loaded! Initilizing the ckeditor...');
+                this.createEditor();
+            }).catch(() => {
+                console.error('Language loading failed!');
+            });
+        } else {
+            this.createEditor();
+        }
 
     }
 
@@ -164,6 +135,42 @@ class VaadinCKEditor extends LitElement {
                    'balloon'===editorType?EDITOR.BalloonEditor:
                    'decoupled'===editorType?EDITOR.DcoupledEditor:editor.ClassicEditor;
         }
+    }
+
+    createEditor() {
+        this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , {
+            toolbar:this.toolBar,
+            placeholder:this.placeHolder,
+            language: this.uiLanguage
+        }).then( editor => {
+            editor.isReadOnly = this.isReadOnly;
+            editor.setData(this.editorData);
+            if(this.isChrome)
+                this.style.width='-webkit-fill-available';
+            else if(this.isFirefox)
+                this.style.width='-moz-available';
+            else
+                this.style.width='100%';
+            this.style.height='100%';
+            editor.editing.view.change( writer => {
+                if(this.editorHeight) {
+                    writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
+                }
+                if(this.editorWidth) {
+                    writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
+                }
+            } );
+            editor.model.document.on( 'change:data', (event, batch) => {
+                this.$server.setEditorData(editor.getData());
+            } );
+            this.editorMap[this.editorId] = editor;
+            if(this.editorType==='decoupled') {
+                document.querySelector( '.toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
+                document.querySelector( '.editable-container' ).appendChild( editor.ui.view.editable.element );
+            }
+        } ).catch( err => {
+            console.error( err.stack );
+        } );
     }
 
     updateData(editorId, value) {
