@@ -32,6 +32,7 @@ class VaadinCKEditor extends LitElement {
 
     static get properties() {
         return { editorId: String,
+                 label: String,
                  editorType: String,
                  editorData: String,
                  editorWidth: String,
@@ -43,6 +44,7 @@ class VaadinCKEditor extends LitElement {
                  isReadOnly: Boolean,
                  isFirefox: Boolean,
                  isChrome: Boolean,
+                 required: Boolean,
                  editorMap: Object,
                  toolBar: Array};
     }
@@ -182,38 +184,17 @@ class VaadinCKEditor extends LitElement {
             return html`
                 <div class="toolbar-container"></div>
                 <div class="editable-container"></div>
-                <style>
-                    .editable-container,
-                    .toolbar-container {
-                        position: relative;
-                        border: 1px solid #ddd;
-                        background: #eee;
-                    }
-            
-                    .toolbar-container {
-                        padding: 1em;
-                    }
-            
-                    .editable-container {
-                        padding: 3em;
-                        overflow-y: scroll;
-                        max-height: 500px;
-                    }
-            
-                    .editable-container .document-editor__editable.ck-editor__editable {
-                        min-height: 21cm;
-                        padding: 2em;
-                        border: 1px #D3D3D3 solid;
-                        border-radius: var(--ck-border-radius);
-                        background: white;
-                        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-                    }
-                </style>
-                <div id="${this.editorId}" class=${classMap(this.classes)}/>
+                <div class="container" required="${this.required}">
+                    <label part="label">${this.label}</label>
+                    <div id="${this.editorId}" class=${classMap(this.classes)}/>
+                </div>
             `;
         } else {
             return html`
-                <div id="${this.editorId}"/>
+                <div class="container" required="${this.required}">
+                    <label part="label">${this.label}</label>
+                    <div part="ckeditor" id="${this.editorId}"/>
+                </div>
             `;
         }
 

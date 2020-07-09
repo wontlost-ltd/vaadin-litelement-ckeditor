@@ -3,11 +3,9 @@ package com.wontlost.ckeditor;
 import com.google.gson.Gson;
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.customfield.CustomField;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
-import com.vaadin.flow.dom.PropertyChangeEvent;
-import com.vaadin.flow.dom.PropertyChangeListener;
 import elemental.json.JsonArray;
 import elemental.json.impl.JreJsonFactory;
 
@@ -18,6 +16,7 @@ import java.util.*;
  */
 @Tag("vaadin-ckeditor")
 @JsModule("./vaadin-ckeditor.js")
+@CssImport("./ckeditor.css")
 public class VaadinCKEditor extends CustomField<String> {
 
     private String editorData;
@@ -99,18 +98,13 @@ public class VaadinCKEditor extends CustomField<String> {
      */
     private void updateValue(String content) {
         if(getId().isPresent()) {
-            getElement().executeJs("this.updateData($0, $1)", getId().get(), content);
+            getElement().executeJs("this.updateData($0, $1)", getId().get(), content==null?"":content);
         }
-    }
-
-    public void updateValue() {
-        super.updateValue();
-        updateValue(this.editorData);
     }
 
     public void doSetUpdate(String editorContent) {
         setValue(editorContent);
-        updateValue();
+        updateValue(editorContent);
     }
 
     /**
@@ -171,6 +165,18 @@ public class VaadinCKEditor extends CustomField<String> {
 
     void setUILanguage(String uiLanguage) {
         getElement().setProperty("uiLanguage", uiLanguage==null?"en":uiLanguage);
+    }
+
+    public void clear() {
+        updateValue(null);
+    }
+
+    /**
+     * Show required indicator if true
+     * @param requiredIndicatorVisible Indicator flag, default to false
+     */
+    public void setRequiredIndicatorVisible(boolean requiredIndicatorVisible) {
+        super.setRequiredIndicatorVisible(requiredIndicatorVisible);
     }
 
 }
