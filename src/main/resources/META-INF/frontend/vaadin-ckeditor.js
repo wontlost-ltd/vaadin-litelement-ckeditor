@@ -38,7 +38,7 @@ class VaadinCKEditor extends LitElement {
                  editorWidth: String,
                  editorHeight: String,
                  themeType: String,
-                 themeCss: String,
+                 errorMessage: String,
                  placeHolder: String,
                  uiLanguage: String,
                  isReadOnly: Boolean,
@@ -184,15 +184,21 @@ class VaadinCKEditor extends LitElement {
             return html`
                 <div class="toolbar-container"></div>
                 <div class="editable-container"></div>
-                <div class="container" required="${this.required}">
-                    <label part="label">${this.label}</label>
+                <div>
+                    <label part="label">${this.label} </label>
+                    <ul part="label-ul"><li part="label-li">
+                        <div part="error-message">${this.errorMessage}</div>
+                    </li></ul>
                     <div id="${this.editorId}" class=${classMap(this.classes)}/>
                 </div>
             `;
         } else {
             return html`
-                <div class="container" required="${this.required}">
-                    <label part="label">${this.label}</label>
+                <div>
+                    <label part="label">${this.label}</label>  
+                    <ul part="label-ul"><li part="label-li">
+                        <div part="error-message">${this.errorMessage}</div>
+                    </li></ul>
                     <div part="ckeditor" id="${this.editorId}"/>
                 </div>
             `;

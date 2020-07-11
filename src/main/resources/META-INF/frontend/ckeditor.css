@@ -48,6 +48,34 @@
     position: relative;
     max-width: 100%;
     box-sizing: border-box;
+    display: inline-table;
+}
+
+[part="label-ul"] {
+    overflow-x:hidden;
+    white-space:nowrap;
+    display: inline-table;
+    padding: 0;
+    margin: 0;
+}
+
+[part="label-li"] {
+    display:inline;
+}
+
+[part="error-message"] {
+    margin-left: calc(var(--lumo-border-radius-m) / 4);
+    font-size: var(--lumo-font-size-xs);
+    line-height: var(--lumo-line-height-xs);
+    color: var(--lumo-error-text-color);
+    will-change: max-height;
+    transition: 0.4s max-height;
+    max-height: 5em;
+}
+
+:host(:not([invalid])) [part="error-message"] {
+    max-height: 0;
+    overflow: hidden;
 }
 
 :host([required]:not([has-value])) [part="label"]::after {
@@ -59,10 +87,11 @@
     transition: opacity 0.2s;
     opacity: 0;
     color: var(--lumo-primary-text-color);
-    position: absolute;
+    position: relative;
     right: 0;
     width: 1em;
     text-align: center;
+    display: inline-block;
 }
 
 :host([required]) [part="label"] {

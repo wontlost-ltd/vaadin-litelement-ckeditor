@@ -13,7 +13,7 @@ public class VaadinCKEditorBuilder {
     public ThemeType theme;
     public Boolean readOnly = false;
     public String placeHolder;
-    public String uiLanguage;
+    public Language uiLanguage;
     public Toolbar[] toolbar = VaadinCKEditor.TOOLBAR;
 
     public VaadinCKEditorBuilder with(Consumer<VaadinCKEditorBuilder> builderFunction) {

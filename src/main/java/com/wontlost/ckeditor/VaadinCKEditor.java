@@ -163,8 +163,8 @@ public class VaadinCKEditor extends CustomField<String> {
         getElement().getStyle().set("margin", margin==null?"20px":margin);
     }
 
-    void setUILanguage(String uiLanguage) {
-        getElement().setProperty("uiLanguage", uiLanguage==null?"en":uiLanguage);
+    void setUILanguage(Language uiLanguage) {
+        getElement().setProperty("uiLanguage", uiLanguage==null?"en":uiLanguage.getLanguage());
     }
 
     public void clear() {
