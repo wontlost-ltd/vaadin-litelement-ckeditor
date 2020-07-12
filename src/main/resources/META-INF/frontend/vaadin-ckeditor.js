@@ -154,6 +154,9 @@ class VaadinCKEditor extends LitElement {
             else
                 this.style.width='100%';
             this.style.height='100%';
+            if(this.required) {
+                this.showIndicator(true);
+            }
             editor.editing.view.change( writer => {
                 if(this.editorHeight) {
                     writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
@@ -164,6 +167,11 @@ class VaadinCKEditor extends LitElement {
             } );
             editor.model.document.on( 'change:data', (event, batch) => {
                 this.$server.setEditorData(editor.getData());
+                if(''===editor.getData() && this.required) {
+                    this.showIndicator(true);
+                }else {
+                    this.showIndicator(false);
+                }
             } );
             this.editorMap[this.editorId] = editor;
             if(this.editorType==='decoupled') {
@@ -179,31 +187,61 @@ class VaadinCKEditor extends LitElement {
         this.editorMap[editorId].setData(value);
     }
 
-    render() {
-        if(this.editorType==='decoupled') {
-            return html`
-                <div class="toolbar-container"></div>
-                <div class="editable-container"></div>
-                <div>
-                    <label part="label">${this.label} </label>
-                    <ul part="label-ul"><li part="label-li">
-                        <div part="error-message">${this.errorMessage}</div>
-                    </li></ul>
-                    <div id="${this.editorId}" class=${classMap(this.classes)}/>
-                </div>
-            `;
+    showIndicator(shown) {
+        let id = 'label-'+this.editorId;
+        // let labelAfter = window.getComputedStyle(
+        //     document.getElementById(id), ':after'
+        // );
+        // let opacity = labelAfter.getPropertyValue('opacity');
+        let newStyle = this.contains(id);
+        if(shown) {
+            if(newStyle===false) {
+                document.head.appendChild(this.opacity(1));
+            } else {
+                newStyle.style.opacity = 1;
+            }
         } else {
-            return html`
-                <div>
-                    <label part="label">${this.label}</label>  
-                    <ul part="label-ul"><li part="label-li">
-                        <div part="error-message">${this.errorMessage}</div>
-                    </li></ul>
-                    <div part="ckeditor" id="${this.editorId}"/>
-                </div>
-            `;
+            if(newStyle===false) {
+                document.head.appendChild(this.opacity(0));
+            } else {
+                newStyle.style.opacity = 0;
+            }
         }
 
+    }
+
+    contains(style) {
+        for (let i = 0; i < document.styleSheets.length; i++) {
+            for(let j=0; j<document.styleSheets[i].cssRules.length; j++) {
+                if('#'+style+'::after'===document.styleSheets[i].cssRules[j].selectorText) {
+                    return document.styleSheets[i].cssRules[j];
+                }
+            }
+        }
+        return false;
+    }
+
+    opacity(value) {
+        let id = 'label-'+this.editorId;
+        let newLabelAfter = document.createElement('style');
+        newLabelAfter.innerHTML = `#`+id+`::after{ opacity:`+value+` }`;
+        return newLabelAfter;
+    }
+
+    render() {
+        return html`
+            ${this.editorType==='decoupled' ? html`
+                <div class="toolbar-container"></div>
+                <div class="editable-container"></div>
+            `:html``}
+            <div>
+                <label part="label" id="label-${this.editorId}">${this.label} </label>
+                <ul part="label-ul"><li part="label-li">
+                    <div part="error-message">${this.errorMessage}</div>
+                </li></ul>
+                <div id="${this.editorId}" class=${classMap(this.classes)}/>
+            </div>
+        `;
     }
 
 }
