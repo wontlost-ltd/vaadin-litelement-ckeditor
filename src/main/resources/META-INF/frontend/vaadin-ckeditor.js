@@ -167,11 +167,12 @@ class VaadinCKEditor extends LitElement {
             } );
             editor.model.document.on( 'change:data', (event, batch) => {
                 this.$server.setEditorData(editor.getData());
-                if(''===editor.getData() && this.required) {
-                    this.showIndicator(true);
-                }else {
-                    this.showIndicator(false);
-                }
+                this.showIndicator(''===editor.getData() && this.required);
+                this.showError(''!==this.errorMessage);
+            } );
+            editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
+                console.log( `View document is focused: ${ isFocused }.` );
+                this.focusedColor(isFocused);
             } );
             this.editorMap[this.editorId] = editor;
             if(this.editorType==='decoupled') {
@@ -188,32 +189,40 @@ class VaadinCKEditor extends LitElement {
     }
 
     showIndicator(shown) {
-        let id = 'label-'+this.editorId;
-        // let labelAfter = window.getComputedStyle(
-        //     document.getElementById(id), ':after'
-        // );
-        // let opacity = labelAfter.getPropertyValue('opacity');
-        let newStyle = this.contains(id);
-        if(shown) {
-            if(newStyle===false) {
-                document.head.appendChild(this.opacity(1));
-            } else {
-                newStyle.style.opacity = 1;
-            }
+        let labelId = 'label-'+this.editorId;
+        let newStyle = this.contains('#'+labelId+'::after');
+        if(!newStyle) {
+            document.head.appendChild(shown?this.opacity(1):this.opacity(0));
         } else {
-            if(newStyle===false) {
-                document.head.appendChild(this.opacity(0));
-            } else {
-                newStyle.style.opacity = 0;
-            }
+            newStyle.style.opacity = shown ? 1 : 0;
         }
+    }
 
+    showError(shown) {
+        let errorId = 'error-'+this.editorId;
+        let errorStyle = this.contains('#'+errorId);
+        if(!errorStyle) {
+            document.head.appendChild(shown?this.display('block'):this.display('none'));
+        } else {
+            errorStyle.style.display = shown ? 'block' : 'none';
+        }
+    }
+
+    focusedColor(isFocused) {
+        let id = 'label-'+this.editorId;
+        let newColor = this.contains('#'+id);
+        if(!newColor) {
+            document.head.appendChild(isFocused? this.color('var(--lumo-primary-text-color)'):
+                this.color('var(--lumo-secondary-text-color)'));
+        } else {
+            newColor.style.color=isFocused?'var(--lumo-primary-text-color)':'var(--lumo-secondary-text-color)';
+        }
     }
 
     contains(style) {
         for (let i = 0; i < document.styleSheets.length; i++) {
             for(let j=0; j<document.styleSheets[i].cssRules.length; j++) {
-                if('#'+style+'::after'===document.styleSheets[i].cssRules[j].selectorText) {
+                if(style===document.styleSheets[i].cssRules[j].selectorText) {
                     return document.styleSheets[i].cssRules[j];
                 }
             }
@@ -222,10 +231,24 @@ class VaadinCKEditor extends LitElement {
     }
 
     opacity(value) {
-        let id = 'label-'+this.editorId;
+        let labelId = 'label-'+this.editorId;
         let newLabelAfter = document.createElement('style');
-        newLabelAfter.innerHTML = `#`+id+`::after{ opacity:`+value+` }`;
+        newLabelAfter.innerHTML = `#`+labelId+`::after{ opacity:`+value+` }`;
         return newLabelAfter;
+    }
+
+    color(value) {
+        let labelId = 'label-'+this.editorId;
+        let newColor = document.createElement('style');
+        newColor.innerHTML = `#`+labelId+`{ color :`+value+` }`;
+        return newColor;
+    }
+
+    display(value) {
+        let errorId = 'error-'+this.editorId;
+        let errorStyle = document.createElement('style');
+        errorStyle.innerHTML = `#`+errorId+`{ display :`+value+` }`;
+        return errorStyle;
     }
 
     render() {
@@ -234,10 +257,10 @@ class VaadinCKEditor extends LitElement {
                 <div class="toolbar-container"></div>
                 <div class="editable-container"></div>
             `:html``}
-            <div>
+            <div style="overflow: auto">
                 <label part="label" id="label-${this.editorId}">${this.label} </label>
                 <ul part="label-ul"><li part="label-li">
-                    <div part="error-message">${this.errorMessage}</div>
+                    <div part="error-message" id="error-${this.editorId}">${this.errorMessage}</div>
                 </li></ul>
                 <div id="${this.editorId}" class=${classMap(this.classes)}/>
             </div>

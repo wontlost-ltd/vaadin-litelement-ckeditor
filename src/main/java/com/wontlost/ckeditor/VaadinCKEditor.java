@@ -171,12 +171,4 @@ public class VaadinCKEditor extends CustomField<String> {
         updateValue(null);
     }
 
-    /**
-     * Show required indicator if true
-     * @param requiredIndicatorVisible Indicator flag, default to false
-     */
-    public void setRequiredIndicatorVisible(boolean requiredIndicatorVisible) {
-        super.setRequiredIndicatorVisible(requiredIndicatorVisible);
-    }
-
 }
