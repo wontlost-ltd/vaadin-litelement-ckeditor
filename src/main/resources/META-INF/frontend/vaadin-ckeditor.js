@@ -44,7 +44,6 @@ class VaadinCKEditor extends LitElement {
                  isReadOnly: Boolean,
                  isFirefox: Boolean,
                  isChrome: Boolean,
-                 required: Boolean,
                  editorMap: Object,
                  toolBar: Array};
     }
@@ -168,7 +167,7 @@ class VaadinCKEditor extends LitElement {
             editor.model.document.on( 'change:data', (event, batch) => {
                 this.$server.setEditorData(editor.getData());
                 this.showIndicator(''===editor.getData() && this.required);
-                this.showError(''!==this.errorMessage);
+                this.showError(this.invalid || (''===editor.getData() && this.required));
             } );
             editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
                 console.log( `View document is focused: ${ isFocused }.` );
@@ -253,19 +252,21 @@ class VaadinCKEditor extends LitElement {
 
     render() {
         return html`
+            <label part="label" id="label-${this.editorId}">${this.label} </label>
+            <ul part="label-ul"><li part="label-li">
+                <div part="error-message" id="error-${this.editorId}">${this.errorMessage}</div>
+            </li></ul>
             ${this.editorType==='decoupled' ? html`
                 <div class="toolbar-container"></div>
                 <div class="editable-container"></div>
-            `:html``}
-            <div style="overflow: auto">
-                <label part="label" id="label-${this.editorId}">${this.label} </label>
-                <ul part="label-ul"><li part="label-li">
-                    <div part="error-message" id="error-${this.editorId}">${this.errorMessage}</div>
-                </li></ul>
                 <div id="${this.editorId}" class=${classMap(this.classes)}/>
-            </div>
+            `:html`<div id="${this.editorId}"/>`}
         `;
     }
+
+    validate() {
+        return !(this.focusElement.invalid = this.invalid);
+    };
 
 }
 
