@@ -40,6 +40,7 @@ public enum Toolbar {
     restrictedEditingException("restrictedEditingException"),
     todoList("todoList"),
     exportPdf("exportPdf"),
+    exportWord("exportWord"),
     insertTable("insertTable");
 
     private final String value;
