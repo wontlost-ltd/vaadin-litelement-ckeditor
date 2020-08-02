@@ -16,21 +16,25 @@ public class MainView extends VerticalLayout {
 	public MainView() {
 		super();
 		Comment comment = new Comment();
-		comment.setMessage("Message");
+//		comment.setMessage("Message");
 		VaadinCKEditor editor = new VaadinCKEditorBuilder().with(builder -> {
 			builder.editorType = EditorType.CLASSIC;
-			builder.uiLanguage = "fr";
+			builder.uiLanguage = Language.km;
 			builder.editorData = comment.getMessage();
 //			builder.theme= ThemeType.DARK;
 		}).createVaadinCKEditor();
 		add(new Label(""));
 
+		editor.setLabel("Comment");
+		editor.setRequiredIndicatorVisible(true);
 		Binder<Comment> binder = new Binder<>(Comment.class);
 		binder.forField(editor).bind(Comment::getMessage, Comment::setMessage);
+		binder.withValidator(msg->msg.getMessage().length()>0, "Empty is not allowed")
+		 	  .withValidator(msg->msg.getMessage().length()<10, "Message is too large");
 		binder.setBean(comment);
 		binder.readBean(comment);
 		editor.addValueChangeListener(event -> {
-			System.out.println(binder.getBean().getMessage());
+			System.out.println(event.getValue());
 		});
 		add(editor);
 
