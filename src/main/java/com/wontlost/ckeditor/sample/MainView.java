@@ -28,12 +28,15 @@ public class MainView extends VerticalLayout {
 		editor.setLabel("Comment");
 		editor.setRequiredIndicatorVisible(true);
 		Binder<Comment> binder = new Binder<>(Comment.class);
-		binder.forField(editor).bind(Comment::getMessage, Comment::setMessage);
-		binder.withValidator(msg->msg.getMessage().length()>0, "Empty is not allowed")
-		 	  .withValidator(msg->msg.getMessage().length()<10, "Message is too large");
+		binder.forField(editor)
+				.withValidator(msg->msg==null || msg.length()>0, "Empty is not allowed")
+		 	  	.withValidator(msg->msg!=null && msg.length()<=10, "Message is too large")
+				.bind(Comment::getMessage, Comment::setMessage);
 		binder.setBean(comment);
 		binder.readBean(comment);
 		editor.addValueChangeListener(event -> {
+			editor.setErrorMessage(null);
+			binder.validate(); //update validation status on value changes
 			System.out.println(event.getValue());
 		});
 		add(editor);
