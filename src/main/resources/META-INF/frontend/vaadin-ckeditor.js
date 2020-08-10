@@ -134,7 +134,7 @@ class VaadinCKEditor extends LitElement {
             return 'classic'===editorType?EDITOR.ClassicEditor:
                    'inline'===editorType?EDITOR.InlineEditor:
                    'balloon'===editorType?EDITOR.BalloonEditor:
-                   'decoupled'===editorType?EDITOR.DcoupledEditor:editor.ClassicEditor;
+                   'decoupled'===editorType?EDITOR.DcoupledEditor:EDITOR.ClassicEditor;
         }
     }
 
