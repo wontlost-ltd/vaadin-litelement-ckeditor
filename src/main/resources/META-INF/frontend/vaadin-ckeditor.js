@@ -112,7 +112,6 @@ class VaadinCKEditor extends LitElement {
         let scriptUrl = 'https://www.wontlost.com/translations/'+this.uiLanguage+'.js';
         if('en'!==this.uiLanguage && document.querySelectorAll('[src="' + scriptUrl + '"]').length === 0) {
             this.loadLanguage(scriptUrl).then(() => {
-                console.log('Language \''+this.uiLanguage+'\' loaded! Initilizing the ckeditor...');
                 this.createEditor();
             }).catch(() => {
                 console.error('Language loading failed!');
@@ -124,11 +123,20 @@ class VaadinCKEditor extends LitElement {
     }
 
     getEditorByType(editorType) {
-        return 'classic'===editorType?ClassicEditor:
-               'inline'===editorType?InlineEditor:
-               'balloon'===editorType?BalloonEditor:
-               'decoupled'===editorType?DcoupledEditor:
-               ClassicEditor;
+        if(typeof CKEDITOR !== 'undefined' && CKEDITOR !== null) {
+            return 'classic'===editorType?CKEDITOR.ClassicEditor:
+                   'inline'===editorType?CKEDITOR.InlineEditor:
+                   'balloon'===editorType?CKEDITOR.BalloonEditor:
+                   'decoupled'===editorType?CKEDITOR.DcoupledEditor:
+                   ClassicEditor;
+        } else {
+            return 'classic'===editorType?ClassicEditor:
+                   'inline'===editorType?InlineEditor:
+                   'balloon'===editorType?BalloonEditor:
+                   'decoupled'===editorType?DcoupledEditor:
+                   ClassicEditor;
+        }
+
     }
 
     createEditor() {
@@ -163,7 +171,6 @@ class VaadinCKEditor extends LitElement {
                 this.showError(this.invalid || (''===editor.getData() && this.required));
             } );
             editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
-                console.log( `View document is focused: ${ isFocused }.` );
                 this.focusedColor(isFocused);
             } );
             this.editorMap[this.editorId] = editor;
