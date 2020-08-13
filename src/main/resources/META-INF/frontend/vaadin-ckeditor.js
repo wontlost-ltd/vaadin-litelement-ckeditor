@@ -114,7 +114,6 @@ class VaadinCKEditor extends LitElement {
             this.loadLanguage(scriptUrl).then(() => {
                 this.createEditor();
             }).catch(() => {
-                //init editor with default language 'en'
                 console.error("Failed to load language ("+this.uiLanguage+").")
             });
         } else {
