@@ -1,4 +1,4 @@
-import { LitElement, html } from "lit-element";
+import { LitElement, html } from 'lit-element';
 import { classMap } from 'lit-html/directives/class-map';
 import { ClassicEditor, InlineEditor, BalloonEditor, DcoupledEditor } from './ckeditor';
 
@@ -16,19 +16,19 @@ class VaadinCKEditor extends LitElement {
         this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
     }
 
-    loadLanguage(scriptUrl) {
-        let script = document.createElement('script');
-        script.src = scriptUrl;
-        document.head.appendChild(script);
-        return new Promise((success, failed) => {
-            script.onload = function() {
-                success();
-            }
-            script.onerror = function () {
-                failed();
-            }
-        });
-    }
+    // loadLanguage(scriptUrl) {
+    //     let script = document.createElement('script');
+    //     script.src = scriptUrl;
+    //     document.head.appendChild(script);
+    //     return new Promise((success, failed) => {
+    //         script.onload = function() {
+    //             success();
+    //         }
+    //         script.onerror = function () {
+    //             failed();
+    //         }
+    //     });
+    // }
 
     static get properties() {
         return { editorId: String,
@@ -108,18 +108,7 @@ class VaadinCKEditor extends LitElement {
         if(this.themeType==='dark') {
             this.initDarkTheme();
         }
-
-        let scriptUrl = 'https://www.wontlost.com/translations/'+this.uiLanguage+'.js';
-        if('en'!==this.uiLanguage && document.querySelectorAll('[src="' + scriptUrl + '"]').length === 0) {
-            this.loadLanguage(scriptUrl).then(() => {
-                this.createEditor();
-            }).catch(() => {
-                console.error("Failed to load language ("+this.uiLanguage+").")
-            });
-        } else {
-            this.createEditor();
-        }
-
+        this.createEditor();
     }
 
     getEditorByType(editorType) {
@@ -161,9 +150,9 @@ class VaadinCKEditor extends LitElement {
                 if(this.editorHeight) {
                     writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
                 }
-                if(this.editorWidth) {
-                    writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
-                }
+                // if(this.editorWidth) {
+                //     writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
+                // }
             } );
             editor.model.document.on( 'change:data', (event, batch) => {
                 this.$server.setEditorData(editor.getData());
@@ -256,6 +245,12 @@ class VaadinCKEditor extends LitElement {
             <ul part="label-ul"><li part="label-li">
                 <div part="error-message" id="error-${this.editorId}">${this.errorMessage}</div>
             </li></ul>
+            ${this.editorWidth !== 'auto'? html`
+                <style>
+                    .ck.ck-editor {
+                        width: ${this.editorWidth};
+                    }
+                </style>`: html``} 
             ${this.editorType==='decoupled' ? html`
                 <div class="toolbar-container"></div>
                 <div class="editable-container"></div>

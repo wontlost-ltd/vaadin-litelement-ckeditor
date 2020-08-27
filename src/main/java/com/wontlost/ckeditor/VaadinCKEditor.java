@@ -16,6 +16,67 @@ import java.util.*;
  */
 @Tag("vaadin-ckeditor")
 @JsModule("./vaadin-ckeditor.js")
+@JsModule("./translations/af.js")
+@JsModule("./translations/ar.js")
+@JsModule("./translations/ast.js")
+@JsModule("./translations/az.js")
+@JsModule("./translations/bg.js")
+@JsModule("./translations/ca.js")
+@JsModule("./translations/cs.js")
+@JsModule("./translations/da.js")
+@JsModule("./translations/de.js")
+@JsModule("./translations/de-ch.js")
+@JsModule("./translations/el.js")
+@JsModule("./translations/en-au.js")
+@JsModule("./translations/en-gb.js")
+@JsModule("./translations/eo.js")
+@JsModule("./translations/es.js")
+@JsModule("./translations/et.js")
+@JsModule("./translations/eu.js")
+@JsModule("./translations/fa.js")
+@JsModule("./translations/fi.js")
+@JsModule("./translations/fr.js")
+@JsModule("./translations/gl.js")
+@JsModule("./translations/gu.js")
+@JsModule("./translations/he.js")
+@JsModule("./translations/hr.js")
+@JsModule("./translations/hu.js")
+@JsModule("./translations/id.js")
+@JsModule("./translations/it.js")
+@JsModule("./translations/ja.js")
+@JsModule("./translations/km.js")
+@JsModule("./translations/kn.js")
+@JsModule("./translations/ko.js")
+@JsModule("./translations/ku.js")
+@JsModule("./translations/lt.js")
+@JsModule("./translations/lv.js")
+@JsModule("./translations/ms.js")
+@JsModule("./translations/nb.js")
+@JsModule("./translations/ne.js")
+@JsModule("./translations/nl.js")
+@JsModule("./translations/no.js")
+@JsModule("./translations/oc.js")
+@JsModule("./translations/pl.js")
+@JsModule("./translations/pt.js")
+@JsModule("./translations/pt-br.js")
+@JsModule("./translations/ro.js")
+@JsModule("./translations/ru.js")
+@JsModule("./translations/si.js")
+@JsModule("./translations/sk.js")
+@JsModule("./translations/sl.js")
+@JsModule("./translations/sq.js")
+@JsModule("./translations/sr.js")
+@JsModule("./translations/sr-latn.js")
+@JsModule("./translations/sv.js")
+@JsModule("./translations/th.js")
+@JsModule("./translations/tk.js")
+@JsModule("./translations/tr.js")
+@JsModule("./translations/tt.js")
+@JsModule("./translations/ug.js")
+@JsModule("./translations/uk.js")
+@JsModule("./translations/vi.js")
+@JsModule("./translations/zh.js")
+@JsModule("./translations/zh-cn.js")
 @CssImport("./ckeditor.css")
 public class VaadinCKEditor extends CustomField<String> {
 
@@ -132,6 +193,7 @@ public class VaadinCKEditor extends CustomField<String> {
      * @param editorWidth   Width of editor, default value is 'auto'.
      */
     public void setWidth(String editorWidth) {
+        super.setWidth(editorWidth);
         getElement().setProperty("editorWidth", editorWidth==null?"auto":editorWidth);
     }
 
@@ -139,6 +201,7 @@ public class VaadinCKEditor extends CustomField<String> {
      * @param editorHeight  Height of editor, default value is 'auto'.
      */
     public void setHeight(String editorHeight) {
+        super.setHeight(editorHeight);
         getElement().setProperty("editorHeight", editorHeight==null?"auto":editorHeight);
     }
 
