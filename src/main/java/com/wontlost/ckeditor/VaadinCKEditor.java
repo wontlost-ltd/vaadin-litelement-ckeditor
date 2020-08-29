@@ -170,6 +170,11 @@ public class VaadinCKEditor extends CustomField<String> {
         }
     }
 
+
+    /**
+     * Use setValue instead
+     */
+    @Deprecated
     public void doSetUpdate(String editorContent) {
         setValue(editorContent);
         updateValue(editorContent);
