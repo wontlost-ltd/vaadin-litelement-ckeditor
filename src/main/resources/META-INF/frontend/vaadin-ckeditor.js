@@ -173,7 +173,9 @@ class VaadinCKEditor extends LitElement {
     }
 
     updateData(editorId, value) {
-        this.editorMap[editorId].setData(value);
+        if(this.editorMap && this.editorMap[editorId]) {
+            this.editorMap[editorId].setData(value);
+        }
     }
 
     showIndicator(shown) {

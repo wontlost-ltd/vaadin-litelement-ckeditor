@@ -143,14 +143,21 @@ public class VaadinCKEditor extends CustomField<String> {
      * @param value  Data in editor text area.
      */
     public void setValue(String value) {
+        super.setValue(value);
+        this.editorData = value;
+        getElement().setProperty("editorData", editorData==null?"":editorData);
+        updateValue(value);
+    }
+
+    protected void setModelValue(String value, boolean fromClient){
         String oldEditorData = this.editorData;
         this.editorData = value;
-        fireEvent(new ComponentValueChangeEvent<>(this, this, oldEditorData,false));
+        fireEvent(new ComponentValueChangeEvent<>(this, this, oldEditorData,fromClient));
     }
 
     @ClientCallable
     private void setEditorData(String editorData) {
-        setValue(editorData);
+        setModelValue(editorData, true);
     }
 
     /**
