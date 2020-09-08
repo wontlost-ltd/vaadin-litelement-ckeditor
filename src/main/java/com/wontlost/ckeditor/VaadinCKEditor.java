@@ -150,6 +150,7 @@ public class VaadinCKEditor extends CustomField<String> {
     }
 
     protected void setModelValue(String value, boolean fromClient){
+        super.setModelValue(value, fromClient);
         String oldEditorData = this.editorData;
         this.editorData = value;
         fireEvent(new ComponentValueChangeEvent<>(this, this, oldEditorData,fromClient));

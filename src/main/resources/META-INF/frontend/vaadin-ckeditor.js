@@ -12,6 +12,7 @@ class VaadinCKEditor extends LitElement {
             'ck-editor__editable' : true
         };
         this.editorMap = {};
+        this.config = {};
         this.isFirefox = typeof InstallTrigger !== 'undefined';
         this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
     }
@@ -45,7 +46,9 @@ class VaadinCKEditor extends LitElement {
                  isFirefox: Boolean,
                  isChrome: Boolean,
                  editorMap: Object,
-                 toolBar: Array};
+                 config: Object,
+                 toolBar: Array,
+                 alignmentOptions: Array};
     }
 
     createRenderRoot() {
@@ -132,16 +135,19 @@ class VaadinCKEditor extends LitElement {
         this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , {
             toolbar:this.toolBar,
             placeholder:this.placeHolder,
-            language: this.uiLanguage
+            language: this.uiLanguage,
+            alignment: { options: this.alignmentOptions },
+            autosave: {
+                save( editor ) {
+                    return this.$server.saveData( editor.getData() );
+                },
+                waitingTime: 2000
+            },
         }).then( editor => {
             editor.isReadOnly = this.isReadOnly;
             editor.setData(this.editorData);
-            if(this.isChrome)
-                this.style.width='-webkit-fill-available';
-            else if(this.isFirefox)
-                this.style.width='-moz-available';
-            else
-                this.style.width='100%';
+            this.style.width = this.isChrome?'-webkit-fill-available':
+                               this.isFirefox?'-moz-available':'100%';
             this.style.height='100%';
             if(this.required) {
                 this.showIndicator(true);
