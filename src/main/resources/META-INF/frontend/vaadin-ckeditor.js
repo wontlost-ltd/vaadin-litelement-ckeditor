@@ -40,15 +40,11 @@ class VaadinCKEditor extends LitElement {
                  editorHeight: String,
                  themeType: String,
                  errorMessage: String,
-                 // placeHolder: String,
-                 // uiLanguage: String,
                  isReadOnly: Boolean,
                  isFirefox: Boolean,
                  isChrome: Boolean,
                  editorMap: Object,
-                 config: Object,
-                 // toolBar: Array,
-                 alignmentOptions: Array};
+                 config: Object};
     }
 
     createRenderRoot() {
