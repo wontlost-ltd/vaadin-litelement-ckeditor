@@ -75,7 +75,7 @@ import java.util.*;
 @JsModule("./translations/zh.js")
 @JsModule("./translations/zh-cn.js")
 @CssImport("./ckeditor.css")
-public class VaadinCKEditor extends CustomField<String> implements HasConfig{
+public class VaadinCKEditor extends CustomField<String> implements HasConfig {
 
     private String editorData;
 

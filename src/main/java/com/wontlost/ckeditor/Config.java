@@ -26,7 +26,6 @@ public class Config {
 
     public Config() {
         configs.put(ConfigType.alignment, Json.createObject());
-        configs.put(ConfigType.autosave, Json.createObject());
         configs.put(ConfigType.balloonToolbar, Json.createArray());
         configs.put(ConfigType.blockToolbar, Json.createArray());
         configs.put(ConfigType.ckfinder, Json.createObject());
@@ -61,7 +60,6 @@ public class Config {
 
     Config(JsonObject jsonObject) {
         configs.put(ConfigType.alignment, jsonObject.get(ConfigType.alignment.name()));
-        configs.put(ConfigType.autosave, jsonObject.get(ConfigType.autosave.name()));
         configs.put(ConfigType.balloonToolbar, jsonObject.get(ConfigType.balloonToolbar.name()));
         configs.put(ConfigType.blockToolbar, jsonObject.get(ConfigType.blockToolbar.name()));
         configs.put(ConfigType.ckfinder, jsonObject.get(ConfigType.ckfinder.name()));
@@ -119,6 +117,16 @@ public class Config {
     }
 
     /**
+     * @param list String list
+     * @return JsonArray
+     */
+    JsonArray toJsonArray(String... list) {
+        List<String> values = Arrays.asList(list==null?new String[0]:list);
+        String toolbarJson = new Gson().toJson(values);
+        return Json.instance().parse(toolbarJson);
+    }
+
+    /**
      * @param placeHolder Place holder of Editor
      */
     public void setPlaceHolder(String placeHolder){
@@ -126,15 +134,27 @@ public class Config {
     }
 
     /**
-     * @param editorToolBar   Toolbar of Editor, refer to enum @Toolbar.
+     * @param editorToolBar Toolbar of Editor, refer to enum @Toolbar
      */
     public void setEditorToolBar(Toolbar[] editorToolBar) {
         configs.put(ConfigType.toolbar, toJsonArray(editorToolBar));
     }
 
+    /**
+     * @param uiLanguage Language of user interface, refer to enum @Language
+     */
     public void setUILanguage(Language uiLanguage) {
         configs.put(ConfigType.language, Json.create(uiLanguage==null?"en":uiLanguage.getLanguage()));
     }
 
+    /**
+     * Configuation of alignment
+     * @param options The available options are: 'left', 'right', 'center' and 'justify'. Other values are ignored.
+     */
+    public void setAlignment(String[] options) {
+        JsonObject alignment = Json.createObject();
+        alignment.put("options", toJsonArray(options));
+        configs.put(ConfigType.alignment, alignment);
+    }
 
 }
