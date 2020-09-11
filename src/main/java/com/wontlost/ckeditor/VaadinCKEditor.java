@@ -1,13 +1,10 @@
 package com.wontlost.ckeditor;
 
-import com.google.gson.Gson;
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
-import elemental.json.JsonArray;
-import elemental.json.impl.JreJsonFactory;
 
 import java.util.*;
 
@@ -78,17 +75,9 @@ import java.util.*;
 @JsModule("./translations/zh.js")
 @JsModule("./translations/zh-cn.js")
 @CssImport("./ckeditor.css")
-public class VaadinCKEditor extends CustomField<String> {
+public class VaadinCKEditor extends CustomField<String> implements HasConfig{
 
     private String editorData;
-
-    public static final Toolbar[] TOOLBAR = new Toolbar[]{Toolbar.heading, Toolbar.pipe, Toolbar.fontSize, Toolbar.fontFamily,
-           Toolbar.fontColor, Toolbar.fontBackgroundColor, Toolbar.pipe, Toolbar.bold, Toolbar.italic,
-           Toolbar.underline, Toolbar.strikethrough, Toolbar.subscript, Toolbar.superscript, Toolbar.highlight,
-           Toolbar.removeFormat, Toolbar.pipe, Toolbar.horizontalLine, Toolbar.pageBreak, Toolbar.link,
-           Toolbar.bulletedList, Toolbar.numberedList, Toolbar.alignment, Toolbar.todoList, Toolbar.indent, Toolbar.outdent,
-           Toolbar.code, Toolbar.codeBlock, Toolbar.pipe, Toolbar.specialCharacters, Toolbar.exportPdf, Toolbar.exportWord,
-           Toolbar.imageUpload, Toolbar.blockQuote, Toolbar.insertTable, Toolbar.mediaEmbed, Toolbar.undo, Toolbar.redo};
 
     /**
      * Constructor of VaadinCKEditor.
@@ -97,20 +86,6 @@ public class VaadinCKEditor extends CustomField<String> {
     VaadinCKEditor(String editorData) {
         this.editorData = editorData;
         getElement().setProperty("editorData", editorData==null?"":editorData);
-    }
-
-    /**
-     * @param toolbar Toolbar of Editor, refer to enum @Toolbar
-     * @return JsonArray
-     */
-    private JsonArray toJson(Toolbar[] toolbar) {
-        List<String> values = new ArrayList<>();
-        if(toolbar == null || toolbar.length==0) {
-            toolbar = VaadinCKEditor.TOOLBAR;
-        }
-        Arrays.stream(toolbar).forEach(item -> values.add(item.getValue()));
-        String toolbarJson = new Gson().toJson(values);
-        return new JreJsonFactory().parse(toolbarJson);
     }
 
     protected String generateModelValue() {
@@ -171,35 +146,11 @@ public class VaadinCKEditor extends CustomField<String> {
         }
     }
 
-
-    /**
-     * Use setValue instead
-     */
-    @Deprecated
-    public void doSetUpdate(String editorContent) {
-        setValue(editorContent);
-        updateValue(editorContent);
-    }
-
-    /**
-     * @param placeHolder Place holder of Editor
-     */
-    void setPlaceHolder(String placeHolder){
-        getElement().setProperty("placeHolder", placeHolder==null?"Type the content here!":placeHolder);
-    }
-
     /**
      * @param editorType  Type of Editor, refer to enum @EditorType.
      */
     void setEditorType(EditorType editorType) {
         getElement().setProperty("editorType", editorType.toString());
-    }
-
-    /**
-     * @param editorToolBar   Toolbar of Editor, refer to enum @Toolbar.
-     */
-    void setEditorToolBar(Toolbar[] editorToolBar) {
-        getElement().setPropertyJson("toolBar", toJson(editorToolBar));
     }
 
     /**
@@ -239,12 +190,12 @@ public class VaadinCKEditor extends CustomField<String> {
         getElement().getStyle().set("margin", margin==null?"20px":margin);
     }
 
-    void setUILanguage(Language uiLanguage) {
-        getElement().setProperty("uiLanguage", uiLanguage==null?"en":uiLanguage.getLanguage());
-    }
-
     public void clear() {
         updateValue(null);
+    }
+
+    public void setConfig(Config config) {
+        getElement().setPropertyJson("config", config==null?new Config().getConfigJson():config.getConfigJson());
     }
 
 }

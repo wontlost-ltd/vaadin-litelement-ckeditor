@@ -12,9 +12,7 @@ public class VaadinCKEditorBuilder {
     public EditorType editorType = EditorType.CLASSIC;
     public ThemeType theme;
     public Boolean readOnly = false;
-    public String placeHolder;
-    public Language uiLanguage;
-    public Toolbar[] toolbar = VaadinCKEditor.TOOLBAR;
+    public Config config;
 
     public VaadinCKEditorBuilder with(Consumer<VaadinCKEditorBuilder> builderFunction) {
         builderFunction.accept(this);
@@ -28,13 +26,9 @@ public class VaadinCKEditorBuilder {
         editor.setHeight(height);
         editor.setEditorMargin(margin);
         editor.setEditorTheme(theme);
-        editor.setEditorToolBar(toolbar);
+        editor.setConfig(config);
         editor.setReadOnly(readOnly);
         editor.setEditorType(editorType);
-        editor.setUILanguage(uiLanguage);
-        if(editorData == null) {
-            editor.setPlaceHolder(placeHolder);
-        }
         return editor;
     }
 

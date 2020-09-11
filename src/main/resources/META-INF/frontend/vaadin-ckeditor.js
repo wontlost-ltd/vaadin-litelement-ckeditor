@@ -40,14 +40,14 @@ class VaadinCKEditor extends LitElement {
                  editorHeight: String,
                  themeType: String,
                  errorMessage: String,
-                 placeHolder: String,
-                 uiLanguage: String,
+                 // placeHolder: String,
+                 // uiLanguage: String,
                  isReadOnly: Boolean,
                  isFirefox: Boolean,
                  isChrome: Boolean,
                  editorMap: Object,
                  config: Object,
-                 toolBar: Array,
+                 // toolBar: Array,
                  alignmentOptions: Array};
     }
 
@@ -132,18 +132,7 @@ class VaadinCKEditor extends LitElement {
     }
 
     createEditor() {
-        this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , {
-            toolbar:this.toolBar,
-            placeholder:this.placeHolder,
-            language: this.uiLanguage,
-            alignment: { options: this.alignmentOptions },
-            autosave: {
-                save( editor ) {
-                    return this.$server.saveData( editor.getData() );
-                },
-                waitingTime: 2000
-            },
-        }).then( editor => {
+        this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , this.config).then( editor => {
             editor.isReadOnly = this.isReadOnly;
             editor.setData(this.editorData);
             this.style.width = this.isChrome?'-webkit-fill-available':
