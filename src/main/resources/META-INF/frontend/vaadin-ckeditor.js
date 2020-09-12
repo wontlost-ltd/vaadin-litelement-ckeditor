@@ -13,6 +13,7 @@ class VaadinCKEditor extends LitElement {
         };
         this.editorMap = {};
         this.config = {};
+        this.autosave = false;
         this.isFirefox = typeof InstallTrigger !== 'undefined';
         this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
     }
@@ -43,6 +44,7 @@ class VaadinCKEditor extends LitElement {
                  isReadOnly: Boolean,
                  isFirefox: Boolean,
                  isChrome: Boolean,
+                 autosave: Boolean,
                  editorMap: Object,
                  config: Object};
     }
@@ -127,8 +129,23 @@ class VaadinCKEditor extends LitElement {
 
     }
 
+    getConfig() {
+        return this.autosave===true? {
+            ...this.config,
+            ...{
+                autosave: {
+                    save( editor ) {
+                        return editor.saveData( editor.getData() );
+                    },
+                    waitingTime: 2000
+                }
+            }
+        } : this.config;
+    }
+
+
     createEditor() {
-        this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , this.config).then( editor => {
+        this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , this.getConfig()).then( editor => {
             editor.isReadOnly = this.isReadOnly;
             editor.setData(this.editorData);
             this.style.width = this.isChrome?'-webkit-fill-available':
@@ -137,6 +154,7 @@ class VaadinCKEditor extends LitElement {
             if(this.required) {
                 this.showIndicator(true);
             }
+            window.server = this.$server;
             editor.editing.view.change( writer => {
                 if(this.editorHeight) {
                     writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
@@ -153,6 +171,14 @@ class VaadinCKEditor extends LitElement {
             editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
                 this.focusedColor(isFocused);
             } );
+            editor.saveData = function( data ) {
+                return new Promise( resolve => {
+                    setTimeout( () => {
+                        server.saveEditorData(data);
+                        resolve();
+                    }, 400 );
+                } );
+            }
             this.editorMap[this.editorId] = editor;
             if(this.editorType==='decoupled') {
                 document.querySelector( '.toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
@@ -170,7 +196,7 @@ class VaadinCKEditor extends LitElement {
     }
 
     showIndicator(shown) {
-        let labelId = 'label-'+this.editorId;
+        let labelId = 'label_'+this.editorId;
         let newStyle = this.contains('#'+labelId+'::after');
         if(!newStyle) {
             document.head.appendChild(shown?this.opacity(1):this.opacity(0));
@@ -180,7 +206,7 @@ class VaadinCKEditor extends LitElement {
     }
 
     showError(shown) {
-        let errorId = 'error-'+this.editorId;
+        let errorId = 'error_'+this.editorId;
         let errorStyle = this.contains('#'+errorId);
         if(!errorStyle) {
             document.head.appendChild(shown?this.display('block'):this.display('none'));
@@ -190,7 +216,7 @@ class VaadinCKEditor extends LitElement {
     }
 
     focusedColor(isFocused) {
-        let id = 'label-'+this.editorId;
+        let id = 'label_'+this.editorId;
         let newColor = this.contains('#'+id);
         if(!newColor) {
             document.head.appendChild(isFocused? this.color('var(--lumo-primary-text-color)'):
@@ -212,21 +238,21 @@ class VaadinCKEditor extends LitElement {
     }
 
     opacity(value) {
-        let labelId = 'label-'+this.editorId;
+        let labelId = 'label_'+this.editorId;
         let newLabelAfter = document.createElement('style');
         newLabelAfter.innerHTML = `#`+labelId+`::after{ opacity:`+value+` }`;
         return newLabelAfter;
     }
 
     color(value) {
-        let labelId = 'label-'+this.editorId;
+        let labelId = 'label_'+this.editorId;
         let newColor = document.createElement('style');
         newColor.innerHTML = `#`+labelId+`{ color :`+value+` }`;
         return newColor;
     }
 
     display(value) {
-        let errorId = 'error-'+this.editorId;
+        let errorId = 'error_'+this.editorId;
         let errorStyle = document.createElement('style');
         errorStyle.innerHTML = `#`+errorId+`{ display :`+value+` }`;
         return errorStyle;
@@ -234,9 +260,9 @@ class VaadinCKEditor extends LitElement {
 
     render() {
         return html`
-            <label part="label" id="label-${this.editorId}">${this.label} </label>
+            <label part="label" id="label_${this.editorId}">${this.label} </label>
             <ul part="label-ul"><li part="label-li">
-                <div part="error-message" id="error-${this.editorId}">${this.errorMessage}</div>
+                <div part="error-message" id="error_${this.editorId}">${this.errorMessage}</div>
             </li></ul>
             ${this.editorWidth !== 'auto'? html`
                 <style>

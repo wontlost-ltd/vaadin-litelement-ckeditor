@@ -12,6 +12,8 @@ public class VaadinCKEditorBuilder {
     public EditorType editorType = EditorType.CLASSIC;
     public ThemeType theme;
     public Boolean readOnly = false;
+    public Boolean autosave = false;
+    public AutoSave saveEditorData;
     public Config config;
 
     public VaadinCKEditorBuilder with(Consumer<VaadinCKEditorBuilder> builderFunction) {
@@ -28,6 +30,8 @@ public class VaadinCKEditorBuilder {
         editor.setEditorTheme(theme);
         editor.setConfig(config);
         editor.setReadOnly(readOnly);
+        editor.setAutosave(autosave);
+        editor.setSaveEditorData(saveEditorData);
         editor.setEditorType(editorType);
         return editor;
     }

@@ -7,6 +7,9 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Used in @VaadinCKEditorBuilder.
@@ -79,6 +82,10 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
 
     private String editorData;
 
+    private Consumer<String> saveEditorData;
+
+    Logger vaddinCKEditorLog = Logger.getLogger(this.getClass().getName());
+
     /**
      * Constructor of VaadinCKEditor.
      * @param editorData Content of editor.
@@ -97,7 +104,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
     }
 
     public void setId(String id) {
-        getElement().setProperty("editorId", id==null? "editor-"+Math.abs(new Random().nextInt()): id);
+        getElement().setProperty("editorId", id==null? "editor_"+Math.abs(new Random().nextInt()): id);
     }
 
     public Optional<String> getId() {
@@ -134,6 +141,20 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
     @ClientCallable
     private void setEditorData(String editorData) {
         setModelValue(editorData, true);
+    }
+
+    @ClientCallable
+    private void saveEditorData(String editorData) {
+        Optional<Consumer<String>> save = getSaveEditorData();
+        save.orElse((data)-> vaddinCKEditorLog.log(Level.SEVERE, "Invalid consumer provided")).accept(editorData);
+    }
+
+    Optional<Consumer<String>> getSaveEditorData() {
+        return Optional.ofNullable(saveEditorData);
+    }
+
+    void setSaveEditorData(AutoSave dataConsumer) {
+        this.saveEditorData = dataConsumer;
     }
 
     /**
@@ -188,6 +209,14 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
      */
     void setEditorMargin(String margin) {
         getElement().getStyle().set("margin", margin==null?"20px":margin);
+    }
+
+    /**
+     * @param autosave enable autosave function on editor, should be used with setSaveEditorDataConsumer together.
+     *                 Otherwise it'll be ignored.
+     */
+    void setAutosave(boolean autosave) {
+        getElement().setProperty("autosave", autosave);
     }
 
     public void clear() {
