@@ -253,5 +253,28 @@ public class Config {
         configs.put(ConfigType.codeBlock, codeBlock);
     }
 
+    /**
+     * The configuration of the export to PDF feature.
+     * @param fileName The name of the generated PDF file.
+     * @param converterUrl A URL to the HTML to PDF converter.
+     */
+    public void setExportPdf(String fileName, String converterUrl) {
+        JsonObject exportPdf = Json.createObject();
+        exportPdf.put("fileName", Json.create(fileName));
+        exportPdf.put("converterUrl", Json.create(converterUrl));
+        configs.put(ConfigType.exportPdf, exportPdf);
+    }
+
+    /**
+     * The configuration of the export to Word feature.
+     * @param fileName The name of the generated Word file.
+     * @param converterUrl A URL to the HTML to Word converter.
+     */
+    public void setExportWord(String fileName, String converterUrl) {
+        JsonObject exportWord = Json.createObject();
+        exportWord.put("fileName", Json.create(fileName));
+        exportWord.put("converterUrl", Json.create(converterUrl));
+        configs.put(ConfigType.exportWord, exportWord);
+    }
 
 }
