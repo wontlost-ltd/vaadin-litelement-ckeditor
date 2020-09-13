@@ -157,4 +157,20 @@ public class Config {
         configs.put(ConfigType.alignment, alignment);
     }
 
+    /**
+     * @param balloonToolBar BalloonToolbar of Editor, refer to enum @Toolbar.
+     *                       Contextual toolbar configuration. Used by the BalloonToolbar feature.
+     */
+    public void setBalloonToolBar(Toolbar[] balloonToolBar) {
+        configs.put(ConfigType.balloonToolbar, toJsonArray(balloonToolBar));
+    }
+
+    /**
+     * @param blockToolBar BlockToolbar of Editor, refer to enum @Toolbar.
+     *                     The block toolbar configuration. Used by the BlockToolbar feature.
+     */
+    public void setBlockToolBar(Toolbar[] blockToolBar) {
+        configs.put(ConfigType.blockToolbar, toJsonArray(blockToolBar));
+    }
+
 }
