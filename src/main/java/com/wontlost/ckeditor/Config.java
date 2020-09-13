@@ -196,6 +196,40 @@ public class Config {
         ckfinderOptions.put("height", options.get("height"));
         ckfinderOptions.put("width", options.get("width"));
         ckfinder.put("options", ckfinderOptions);
+        configs.put(ConfigType.ckfinder, ckfinder);
     }
+
+    /**
+     * The configuration of CKEditor Cloud Services
+     * @param bundleVersion An optional parameter used for integration with CKEditor Cloud Services
+     *                      when uploading the editor build to cloud services. Whenever the editor build or
+     *                      the configuration changes, this parameter should be set to a new, unique value
+     *                      to differentiate the new bundle (build + configuration) from the old ones.
+     * @param tokenUrl  A token URL which should be a URL to the security token endpoint in your application.
+     *                  The role of this endpoint is to securely authorize the end users of your application
+     *                  to use CKEditor Cloud Services only if they should have access e.g. to upload files
+     *                  with Easy Image or to use the Collaboration service.
+     * @param uploadUrl The endpoint URL for CKEditor Cloud Services uploads.
+     *                  This option must be set for Easy Image to work correctly.
+     *                  The upload URL is unique for each customer and can be found in the CKEditor Ecosystem customer dashboard
+     *                  after subscribing to the Easy Image service. To learn how to start using Easy Image,
+     *                  check the Easy Image - Quick start documentation.
+     *                  Note: Make sure to also set the tokenUrl configuration option.
+     * @param webSocketUrl The URL for web socket communication, used by the RealTimeCollaborativeEditing plugin.
+     *                     Every customer (organization in the CKEditor Ecosystem dashboard) has their own,
+     *                     unique URLs to communicate with CKEditor Cloud Services. The URL can be found in the
+     *                     CKEditor Ecosystem customer dashboard.
+     *
+     */
+    public void setCloudServices(String bundleVersion, String tokenUrl, String uploadUrl, String webSocketUrl) {
+        JsonObject cloudServices = Json.createObject();
+        cloudServices.put("bundleVersion", Json.create(bundleVersion));
+        cloudServices.put("tokenUrl", Json.create(tokenUrl));
+        cloudServices.put("uploadUrl", Json.create(uploadUrl));
+        cloudServices.put("webSocketUrl", Json.create(webSocketUrl));
+        configs.put(ConfigType.cloudServices, cloudServices);
+    }
+
+
 
 }
