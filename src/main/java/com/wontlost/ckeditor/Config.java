@@ -331,4 +331,29 @@ public class Config {
         configs.put(ConfigType.fontColor, fontBackgroundColor);
     }
 
+    /**
+     *
+     * @param supportAllValues By default the plugin removes any font-family value that does not match
+     *                         the plugin's configuration. It means that if you paste content with font families
+     *                         that the editor does not understand, the font-family attribute will be removed and
+     *                         the content will be displayed with the default font.
+     *                         You can preserve pasted font family values by switching the supportAllValues option to true
+     * @param options Available font family options defined as an array of strings. The default value is:
+     *                'default',
+     * 		          'Arial, Helvetica, sans-serif',
+     * 		          'Courier New, Courier, monospace',
+     * 		          'Georgia, serif',
+     * 		          'Lucida Sans Unicode, Lucida Grande, sans-serif',
+     * 		          'Tahoma, Geneva, sans-serif',
+     * 		          'Times New Roman, Times, serif',
+     * 		          'Trebuchet MS, Helvetica, sans-serif',
+     * 		          'Verdana, Geneva, sans-serif'
+     */
+    public void setFontFamily(boolean supportAllValues, String[] options) {
+        JsonObject fontFamily = Json.createObject();
+        fontFamily.put("supportAllValues", Json.create(supportAllValues));
+        fontFamily.put("options", toJsonArray(options));
+        configs.put(ConfigType.fontFamily, fontFamily);
+    }
+
 }
