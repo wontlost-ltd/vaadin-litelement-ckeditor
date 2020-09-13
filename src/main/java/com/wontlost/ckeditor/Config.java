@@ -356,4 +356,20 @@ public class Config {
         configs.put(ConfigType.fontFamily, fontFamily);
     }
 
+    /**
+     *
+     * @param supportAllValues By default the plugin removes any font-size value that
+     *                         does not match the plugin's configuration. It means that if you paste content with
+     *                         font sizes that the editor does not understand, the font-size attribute will be removed
+     *                         and the content will be displayed with the default size.
+     *                         You can preserve pasted font size values by switching the supportAllValues option to true
+     * @param options Available font size options. Expressed as predefined presets, numerical "pixel" values
+     */
+    public void setFontSize(boolean supportAllValues, String[] options) {
+        JsonObject fontSize = Json.createObject();
+        fontSize.put("supportAllValues", Json.create(supportAllValues));
+        fontSize.put("options", toJsonArray(options));
+        configs.put(ConfigType.fontSize, fontSize);
+    }
+
 }
