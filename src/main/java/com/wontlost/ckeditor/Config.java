@@ -230,6 +230,28 @@ public class Config {
         configs.put(ConfigType.cloudServices, cloudServices);
     }
 
+    /**
+     *
+     * @param indentSequence A sequence of characters inserted or removed from the code block lines 、
+     *                       when its indentation is changed by the user, for instance, using Tab and Shift+Tab keys.
+     *                       The default value is a single tab character (" ", \u0009 in Unicode).
+     *                       This configuration is used by indentCodeBlock and outdentCodeBlock commands
+     *                       (instances of IndentCodeBlockCommand).
+     *                       Note: Setting this configuration to false will disable the code block indentation commands
+     *                       and associated keystrokes.
+     * @param languages  The list of code languages available in the user interface to choose for a particular code block.
+     *                   [
+     *                    { language: 'plaintext', label: 'Plain text', class: '' },
+     *                    { language: 'php', label: 'PHP', class: 'php-code' }
+     *                   ]
+     *                   class is optional
+     */
+    public void setCodeBlock(String indentSequence, String[] languages) {
+        JsonObject codeBlock = Json.createObject();
+        codeBlock.put("indentSequence", Json.create(indentSequence));
+        codeBlock.put("languages", toJsonArray(languages));
+        configs.put(ConfigType.codeBlock, codeBlock);
+    }
 
 
 }
