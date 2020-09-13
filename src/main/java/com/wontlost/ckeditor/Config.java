@@ -116,6 +116,10 @@ public class Config {
         return Json.instance().parse(toolbarJson);
     }
 
+    JsonArray toJsonArray(List<String[]> options) {
+        return Json.instance().parse(new Gson().toJson(options));
+    }
+
     /**
      * @param list String list
      * @return JsonArray
@@ -371,5 +375,22 @@ public class Config {
         fontSize.put("options", toJsonArray(options));
         configs.put(ConfigType.fontSize, fontSize);
     }
+
+    /**
+     * Configuation of heading
+     * @param options The available heading options.
+     *                [
+     *                  { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+     *                  { model: 'heading1', view: 'h2', title: 'Heading 1', class: 'ck-heading_heading1' },
+     *                  { model: 'heading2', view: 'h3', title: 'Heading 2', class: 'ck-heading_heading2' },
+     *                  { model: 'heading3', view: 'h4', title: 'Heading 3', class: 'ck-heading_heading3' }
+     * 	              ]
+     */
+    public void setHeading(List<String[]> options) {
+        JsonObject heading = Json.createObject();
+        heading.put("options", toJsonArray(options));
+        configs.put(ConfigType.heading, heading);
+    }
+
 
 }
