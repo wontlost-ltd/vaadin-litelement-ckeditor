@@ -392,5 +392,32 @@ public class Config {
         configs.put(ConfigType.heading, heading);
     }
 
+    /**
+     * Configuation of highlight
+     * @param options The available highlight options.
+     *                [
+     *                  {
+     * 		              model: 'yellowMarker',
+     * 		              class: 'marker-yellow',
+     * 		              title: 'Yellow marker',
+     * 		              color: 'var(--ck-highlight-marker-yellow)',
+     * 		              type: 'marker'
+     *                  },
+     *                  {
+     * 		              model: 'greenMarker',
+     * 		              class: 'marker-green',
+     * 		              title: 'Green marker',
+     * 		              color: 'var(--ck-highlight-marker-green)',
+     * 		              type: 'marker'
+     *                  }
+     *                ]
+     */
+    public void setHighlight(List<String[]> options) {
+        JsonObject highlight = Json.createObject();
+        highlight.put("options", toJsonArray(options));
+        configs.put(ConfigType.highlight, highlight);
+    }
+
+
 
 }
