@@ -277,4 +277,58 @@ public class Config {
         configs.put(ConfigType.exportWord, exportWord);
     }
 
+    /**
+     * The configuration of the font background color feature.
+     * @param columns Represents the number of columns in the font background color dropdown. Defaults to 5.
+     * @param documentColors Determines the maximum number of available document colors.
+     *                       Setting it to 0 will disable the document colors feature.
+     *                       By default it equals to the columns value.
+     * @param colors Available font background colors defined as an array of strings or objects.
+     *               colors:
+     *               [
+     *                {
+     * 			        color: 'hsl(0, 0%, 0%)',
+     * 			        label: 'Black'
+     *                },
+     *                {
+     * 			        color: 'hsl(0, 0%, 30%)',
+     * 			        label: 'Dim grey'
+     *                }
+     * 	            ]
+     */
+    public void setFontBackgroundColor(int columns, int documentColors, Map<String, String> colors) {
+        JsonObject fontBackgroundColor = Json.createObject();
+        fontBackgroundColor.put("columns", Json.create(columns));
+        fontBackgroundColor.put("documentColors", Json.create(documentColors));
+        fontBackgroundColor.put("colors", Json.createArray());//TODO: imply colors
+        configs.put(ConfigType.fontBackgroundColor, fontBackgroundColor);
+    }
+
+    /**
+     * The configuration of the font color feature.
+     * @param columns Represents the number of columns in the font background color dropdown. Defaults to 5.
+     * @param documentColors Determines the maximum number of available document colors.
+     *                       Setting it to 0 will disable the document colors feature.
+     *                       By default it equals to the columns value.
+     * @param colors Available font background colors defined as an array of strings or objects.
+     *               colors:
+     *               [
+     *                {
+     * 			        color: 'hsl(0, 0%, 0%)',
+     * 			        label: 'Black'
+     *                },
+     *                {
+     * 			        color: 'hsl(0, 0%, 30%)',
+     * 			        label: 'Dim grey'
+     *                }
+     * 	            ]
+     */
+    public void setFontColor(int columns, int documentColors, Map<String, String> colors) {
+        JsonObject fontBackgroundColor = Json.createObject();
+        fontBackgroundColor.put("columns", Json.create(columns));
+        fontBackgroundColor.put("documentColors", Json.create(documentColors));
+        fontBackgroundColor.put("colors", Json.createArray());//TODO: imply colors
+        configs.put(ConfigType.fontColor, fontBackgroundColor);
+    }
+
 }
