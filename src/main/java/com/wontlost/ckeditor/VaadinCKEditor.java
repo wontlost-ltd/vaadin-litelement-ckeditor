@@ -7,6 +7,7 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -82,7 +83,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
 
     private String editorData;
 
-    private Consumer<String> saveEditorData;
+    private BiConsumer<String, String> autosaveAction;
 
     Logger vaddinCKEditorLog = Logger.getLogger(this.getClass().getName());
 
@@ -144,17 +145,24 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
     }
 
     @ClientCallable
-    private void saveEditorData(String editorData) {
-        Optional<Consumer<String>> save = getSaveEditorData();
-        save.orElse((data)-> vaddinCKEditorLog.log(Level.SEVERE, "Invalid consumer provided")).accept(editorData);
+    private void saveEditorData(String editorId, String editorData) {
+        Optional<BiConsumer<String, String>> save = getAutosaveAction();
+        save.orElse((id, data)-> vaddinCKEditorLog.log(Level.SEVERE, "Invalid consumer provided. If you have " +
+                "multiple editors in one page, you need to set autosave configurations for every editor."))
+                .accept(editorId, editorData);
     }
 
-    Optional<Consumer<String>> getSaveEditorData() {
-        return Optional.ofNullable(saveEditorData);
+    Optional<BiConsumer<String, String>> getAutosaveAction() {
+        return Optional.ofNullable(autosaveAction);
     }
 
-    void setSaveEditorData(AutoSave dataConsumer) {
-        this.saveEditorData = dataConsumer;
+    /**
+     * Should be used with method setAutosave. Be aware that if you have multiple editors within one page, you need to
+     * set this for every editor. Otherwise the autosave function would not work as expected.
+     * @param dataConsumer Autosave Action handler
+     */
+    void setAutosaveAction(AutosaveAction dataConsumer) {
+        this.autosaveAction = dataConsumer;
     }
 
     /**
@@ -212,7 +220,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
     }
 
     /**
-     * @param autosave enable autosave function on editor, should be used with setSaveEditorDataConsumer together.
+     * @param autosave enable autosave function on editor, should be used with setSaveEditorData together.
      *                 Otherwise it'll be ignored.
      */
     void setAutosave(boolean autosave) {

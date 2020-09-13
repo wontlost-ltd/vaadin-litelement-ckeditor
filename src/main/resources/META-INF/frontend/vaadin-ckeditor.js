@@ -135,7 +135,7 @@ class VaadinCKEditor extends LitElement {
             ...{
                 autosave: {
                     save( editor ) {
-                        return editor.saveData( editor.getData() );
+                        return editor.saveData( editor.id, editor.getData() );
                     },
                     waitingTime: 2000
                 }
@@ -146,6 +146,7 @@ class VaadinCKEditor extends LitElement {
 
     createEditor() {
         this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , this.getConfig()).then( editor => {
+            editor.id = this.editorId;
             editor.isReadOnly = this.isReadOnly;
             editor.setData(this.editorData);
             this.style.width = this.isChrome?'-webkit-fill-available':
@@ -171,10 +172,10 @@ class VaadinCKEditor extends LitElement {
             editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
                 this.focusedColor(isFocused);
             } );
-            editor.saveData = function( data ) {
+            editor.saveData = function( editorId, editorData ) {
                 return new Promise( resolve => {
                     setTimeout( () => {
-                        server.saveEditorData(data);
+                        server.saveEditorData(editorId, editorData);
                         resolve();
                     }, 400 );
                 } );
