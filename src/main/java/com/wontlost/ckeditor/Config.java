@@ -173,4 +173,29 @@ public class Config {
         configs.put(ConfigType.blockToolbar, toJsonArray(blockToolBar));
     }
 
+    /**
+     * CKFinder configurations
+     * @param openerMethod The type of the CKFinder opener method.
+     *                     Supported types are:
+     *                     'modal' – Opens CKFinder in a modal,
+     *                     'popup' – Opens CKFinder in a new "pop-up" window.
+     *                     Defaults to 'modal'.
+     * @param uploadUrl The path (URL) to the connector which handles the file upload in CKFinder file manager.
+     *                  When specified, it enables the automatic upload of resources
+     *                  such as images inserted into the content.
+     *                  Used by the upload adapter.
+     * @param options Configuration settings for CKFinder. Not fully integrated with ckfinder
+     */
+    public void setCKFinder(String openerMethod, String uploadUrl, Map<String, String> options) {
+        JsonObject ckfinder = Json.createObject();
+        ckfinder.put("openerMethod", Json.create(openerMethod));
+        ckfinder.put("uploadUrl", Json.create(uploadUrl));
+        JsonObject ckfinderOptions = Json.createObject();
+        ckfinderOptions.put("connectorInfo", options.get("connectorInfo"));
+        ckfinderOptions.put("connectorPath", options.get("connectorPath"));
+        ckfinderOptions.put("height", options.get("height"));
+        ckfinderOptions.put("width", options.get("width"));
+        ckfinder.put("options", ckfinderOptions);
+    }
+
 }
