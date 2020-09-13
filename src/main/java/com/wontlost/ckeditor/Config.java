@@ -418,6 +418,19 @@ public class Config {
         configs.put(ConfigType.highlight, highlight);
     }
 
-
+    /**
+     * TODO:
+     * @param resizeOptions
+     * @param resizeUnit
+     * @param styles
+     * @param toolbar
+     * @param upload
+     */
+    public void setImage(List<String[]> resizeOptions, String resizeUnit, List<String[]> styles,
+                         List<String> toolbar, List<String> upload) {
+        JsonObject image = Json.createObject();
+        image.put("resizeOptions", toJsonArray(resizeOptions));
+        configs.put(ConfigType.image, image);
+    }
 
 }
