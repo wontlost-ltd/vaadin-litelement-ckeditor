@@ -377,7 +377,7 @@ public class Config {
     }
 
     /**
-     * Configuation of heading
+     * Configuration of heading
      * @param options The available heading options.
      *                [
      *                  { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
@@ -393,7 +393,7 @@ public class Config {
     }
 
     /**
-     * Configuation of highlight
+     * Configuration of highlight
      * @param options The available highlight options.
      *                [
      *                  {
@@ -419,7 +419,6 @@ public class Config {
     }
 
     /**
-     * TODO:
      * @param resizeOptions
      * @param resizeUnit
      * @param styles
@@ -432,5 +431,7 @@ public class Config {
         image.put("resizeOptions", toJsonArray(resizeOptions));
         configs.put(ConfigType.image, image);
     }
+
+
 
 }

@@ -8,7 +8,6 @@ import com.vaadin.flow.component.dependency.JsModule;
 
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -78,6 +77,7 @@ import java.util.logging.Logger;
 @JsModule("./translations/vi.js")
 @JsModule("./translations/zh.js")
 @JsModule("./translations/zh-cn.js")
+@JsModule("./wscbundle.js")
 @CssImport("./ckeditor.css")
 public class VaadinCKEditor extends CustomField<String> implements HasConfig {
 
