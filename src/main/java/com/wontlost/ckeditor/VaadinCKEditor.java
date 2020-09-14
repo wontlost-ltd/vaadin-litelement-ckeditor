@@ -77,7 +77,6 @@ import java.util.logging.Logger;
 @JsModule("./translations/vi.js")
 @JsModule("./translations/zh.js")
 @JsModule("./translations/zh-cn.js")
-@JsModule("./wscbundle.js")
 @CssImport("./ckeditor.css")
 public class VaadinCKEditor extends CustomField<String> implements HasConfig {
 
@@ -178,7 +177,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
     /**
      * @param editorType  Type of Editor, refer to enum @EditorType.
      */
-    void setEditorType(EditorType editorType) {
+    void setEditorType(Constants.EditorType editorType) {
         getElement().setProperty("editorType", editorType.toString());
     }
 
@@ -208,8 +207,8 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
     /**
      * @param theme  Theme of Editor, refer to enum @ThemeType.
      */
-    void setEditorTheme(ThemeType theme) {
-        getElement().setProperty("themeType", theme==null?ThemeType.LIGHT.toString():theme.toString());
+    void setEditorTheme(Constants.ThemeType theme) {
+        getElement().setProperty("themeType", theme==null?Constants.ThemeType.LIGHT.toString():theme.toString());
     }
 
     /**

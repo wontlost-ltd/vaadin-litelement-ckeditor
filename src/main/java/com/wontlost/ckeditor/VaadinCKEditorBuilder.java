@@ -9,12 +9,12 @@ public class VaadinCKEditorBuilder {
     public String width;
     public String height;
     public String margin;
-    public EditorType editorType = EditorType.CLASSIC;
-    public ThemeType theme;
+    public Config config;
+    public Constants.ThemeType theme;
     public Boolean readOnly = false;
     public Boolean autosave = false;
     public AutosaveAction autosaveAction;
-    public Config config;
+    public Constants.EditorType editorType = Constants.EditorType.CLASSIC;
 
     public VaadinCKEditorBuilder with(Consumer<VaadinCKEditorBuilder> builderFunction) {
         builderFunction.accept(this);

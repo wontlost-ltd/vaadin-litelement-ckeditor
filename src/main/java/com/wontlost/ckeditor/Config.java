@@ -14,82 +14,117 @@ import java.util.*;
  */
 public class Config {
 
-    static final Toolbar[] TOOLBAR = new Toolbar[]{Toolbar.heading, Toolbar.pipe, Toolbar.fontSize, Toolbar.fontFamily,
-            Toolbar.fontColor, Toolbar.fontBackgroundColor, Toolbar.pipe, Toolbar.bold, Toolbar.italic,
-            Toolbar.underline, Toolbar.strikethrough, Toolbar.subscript, Toolbar.superscript, Toolbar.highlight,
-            Toolbar.removeFormat, Toolbar.pipe, Toolbar.horizontalLine, Toolbar.pageBreak, Toolbar.link,
-            Toolbar.bulletedList, Toolbar.numberedList, Toolbar.alignment, Toolbar.todoList, Toolbar.indent, Toolbar.outdent,
-            Toolbar.code, Toolbar.codeBlock, Toolbar.pipe, Toolbar.specialCharacters, Toolbar.exportPdf, Toolbar.exportWord,
-            Toolbar.imageUpload, Toolbar.blockQuote, Toolbar.insertTable, Toolbar.mediaEmbed, Toolbar.undo, Toolbar.redo};
+    static final Constants.Toolbar[] TOOLBAR = new Constants.Toolbar[] {
+            Constants.Toolbar.heading,
+            Constants.Toolbar.pipe,
+            Constants.Toolbar.fontSize,
+            Constants.Toolbar.fontFamily,
+            Constants.Toolbar.fontColor,
+            Constants.Toolbar.fontBackgroundColor,
+            Constants.Toolbar.pipe,
+            Constants.Toolbar.bold,
+            Constants.Toolbar.italic,
+            Constants.Toolbar.underline,
+            Constants.Toolbar.strikethrough,
+            Constants.Toolbar.subscript,
+            Constants.Toolbar.superscript,
+            Constants.Toolbar.highlight,
+            Constants.Toolbar.removeFormat,
+            Constants.Toolbar.pipe,
+            Constants.Toolbar.horizontalLine,
+            Constants.Toolbar.pageBreak,
+            Constants.Toolbar.link,
+            Constants.Toolbar.bulletedList,
+            Constants.Toolbar.numberedList,
+            Constants.Toolbar.alignment,
+            Constants.Toolbar.todoList,
+            Constants.Toolbar.indent,
+            Constants.Toolbar.outdent,
+            Constants.Toolbar.code,
+            Constants.Toolbar.codeBlock,
+            Constants.Toolbar.pipe,
+            Constants.Toolbar.specialCharacters,
+            Constants.Toolbar.exportPdf,
+            Constants.Toolbar.exportWord,
+            Constants.Toolbar.imageUpload,
+            Constants.Toolbar.blockQuote,
+            Constants.Toolbar.insertTable,
+            Constants.Toolbar.mediaEmbed,
+            Constants.Toolbar.undo,
+            Constants.Toolbar.redo };
 
-    Map<ConfigType, JsonValue> configs = new HashMap<>();
+    Map<Constants.ConfigType, JsonValue> configs = new HashMap<>();
 
     public Config() {
-        configs.put(ConfigType.alignment, Json.createObject());
-        configs.put(ConfigType.balloonToolbar, Json.createArray());
-        configs.put(ConfigType.blockToolbar, Json.createArray());
-        configs.put(ConfigType.ckfinder, Json.createObject());
-        configs.put(ConfigType.cloudServices, Json.createObject());
-        configs.put(ConfigType.codeBlock, Json.createObject());
-        configs.put(ConfigType.exportPdf, Json.createObject());
-        configs.put(ConfigType.exportWord, Json.createObject());
-        configs.put(ConfigType.extraPlugins, Json.createArray());
-        configs.put(ConfigType.fontBackgroundColor, Json.createObject());
-        configs.put(ConfigType.fontColor, Json.createObject());
-        configs.put(ConfigType.fontFamily, Json.createObject());
-        configs.put(ConfigType.fontSize, Json.createObject());
-        configs.put(ConfigType.heading, Json.createObject());
-        configs.put(ConfigType.highlight, Json.createObject());
-        configs.put(ConfigType.image, Json.createObject());
-        configs.put(ConfigType.indentBlock, Json.createObject());
-        configs.put(ConfigType.initialData, Json.create(""));
-        configs.put(ConfigType.language, Json.create("en"));
-        configs.put(ConfigType.link, Json.createObject());
-        configs.put(ConfigType.mediaEmbed, Json.createObject());
-        configs.put(ConfigType.mention, Json.createObject());
-        configs.put(ConfigType.placeholder, Json.create(""));
-        configs.put(ConfigType.restrictedEditing, Json.createObject());
-        configs.put(ConfigType.simpleUpload, Json.createObject());
-        configs.put(ConfigType.table, Json.createObject());
-        configs.put(ConfigType.title, Json.createObject());
-        configs.put(ConfigType.toolbar, toJsonArray(TOOLBAR));
-        configs.put(ConfigType.typing, Json.createObject());
-        configs.put(ConfigType.wordCount, Json.createObject());
-        configs.put(ConfigType.wproofreader, Json.createObject());
+        configs.put(Constants.ConfigType.alignment, Json.createObject());
+        configs.put(Constants.ConfigType.balloonToolbar, Json.createArray());
+        configs.put(Constants.ConfigType.blockToolbar, Json.createArray());
+        configs.put(Constants.ConfigType.ckfinder, Json.createObject());
+        configs.put(Constants.ConfigType.cloudServices, Json.createObject());
+        configs.put(Constants.ConfigType.codeBlock, Json.createObject());
+        configs.put(Constants.ConfigType.exportPdf, Json.createObject());
+        configs.put(Constants.ConfigType.exportWord, Json.createObject());
+        configs.put(Constants.ConfigType.extraPlugins, Json.createArray());
+        configs.put(Constants.ConfigType.fontBackgroundColor, Json.createObject());
+        configs.put(Constants.ConfigType.fontColor, Json.createObject());
+        configs.put(Constants.ConfigType.fontFamily, Json.createObject());
+        configs.put(Constants.ConfigType.fontSize, Json.createObject());
+        configs.put(Constants.ConfigType.heading, Json.createObject());
+        configs.put(Constants.ConfigType.highlight, Json.createObject());
+        configs.put(Constants.ConfigType.image, Json.createObject());
+        configs.put(Constants.ConfigType.indentBlock, Json.createObject());
+        configs.put(Constants.ConfigType.initialData, Json.create(""));
+        configs.put(Constants.ConfigType.language, Json.create("en"));
+        configs.put(Constants.ConfigType.link, Json.createObject());
+        configs.put(Constants.ConfigType.mediaEmbed, Json.createObject());
+        configs.put(Constants.ConfigType.mention, Json.createObject());
+        configs.put(Constants.ConfigType.placeholder, Json.create(""));
+        configs.put(Constants.ConfigType.removePlugins, toJsonArray(Constants.Plugins.WProofreader.name()));
+        configs.put(Constants.ConfigType.restrictedEditing, Json.createObject());
+        configs.put(Constants.ConfigType.simpleUpload, Json.createObject());
+        configs.put(Constants.ConfigType.table, Json.createObject());
+        configs.put(Constants.ConfigType.title, Json.createObject());
+        configs.put(Constants.ConfigType.toolbar, toJsonArray(TOOLBAR));
+        configs.put(Constants.ConfigType.typing, Json.createObject());
+        configs.put(Constants.ConfigType.wordCount, Json.createObject());
+        configs.put(Constants.ConfigType.wproofreader, Json.createObject());
     }
 
     Config(JsonObject jsonObject) {
-        configs.put(ConfigType.alignment, jsonObject.get(ConfigType.alignment.name()));
-        configs.put(ConfigType.balloonToolbar, jsonObject.get(ConfigType.balloonToolbar.name()));
-        configs.put(ConfigType.blockToolbar, jsonObject.get(ConfigType.blockToolbar.name()));
-        configs.put(ConfigType.ckfinder, jsonObject.get(ConfigType.ckfinder.name()));
-        configs.put(ConfigType.cloudServices, jsonObject.get(ConfigType.cloudServices.name()));
-        configs.put(ConfigType.codeBlock, jsonObject.get(ConfigType.codeBlock.name()));
-        configs.put(ConfigType.exportPdf, jsonObject.get(ConfigType.exportPdf.name()));
-        configs.put(ConfigType.exportWord, jsonObject.get(ConfigType.exportWord.name()));
-        configs.put(ConfigType.extraPlugins, jsonObject.get(ConfigType.extraPlugins.name()));
-        configs.put(ConfigType.fontBackgroundColor, jsonObject.get(ConfigType.fontBackgroundColor.name()));
-        configs.put(ConfigType.fontColor, jsonObject.get(ConfigType.fontColor.name()));
-        configs.put(ConfigType.fontFamily, jsonObject.get(ConfigType.fontFamily.name()));
-        configs.put(ConfigType.fontSize, jsonObject.get(ConfigType.fontSize.name()));
-        configs.put(ConfigType.heading, jsonObject.get(ConfigType.heading.name()));
-        configs.put(ConfigType.highlight, jsonObject.get(ConfigType.highlight.name()));
-        configs.put(ConfigType.image, jsonObject.get(ConfigType.image.name()));
-        configs.put(ConfigType.indentBlock, jsonObject.get(ConfigType.indentBlock.name()));
-        configs.put(ConfigType.initialData, jsonObject.get(ConfigType.initialData.name()));
-        configs.put(ConfigType.language, jsonObject.get(ConfigType.language.name()));
-        configs.put(ConfigType.link, jsonObject.get(ConfigType.link.name()));
-        configs.put(ConfigType.mediaEmbed, jsonObject.get(ConfigType.mediaEmbed.name()));
-        configs.put(ConfigType.mention, jsonObject.get(ConfigType.mention.name()));
-        configs.put(ConfigType.placeholder, jsonObject.get(ConfigType.placeholder.name()));
-        configs.put(ConfigType.restrictedEditing, jsonObject.get(ConfigType.restrictedEditing.name()));
-        configs.put(ConfigType.simpleUpload, jsonObject.get(ConfigType.simpleUpload.name()));
-        configs.put(ConfigType.table, jsonObject.get(ConfigType.table.name()));
-        configs.put(ConfigType.title, jsonObject.get(ConfigType.title.name()));
-        configs.put(ConfigType.toolbar, jsonObject.get(ConfigType.toolbar.name()));
-        configs.put(ConfigType.typing, jsonObject.get(ConfigType.typing.name()));
-        configs.put(ConfigType.wordCount, jsonObject.get(ConfigType.wordCount.name()));
-        configs.put(ConfigType.wproofreader, jsonObject.get(ConfigType.wproofreader.name()));
+        configs.put(Constants.ConfigType.alignment, jsonObject.get(Constants.ConfigType.alignment.name()));
+        configs.put(Constants.ConfigType.balloonToolbar, jsonObject.get(Constants.ConfigType.balloonToolbar.name()));
+        configs.put(Constants.ConfigType.blockToolbar, jsonObject.get(Constants.ConfigType.blockToolbar.name()));
+        configs.put(Constants.ConfigType.ckfinder, jsonObject.get(Constants.ConfigType.ckfinder.name()));
+        configs.put(Constants.ConfigType.cloudServices, jsonObject.get(Constants.ConfigType.cloudServices.name()));
+        configs.put(Constants.ConfigType.codeBlock, jsonObject.get(Constants.ConfigType.codeBlock.name()));
+        configs.put(Constants.ConfigType.exportPdf, jsonObject.get(Constants.ConfigType.exportPdf.name()));
+        configs.put(Constants.ConfigType.exportWord, jsonObject.get(Constants.ConfigType.exportWord.name()));
+        configs.put(Constants.ConfigType.extraPlugins, jsonObject.get(Constants.ConfigType.extraPlugins.name()));
+        configs.put(Constants.ConfigType.fontBackgroundColor, jsonObject.get(Constants.ConfigType.fontBackgroundColor.name()));
+        configs.put(Constants.ConfigType.fontColor, jsonObject.get(Constants.ConfigType.fontColor.name()));
+        configs.put(Constants.ConfigType.fontFamily, jsonObject.get(Constants.ConfigType.fontFamily.name()));
+        configs.put(Constants.ConfigType.fontSize, jsonObject.get(Constants.ConfigType.fontSize.name()));
+        configs.put(Constants.ConfigType.heading, jsonObject.get(Constants.ConfigType.heading.name()));
+        configs.put(Constants.ConfigType.highlight, jsonObject.get(Constants.ConfigType.highlight.name()));
+        configs.put(Constants.ConfigType.image, jsonObject.get(Constants.ConfigType.image.name()));
+        configs.put(Constants.ConfigType.indentBlock, jsonObject.get(Constants.ConfigType.indentBlock.name()));
+        configs.put(Constants.ConfigType.initialData, jsonObject.get(Constants.ConfigType.initialData.name()));
+        configs.put(Constants.ConfigType.language, jsonObject.get(Constants.ConfigType.language.name()));
+        configs.put(Constants.ConfigType.link, jsonObject.get(Constants.ConfigType.link.name()));
+        configs.put(Constants.ConfigType.mediaEmbed, jsonObject.get(Constants.ConfigType.mediaEmbed.name()));
+        configs.put(Constants.ConfigType.mention, jsonObject.get(Constants.ConfigType.mention.name()));
+        configs.put(Constants.ConfigType.placeholder, jsonObject.get(Constants.ConfigType.placeholder.name()));
+        configs.put(Constants.ConfigType.removePlugins, jsonObject.get(Constants.ConfigType.removePlugins.name())==null?
+                                                        toJsonArray(Constants.Plugins.WProofreader.name()):
+                                                        jsonObject.get(Constants.ConfigType.removePlugins.name()));
+        configs.put(Constants.ConfigType.restrictedEditing, jsonObject.get(Constants.ConfigType.restrictedEditing.name()));
+        configs.put(Constants.ConfigType.simpleUpload, jsonObject.get(Constants.ConfigType.simpleUpload.name()));
+        configs.put(Constants.ConfigType.table, jsonObject.get(Constants.ConfigType.table.name()));
+        configs.put(Constants.ConfigType.title, jsonObject.get(Constants.ConfigType.title.name()));
+        configs.put(Constants.ConfigType.toolbar, jsonObject.get(Constants.ConfigType.toolbar.name()));
+        configs.put(Constants.ConfigType.typing, jsonObject.get(Constants.ConfigType.typing.name()));
+        configs.put(Constants.ConfigType.wordCount, jsonObject.get(Constants.ConfigType.wordCount.name()));
+        configs.put(Constants.ConfigType.wproofreader, jsonObject.get(Constants.ConfigType.wproofreader.name()));
     }
 
     JsonObject getConfigJson() {
@@ -98,15 +133,15 @@ public class Config {
         return configResult;
     }
 
-    public Map<ConfigType, JsonValue> getConfigs() {
+    public Map<Constants.ConfigType, JsonValue> getConfigs() {
         return configs;
     }
 
     /**
-     * @param toolbar Toolbar of Editor, refer to enum @Toolbar
+     * @param toolbar Toolbar of Editor, refer to enum @Constants.Toolbar
      * @return JsonArray
      */
-    JsonArray toJsonArray(Toolbar... toolbar) {
+    JsonArray toJsonArray(Constants.Toolbar... toolbar) {
         List<String> values = new ArrayList<>();
         if(toolbar == null || toolbar.length==0) {
             toolbar = TOOLBAR;
@@ -134,21 +169,21 @@ public class Config {
      * @param placeHolder Place holder of Editor
      */
     public void setPlaceHolder(String placeHolder){
-        configs.put(ConfigType.placeholder, Json.create(placeHolder==null?"Type the content here!":placeHolder));
+        configs.put(Constants.ConfigType.placeholder, Json.create(placeHolder==null?"Type the content here!":placeHolder));
     }
 
     /**
-     * @param editorToolBar Toolbar of Editor, refer to enum @Toolbar
+     * @param editorToolBar Toolbar of Editor, refer to enum @Constants.Toolbar
      */
-    public void setEditorToolBar(Toolbar[] editorToolBar) {
-        configs.put(ConfigType.toolbar, toJsonArray(editorToolBar));
+    public void setEditorToolBar(Constants.Toolbar[] editorToolBar) {
+        configs.put(Constants.ConfigType.toolbar, toJsonArray(editorToolBar));
     }
 
     /**
      * @param uiLanguage Language of user interface, refer to enum @Language
      */
-    public void setUILanguage(Language uiLanguage) {
-        configs.put(ConfigType.language, Json.create(uiLanguage==null?"en":uiLanguage.getLanguage()));
+    public void setUILanguage(Constants.Language uiLanguage) {
+        configs.put(Constants.ConfigType.language, Json.create(uiLanguage==null?"en":uiLanguage.getLanguage()));
     }
 
     /**
@@ -158,23 +193,23 @@ public class Config {
     public void setAlignment(String[] options) {
         JsonObject alignment = Json.createObject();
         alignment.put("options", toJsonArray(options));
-        configs.put(ConfigType.alignment, alignment);
+        configs.put(Constants.ConfigType.alignment, alignment);
     }
 
     /**
-     * @param balloonToolBar BalloonToolbar of Editor, refer to enum @Toolbar.
+     * @param balloonToolBar BalloonToolbar of Editor, refer to enum @Constants.Toolbar.
      *                       Contextual toolbar configuration. Used by the BalloonToolbar feature.
      */
-    public void setBalloonToolBar(Toolbar[] balloonToolBar) {
-        configs.put(ConfigType.balloonToolbar, toJsonArray(balloonToolBar));
+    public void setBalloonToolBar(Constants.Toolbar[] balloonToolBar) {
+        configs.put(Constants.ConfigType.balloonToolbar, toJsonArray(balloonToolBar));
     }
 
     /**
-     * @param blockToolBar BlockToolbar of Editor, refer to enum @Toolbar.
+     * @param blockToolBar BlockToolbar of Editor, refer to enum @Constants.Toolbar.
      *                     The block toolbar configuration. Used by the BlockToolbar feature.
      */
-    public void setBlockToolBar(Toolbar[] blockToolBar) {
-        configs.put(ConfigType.blockToolbar, toJsonArray(blockToolBar));
+    public void setBlockToolBar(Constants.Toolbar[] blockToolBar) {
+        configs.put(Constants.ConfigType.blockToolbar, toJsonArray(blockToolBar));
     }
 
     /**
@@ -200,7 +235,7 @@ public class Config {
         ckfinderOptions.put("height", options.get("height"));
         ckfinderOptions.put("width", options.get("width"));
         ckfinder.put("options", ckfinderOptions);
-        configs.put(ConfigType.ckfinder, ckfinder);
+        configs.put(Constants.ConfigType.ckfinder, ckfinder);
     }
 
     /**
@@ -231,7 +266,7 @@ public class Config {
         cloudServices.put("tokenUrl", Json.create(tokenUrl));
         cloudServices.put("uploadUrl", Json.create(uploadUrl));
         cloudServices.put("webSocketUrl", Json.create(webSocketUrl));
-        configs.put(ConfigType.cloudServices, cloudServices);
+        configs.put(Constants.ConfigType.cloudServices, cloudServices);
     }
 
     /**
@@ -254,7 +289,7 @@ public class Config {
         JsonObject codeBlock = Json.createObject();
         codeBlock.put("indentSequence", Json.create(indentSequence));
         codeBlock.put("languages", toJsonArray(languages));
-        configs.put(ConfigType.codeBlock, codeBlock);
+        configs.put(Constants.ConfigType.codeBlock, codeBlock);
     }
 
     /**
@@ -266,7 +301,7 @@ public class Config {
         JsonObject exportPdf = Json.createObject();
         exportPdf.put("fileName", Json.create(fileName));
         exportPdf.put("converterUrl", Json.create(converterUrl));
-        configs.put(ConfigType.exportPdf, exportPdf);
+        configs.put(Constants.ConfigType.exportPdf, exportPdf);
     }
 
     /**
@@ -278,7 +313,7 @@ public class Config {
         JsonObject exportWord = Json.createObject();
         exportWord.put("fileName", Json.create(fileName));
         exportWord.put("converterUrl", Json.create(converterUrl));
-        configs.put(ConfigType.exportWord, exportWord);
+        configs.put(Constants.ConfigType.exportWord, exportWord);
     }
 
     /**
@@ -305,7 +340,7 @@ public class Config {
         fontBackgroundColor.put("columns", Json.create(columns));
         fontBackgroundColor.put("documentColors", Json.create(documentColors));
         fontBackgroundColor.put("colors", Json.createArray());//TODO: imply colors
-        configs.put(ConfigType.fontBackgroundColor, fontBackgroundColor);
+        configs.put(Constants.ConfigType.fontBackgroundColor, fontBackgroundColor);
     }
 
     /**
@@ -332,7 +367,7 @@ public class Config {
         fontBackgroundColor.put("columns", Json.create(columns));
         fontBackgroundColor.put("documentColors", Json.create(documentColors));
         fontBackgroundColor.put("colors", Json.createArray());//TODO: imply colors
-        configs.put(ConfigType.fontColor, fontBackgroundColor);
+        configs.put(Constants.ConfigType.fontColor, fontBackgroundColor);
     }
 
     /**
@@ -357,7 +392,7 @@ public class Config {
         JsonObject fontFamily = Json.createObject();
         fontFamily.put("supportAllValues", Json.create(supportAllValues));
         fontFamily.put("options", toJsonArray(options));
-        configs.put(ConfigType.fontFamily, fontFamily);
+        configs.put(Constants.ConfigType.fontFamily, fontFamily);
     }
 
     /**
@@ -373,7 +408,7 @@ public class Config {
         JsonObject fontSize = Json.createObject();
         fontSize.put("supportAllValues", Json.create(supportAllValues));
         fontSize.put("options", toJsonArray(options));
-        configs.put(ConfigType.fontSize, fontSize);
+        configs.put(Constants.ConfigType.fontSize, fontSize);
     }
 
     /**
@@ -389,7 +424,7 @@ public class Config {
     public void setHeading(List<String[]> options) {
         JsonObject heading = Json.createObject();
         heading.put("options", toJsonArray(options));
-        configs.put(ConfigType.heading, heading);
+        configs.put(Constants.ConfigType.heading, heading);
     }
 
     /**
@@ -415,7 +450,7 @@ public class Config {
     public void setHighlight(List<String[]> options) {
         JsonObject highlight = Json.createObject();
         highlight.put("options", toJsonArray(options));
-        configs.put(ConfigType.highlight, highlight);
+        configs.put(Constants.ConfigType.highlight, highlight);
     }
 
     /**
@@ -429,7 +464,7 @@ public class Config {
                          List<String> toolbar, List<String> upload) {
         JsonObject image = Json.createObject();
         image.put("resizeOptions", toJsonArray(resizeOptions));
-        configs.put(ConfigType.image, image);
+        configs.put(Constants.ConfigType.image, image);
     }
 
 
