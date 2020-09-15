@@ -1,12 +1,15 @@
 package com.wontlost.ckeditor;
 
 import com.google.gson.Gson;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.page.Page;
 import elemental.json.Json;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
 import elemental.json.JsonValue;
 import elemental.json.impl.JreJsonFactory;
 
+import java.io.Serializable;
 import java.util.*;
 
 import static com.wontlost.ckeditor.Constants.*;
@@ -469,6 +472,40 @@ public class Config {
         configs.put(ConfigType.image, image);
     }
 
+    /**
+     * Convert javascript function to JsonObject
+     * @param arguments function argument
+     * @param body function body
+     * @return JsonObject
+     */
+    private JsonObject functionToJsonObject(String arguments, String body){
+        JsonObject jsonObject = Json.createObject();
+        JsonObject functionObject = Json.createObject();
+        functionObject.put("arguments", arguments);
+        functionObject.put("body", body);
+        jsonObject.put("function", functionObject);
+        return jsonObject;
+    }
+
+    /**
+     * Convert JsonObject to Function
+     * @param jsonObject JsonObject to be converted
+     * @return function string
+     */
+    private String jsonObjectToFunction(JsonObject jsonObject) {
+        return "var f = new Function("+jsonObject.getObject("function").getString("arguments")+", "
+                +jsonObject.getObject("function").getString("body")+")";
+    }
+
+    /**
+     * Run javascript on page
+     * @param page          Page where to run the function
+     * @param function      Function that will be executed
+     * @param parameters    Arguments of the function if any
+     */
+    public void runJsOnPage(Page page, String function, Serializable... parameters) {
+        page.executeJs(function, parameters);
+    }
 
 
 }
