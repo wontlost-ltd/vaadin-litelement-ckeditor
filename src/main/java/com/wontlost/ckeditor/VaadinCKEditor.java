@@ -11,6 +11,8 @@ import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.wontlost.ckeditor.Constants.*;
+
 /**
  * Used in @VaadinCKEditorBuilder.
  */
@@ -177,7 +179,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
     /**
      * @param editorType  Type of Editor, refer to enum @EditorType.
      */
-    void setEditorType(Constants.EditorType editorType) {
+    void setEditorType(EditorType editorType) {
         getElement().setProperty("editorType", editorType.toString());
     }
 
@@ -207,8 +209,8 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
     /**
      * @param theme  Theme of Editor, refer to enum @ThemeType.
      */
-    void setEditorTheme(Constants.ThemeType theme) {
-        getElement().setProperty("themeType", theme==null?Constants.ThemeType.LIGHT.toString():theme.toString());
+    void setEditorTheme(ThemeType theme) {
+        getElement().setProperty("themeType", theme==null?ThemeType.LIGHT.toString():theme.toString());
     }
 
     /**

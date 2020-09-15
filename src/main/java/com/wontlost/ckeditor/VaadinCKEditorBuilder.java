@@ -2,6 +2,8 @@ package com.wontlost.ckeditor;
 
 import java.util.function.Consumer;
 
+import com.wontlost.ckeditor.Constants.*;
+
 public class VaadinCKEditorBuilder {
 
     public String editorId;
@@ -10,11 +12,11 @@ public class VaadinCKEditorBuilder {
     public String height;
     public String margin;
     public Config config;
-    public Constants.ThemeType theme;
+    public ThemeType theme;
     public Boolean readOnly = false;
     public Boolean autosave = false;
     public AutosaveAction autosaveAction;
-    public Constants.EditorType editorType = Constants.EditorType.CLASSIC;
+    public EditorType editorType = EditorType.CLASSIC;
 
     public VaadinCKEditorBuilder with(Consumer<VaadinCKEditorBuilder> builderFunction) {
         builderFunction.accept(this);
