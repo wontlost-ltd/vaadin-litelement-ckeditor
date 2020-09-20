@@ -1,6 +1,7 @@
 package com.wontlost.ckeditor;
 
 import com.google.gson.Gson;
+import com.helger.commons.functional.IFunction;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.page.Page;
 import elemental.json.Json;
@@ -8,6 +9,7 @@ import elemental.json.JsonArray;
 import elemental.json.JsonObject;
 import elemental.json.JsonValue;
 import elemental.json.impl.JreJsonFactory;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.*;
@@ -647,6 +649,37 @@ public class Config {
     }
 
     /**
+     * If you are going to use WproofReader, you have to add this config or WproofReaderServer.
+     * @param serviceId After signing up for a trial or paid version, you will receive your service ID which is used to activate the service.
+     * @param srcUrl Default: https://svc.webspellchecker.net/spellcheck31/wscbundle/wscbundle.js
+     */
+    public void setWproofReaderCloud(String serviceId, String srcUrl) {
+        JsonObject wproofReaderCloud = Json.createObject();
+        String defaultSrcUrl = "https://svc.webspellchecker.net/spellcheck31/wscbundle/wscbundle.js";
+        wproofReaderCloud.put("serviceId", Json.create(serviceId));
+        wproofReaderCloud.put("srcUrl", Json.create(srcUrl==null || srcUrl.length()==0?defaultSrcUrl:srcUrl));
+        configs.put(ConfigType.wproofreader, wproofReaderCloud);
+    }
+
+    /**
+     * If you are going to use WproofReader, you have to add this config or WproofReaderCloud.
+     * @param serviceProtocol Default to 'https'.
+     * @param serviceHost   Default to localhost.
+     * @param servicePort Default to 8080.
+     * @param servicePath Default to '/'.
+     * @param srcUrl String like 'https://host_name/virtual_directory/wscbundle/wscbundle.js'
+     */
+    public void setWproofReaderServer(String serviceProtocol, String serviceHost, Integer servicePort, String servicePath, String srcUrl) {
+        JsonObject wproofReaderServer = Json.createObject();
+        wproofReaderServer.put("serviceProtocol", Json.create(serviceProtocol==null || serviceProtocol.length()==0?"https":serviceProtocol));
+        wproofReaderServer.put("serviceHost", Json.create(serviceHost==null || serviceHost.length()==0?"localhost":serviceHost));
+        wproofReaderServer.put("servicePort", Json.create(servicePort));
+        wproofReaderServer.put("servicePath", Json.create(servicePath==null || servicePath.length()==0?"/":servicePath));
+        wproofReaderServer.put("srcUrl", Json.create(srcUrl==null || srcUrl.length()==0?"":srcUrl));
+        configs.put(ConfigType.wproofreader, wproofReaderServer);
+    }
+
+    /**
      * The configuration of the word count feature.
      * @param container Allows for providing the HTML element that the word count container will be appended to automatically.
      * @param displayCharacters This option allows for hiding the character counter. The element obtained through
@@ -688,8 +721,8 @@ public class Config {
      * @param jsonObject JsonObject to be converted
      * @return function string
      */
-    private String jsonObjectToFunction(JsonObject jsonObject) {
-        return "var f = new Function("+jsonObject.getObject("function").getString("arguments")+", "
+    private String jsonObjectToFunction(JsonObject jsonObject, String functionName) {
+        return "let "+functionName+" = new Function("+jsonObject.getObject("function").getString("arguments")+", "
                 +jsonObject.getObject("function").getString("body")+")";
     }
 
