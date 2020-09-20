@@ -156,7 +156,7 @@ public class Config {
         return Json.instance().parse(toolbarJson);
     }
 
-    JsonArray toJsonArray(List<String[]> options) {
+    JsonArray toJsonArray(List<Object> options) {
         return Json.instance().parse(new Gson().toJson(options));
     }
 
@@ -428,7 +428,7 @@ public class Config {
      */
     public void setHeading(List<String[]> options) {
         JsonObject heading = Json.createObject();
-        heading.put("options", toJsonArray(options));
+        heading.put("options", toJsonArray(Collections.singletonList(options)));
         configs.put(ConfigType.heading, heading);
     }
 
@@ -454,22 +454,218 @@ public class Config {
      */
     public void setHighlight(List<String[]> options) {
         JsonObject highlight = Json.createObject();
-        highlight.put("options", toJsonArray(options));
+        highlight.put("options", toJsonArray(Collections.singletonList(options)));
         configs.put(ConfigType.highlight, highlight);
     }
 
     /**
-     * @param resizeOptions
-     * @param resizeUnit
-     * @param styles
-     * @param toolbar
-     * @param upload
+     * @param resizeOptions The image resize options.
+     *                      resizeOptions: [ {
+     * 				                name: 'imageResize:original',
+     * 				                value: null
+     *                          },
+     *                          {
+     * 				                name: 'imageResize:50',
+     * 				                value: '50'
+     *                          } ]
+     * @param resizeUnit The available options are 'px' or '%'.
+     * @param styles Available image styles.
+     *               The default value is:
+     *               const imageConfig = {
+     * 	                styles: [ 'full', 'side' ]
+     *               };
+     * @param toolbar Items to be placed in the image toolbar.
+     *                three toolbar items will be available in ComponentFactory: 'imageStyle:full', 'imageStyle:side', and 'imageTextAlternative'
+     *                so you can configure the toolbar like this:
+     *                const imageConfig = {
+     * 	                  toolbar: [ 'imageStyle:full', 'imageStyle:side', '|', 'imageTextAlternative' ]
+     *                };
+     * @param upload The image upload configuration.
+     *               The list of accepted image types.
+     *               The accepted types of images can be customized to allow only certain types of images:
+     *               // Allow only JPEG and PNG images:
+     *              const imageUploadConfig = {
+     * 	                types: [ 'png', 'jpeg' ]
+     *              };
      */
-    public void setImage(List<String[]> resizeOptions, String resizeUnit, List<String[]> styles,
-                         List<String> toolbar, List<String> upload) {
+    public void setImage(List<String[]> resizeOptions, String resizeUnit, String[] styles,
+                         String[] toolbar, String[] upload) {
         JsonObject image = Json.createObject();
-        image.put("resizeOptions", toJsonArray(resizeOptions));
+        image.put("resizeOptions", toJsonArray(Collections.singletonList(resizeOptions)));
+        image.put("resizeUnit", Json.create(resizeUnit));
+        image.put("styles", toJsonArray(styles));
+        image.put("toolbar", toJsonArray(toolbar));
+        image.put("types", toJsonArray(upload));
         configs.put(ConfigType.image, image);
+    }
+
+    /**
+     * The configuration of the block indentation feature.
+     * @param offset The size of indentation units for each indentation step. Default 40
+     * @param unit The unit used for indentation offset.
+     */
+    public void setIndentBlock(int offset, String unit) {
+        JsonObject indentBlock = Json.createObject();
+        indentBlock.put("offset", Json.create(offset));
+        indentBlock.put("unit", Json.create(unit));
+        configs.put(ConfigType.indentBlock, indentBlock);
+    }
+
+    /**
+     * By default, the editor is initialized with the content of the element on which this editor is initialized.
+     * @param initialData The initial editor data to be used instead of the provided element's HTML content.
+     */
+    public void setInitialData(String initialData) {
+        JsonObject indentBlock = Json.createObject();
+        indentBlock.put("initialData", Json.create(initialData));
+        configs.put(ConfigType.initialData, indentBlock);
+    }
+
+    /**
+     * The configuration of the link feature.
+     * @param defaultProtocal    When set, the editor will add the given protocol to the link when the user creates a link without one. For example, when the user is creating a link and types
+     *                           ckeditor.com in the link form input, during link submission the editor will automatically add the http:// protocol, so the link will look as follows: http://ckeditor.com.
+     *                           The feature also provides email address auto-detection. When you submit hello@example.com, the plugin will automatically change it to mailto:hello@example.com.
+     * @param addTargetToExternalLinks When set to true, the target="blank" and rel="noopener noreferrer"
+     *                                 attributes are automatically added to all external links in the editor. "External links" are all links in the editor content starting with http, https, or //.
+     */
+    public void setLink(String defaultProtocal, Boolean addTargetToExternalLinks) {
+        JsonObject link = Json.createObject();
+        link.put("defaultProtocal", Json.create(defaultProtocal));
+        link.put("addTargetToExternalLinks", Json.create(addTargetToExternalLinks));
+        configs.put(ConfigType.link, link);
+    }
+
+    /**
+     * The configuration of the media embed features.
+     * @param previewsInData Controls the data format produced by the feature.
+     * @param providers The default media providers supported by the editor.
+     * @param extraProviders The additional media providers supported by the editor. This configuration helps extend the default providers.
+     * @param removeProviders The list of media providers that should not be used despite being available in config.mediaEmbed.providers and config.mediaEmbed.extraProviders
+     * @param toolbar Items to be placed in the media embed toolbar. This option requires adding MediaEmbedToolbar to the plugin list.
+     */
+    public void setMediaEmbed(Boolean previewsInData, List<JsonObject> providers, List<JsonObject> extraProviders, List<String> removeProviders, List<String> toolbar) {
+        JsonObject mediaEmbed = Json.createObject();
+        mediaEmbed.put("previewsInData", Json.create(previewsInData));
+        mediaEmbed.put("providers", toJsonArray(Collections.singletonList(providers)));
+        mediaEmbed.put("extraProviders", toJsonArray(Collections.singletonList(extraProviders)));
+        mediaEmbed.put("removeProviders", toJsonArray(Collections.singletonList(removeProviders)));
+        mediaEmbed.put("toolbar", toJsonArray(Collections.singletonList(toolbar)));
+        configs.put(ConfigType.mediaEmbed, mediaEmbed);
+    }
+
+    /**
+     * The configuration of the mention feature.
+     * @param feeds The list of mention feeds supported by the editor.
+     */
+    public void setMention(List<JsonObject> feeds) {
+        JsonObject mention = Json.createObject();
+        mention.put("feeds", toJsonArray(Collections.singletonList(feeds)));
+        configs.put(ConfigType.mention, mention);
+    }
+
+    /**
+     * The list of plugins which should not be loaded despite being available in an editor build.
+     * @param plugins names of plugin
+     */
+    public void setRemovePlugins(List<String> plugins) {
+        JsonObject removePlugins = Json.createObject();
+        removePlugins.put("removePlugins", toJsonArray(Collections.singletonList(plugins)));
+        configs.put(ConfigType.removePlugins, removePlugins);
+    }
+
+    /**
+     * The configuration of the restricted editing mode feature.
+     * @param allowedAttributes The text attribute names allowed when pasting content ot non-restricted areas.
+     * @param allowedCommands The command names allowed in non-restricted areas of the content.
+     *                        Defines which feature commands should be enabled in the restricted editing mode.
+     *                        The commands used for typing and deleting text ('input', 'delete' and 'forwardDelete')
+     *                        are allowed by the feature inside non-restricted regions and do not need to be defined.
+     *                        Note: The restricted editing mode always allows to use the restricted mode navigation
+     *                        commands as well as 'undo' and 'redo' commands.
+     */
+    public void setRestrictedEditing(List<String> allowedAttributes, List<String> allowedCommands) {
+        JsonObject restrictedEditing = Json.createObject();
+        restrictedEditing.put("allowedAttributes", toJsonArray(Collections.singletonList(allowedAttributes)));
+        restrictedEditing.put("allowedCommands", toJsonArray(Collections.singletonList(allowedCommands)));
+        configs.put(ConfigType.restrictedEditing, restrictedEditing);
+    }
+
+    /**
+     *
+     * @param uploadUrl The path (URL) to the server (application) which handles the file upload. When specified,
+     *                  enables the automatic upload of resources (images) inserted into the editor content.
+     * @param withCredentials This flag enables the withCredentials property of the request sent to the server
+     *                        during the upload. It affects cross-site requests only and, for instance,
+     *                        allows credentials such as cookies to be sent along with the request.
+     * @param headers An object that defines additional headers sent with the request to the server during the upload.
+     *                This is the right place to implement security mechanisms like authentication and CSRF protection.
+     */
+    public void setSimpleUpload(String uploadUrl, Boolean withCredentials, List<JsonObject> headers) {
+        JsonObject simpleUpload = Json.createObject();
+        simpleUpload.put("uploadUrl", Json.create(uploadUrl));
+        simpleUpload.put("withCredentials", Json.create(withCredentials));
+        simpleUpload.put("headers", toJsonArray(Collections.singletonList(headers)));
+        configs.put(ConfigType.simpleUpload, simpleUpload);
+    }
+
+    /**
+     * The configuration of the table feature. Used by the table feature in the
+     * @param contentToolbar Items to be placed in the table content toolbar. The TableToolbar plugin is required to make this toolbar work.
+     * @param tableToolbar Items to be placed in the table toolbar. The TableToolbar plugin is required to make this toolbar work.
+     * @param tableCellProperties The configuration of the table cell properties user interface (balloon).
+     * @param tableProperties The configuration of the table properties user interface (balloon)
+     */
+    public void setTable(List<String> contentToolbar, List<String> tableToolbar, JsonObject tableCellProperties, JsonObject tableProperties) {
+        JsonObject table = Json.createObject();
+        table.put("contentToolbar", toJsonArray(Collections.singletonList(contentToolbar)));
+        table.put("tableToolbar", toJsonArray(Collections.singletonList(tableToolbar)));
+        table.put("tableCellProperties", tableCellProperties);
+        table.put("tableProperties", tableCellProperties);
+        configs.put(ConfigType.table, table);
+    }
+
+    /**
+     * The configuration of the title feature.
+     * @param placeholder Defines a custom value of the placeholder for the title field.
+     */
+    public void setTitle(String placeholder) {
+        JsonObject title = Json.createObject();
+        title.put("placeholder", Json.create(placeholder));
+        configs.put(ConfigType.title, title);
+    }
+
+    /**
+     * The configuration of the title feature.
+     * @param undo Default to 20
+     */
+    public void setTyping(int undo, JsonObject transformations) {
+        JsonObject typing = Json.createObject();
+        typing.put("undo", Json.create(undo));
+        typing.put("transformations", transformations);
+        configs.put(ConfigType.typing, typing);
+    }
+
+    /**
+     * The configuration of the word count feature.
+     * @param container Allows for providing the HTML element that the word count container will be appended to automatically.
+     * @param displayCharacters This option allows for hiding the character counter. The element obtained through
+     *                          wordCountContainer will only preserve the words part. Character counter is displayed
+     *                          by default when this configuration option is not defined.
+     * @param displayWords This option allows for hiding the word counter. The element obtained through wordCountContainer
+     *                     will only preserve the characters part. Word counter is displayed by default when this configuration
+     *                     option is not defined.
+     * @param onUpdate  This configuration takes a function that is executed whenever the word count plugin updates its
+     *                  values. This function is called with one argument, which is an object with the words and characters
+     *                  keys containing the number of detected words and characters in the document.
+     */
+    public void setWordCount(String container, Boolean displayCharacters, Boolean displayWords, JsonObject onUpdate) {
+        JsonObject wordCount = Json.createObject();
+        wordCount.put("container", Json.create(container));
+        wordCount.put("displayCharacters", Json.create(displayCharacters));
+        wordCount.put("displayWords", Json.create(displayWords));
+        wordCount.put("onUpdate", onUpdate);
+        configs.put(ConfigType.wordCount, wordCount);
     }
 
     /**
