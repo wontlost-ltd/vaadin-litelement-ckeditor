@@ -64,6 +64,7 @@ public class Config {
 
     public Config() {
         configs.put(ConfigType.alignment, Json.createObject());
+        configs.put(ConfigType.autosave, Json.createObject());
         configs.put(ConfigType.balloonToolbar, Json.createArray());
         configs.put(ConfigType.blockToolbar, Json.createArray());
         configs.put(ConfigType.ckfinder, Json.createObject());
@@ -99,6 +100,7 @@ public class Config {
 
     Config(JsonObject jsonObject) {
         configs.put(ConfigType.alignment, jsonObject.get(ConfigType.alignment.name()));
+        configs.put(ConfigType.autosave, jsonObject.get(ConfigType.autosave.name()));
         configs.put(ConfigType.balloonToolbar, jsonObject.get(ConfigType.balloonToolbar.name()));
         configs.put(ConfigType.blockToolbar, jsonObject.get(ConfigType.blockToolbar.name()));
         configs.put(ConfigType.ckfinder, jsonObject.get(ConfigType.ckfinder.name()));
@@ -201,6 +203,18 @@ public class Config {
         JsonObject alignment = Json.createObject();
         alignment.put("options", toJsonArray(options));
         configs.put(ConfigType.alignment, alignment);
+    }
+
+    /**
+     * The configuration of the autosave feature.
+     * @param waitingTime
+     * @param saveFunction
+     */
+    public void setAutosave(int waitingTime, JsonObject saveFunction) {
+        JsonObject autosave = Json.createObject();
+        autosave.put("waitingTime", Json.create(waitingTime));
+        autosave.put("function", saveFunction);
+        configs.put(ConfigType.autosave, autosave);
     }
 
     /**
@@ -707,13 +721,12 @@ public class Config {
      * @param body function body
      * @return JsonObject
      */
-    private JsonObject functionToJsonObject(String arguments, String body){
-        JsonObject jsonObject = Json.createObject();
+    private JsonObject functionToJsonObject(String functionName, String arguments, String body){
         JsonObject functionObject = Json.createObject();
+        functionObject.put("functionName", functionName);
         functionObject.put("arguments", arguments);
         functionObject.put("body", body);
-        jsonObject.put("function", functionObject);
-        return jsonObject;
+        return functionObject;
     }
 
     /**
@@ -721,9 +734,9 @@ public class Config {
      * @param jsonObject JsonObject to be converted
      * @return function string
      */
-    private String jsonObjectToFunction(JsonObject jsonObject, String functionName) {
-        return "let "+functionName+" = new Function("+jsonObject.getObject("function").getString("arguments")+", "
-                +jsonObject.getObject("function").getString("body")+")";
+    private String jsonObjectToFunction(JsonObject jsonObject) {
+        return "let "+jsonObject.getString("functionName")+" = new Function("+jsonObject.getString("arguments")+", "
+                +jsonObject.getString("body")+")";
     }
 
     /**
@@ -734,6 +747,13 @@ public class Config {
      */
     public void runJsOnPage(Page page, String function, Serializable... parameters) {
         page.executeJs(function, parameters);
+    }
+
+    public static void main(String... args) {
+        Config config = new Config();
+        JsonObject saveFunc = config.functionToJsonObject("save", "editor", "console.log(editor + ' saved!!')");
+        System.out.println(config.jsonObjectToFunction(saveFunc));
+
     }
 
 
