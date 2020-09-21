@@ -1,15 +1,12 @@
 package com.wontlost.ckeditor;
 
 import com.google.gson.Gson;
-import com.helger.commons.functional.IFunction;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.page.Page;
 import elemental.json.Json;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
 import elemental.json.JsonValue;
 import elemental.json.impl.JreJsonFactory;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.*;
@@ -207,12 +204,12 @@ public class Config {
 
     /**
      * The configuration of the autosave feature.
-     * @param waitingTime
-     * @param saveFunction
+     * @param waitingTime waiting time
      */
-    public void setAutosave(int waitingTime, JsonObject saveFunction) {
+    public void setAutosave(int waitingTime) {
         JsonObject autosave = Json.createObject();
         autosave.put("waitingTime", Json.create(waitingTime));
+        JsonObject saveFunction = functionToJsonObject("save", "editor", "return editor.saveData( editor.id, editor.getData() )");
         autosave.put("function", saveFunction);
         configs.put(ConfigType.autosave, autosave);
     }

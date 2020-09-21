@@ -13,7 +13,7 @@ class VaadinCKEditor extends LitElement {
         };
         this.editorMap = {};
         this.config = {};
-        this.autosave = false;
+        // this.autosave = false;
         this.isFirefox = typeof InstallTrigger !== 'undefined';
         this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
     }
@@ -44,7 +44,7 @@ class VaadinCKEditor extends LitElement {
                  isReadOnly: Boolean,
                  isFirefox: Boolean,
                  isChrome: Boolean,
-                 autosave: Boolean,
+                 // autosave: Boolean,
                  editorMap: Object,
                  config: Object};
     }
@@ -129,18 +129,24 @@ class VaadinCKEditor extends LitElement {
 
     }
 
-    getConfig() {
-        return this.autosave===true? {
-            ...this.config,
-            ...{
-                autosave: {
-                    save( editor ) {
-                        return editor.saveData( editor.id, editor.getData() );
-                    },
-                    waitingTime: 2000
-                }
-            }
-        } : this.config;
+    getConfig() {//check if contains function
+        // return this.autosave===true? {
+        //     ...this.config,
+        //     ...{
+        //         autosave: {
+        //             save( editor ) {
+        //                 return editor.saveData( editor.id, editor.getData() );
+        //             },
+        //             waitingTime: 2000
+        //         }
+        //     }
+        // } : this.config;
+        this.config.autosave = {
+                        JSON.stringify,
+                        waitingTime: 2000
+                    }
+        console.log(this.config);
+        return this.config;
     }
 
 
