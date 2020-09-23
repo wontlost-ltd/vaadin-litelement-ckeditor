@@ -1,6 +1,7 @@
 package com.wontlost.ckeditor;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.vaadin.flow.component.page.Page;
 import elemental.json.Json;
 import elemental.json.JsonArray;
@@ -718,9 +719,9 @@ public class Config {
      * @param body function body
      * @return JsonObject
      */
-    private JsonObject functionToJsonObject(String functionName, String arguments, String body){
+    private JsonObject functionToJsonObject(String name, String arguments, String body){
         JsonObject functionObject = Json.createObject();
-        functionObject.put("functionName", functionName);
+        functionObject.put("name", name);
         functionObject.put("arguments", arguments);
         functionObject.put("body", body);
         return functionObject;
@@ -732,7 +733,7 @@ public class Config {
      * @return function string
      */
     private String jsonObjectToFunction(JsonObject jsonObject) {
-        return "let "+jsonObject.getString("functionName")+" = new Function("+jsonObject.getString("arguments")+", "
+        return "let "+jsonObject.getString("name")+" = new Function("+jsonObject.getString("arguments")+", "
                 +jsonObject.getString("body")+")";
     }
 
@@ -747,10 +748,14 @@ public class Config {
     }
 
     public static void main(String... args) {
-        Config config = new Config();
-        JsonObject saveFunc = config.functionToJsonObject("save", "editor", "console.log(editor + ' saved!!')");
-        System.out.println(config.jsonObjectToFunction(saveFunc));
-
+        Autosave autosave = new Autosave(2000, "save", "editor", "return editor.saveData( editor.id, editor.getData() );");
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setLenient();
+        Gson gson = gsonBuilder
+                .excludeFieldsWithoutExposeAnnotation()
+                .registerTypeAdapterFactory(new AutosaveAdapter())
+                .create();
+        System.out.println(gson.toJson(autosave));
     }
 
 

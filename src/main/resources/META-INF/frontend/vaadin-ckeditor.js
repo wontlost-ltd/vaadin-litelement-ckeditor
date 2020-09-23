@@ -1,6 +1,6 @@
-import { LitElement, html } from 'lit-element';
-import { classMap } from 'lit-html/directives/class-map';
-import { ClassicEditor, InlineEditor, BalloonEditor, DcoupledEditor } from './ckeditor';
+import {html, LitElement} from 'lit-element';
+import {classMap} from 'lit-html/directives/class-map';
+import {BalloonEditor, ClassicEditor, DcoupledEditor, InlineEditor} from './ckeditor';
 
 class VaadinCKEditor extends LitElement {
 
@@ -141,11 +141,15 @@ class VaadinCKEditor extends LitElement {
         //         }
         //     }
         // } : this.config;
-        this.config.autosave = {
-                        JSON.stringify,
-                        waitingTime: 2000
-                    }
         console.log(this.config);
+        this.config.autosave = JSON.parse(JSON.stringify(this.config.autosave), function (key, value) {
+            if (key === 'function') {
+                let saveFunction = new Function(this.function.arguments, this.function.body);
+                return Object.defineProperty(saveFunction, "name", { value: this.function.name });
+            }
+            return value;
+        });
+
         return this.config;
     }
 
