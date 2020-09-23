@@ -747,16 +747,4 @@ public class Config {
         page.executeJs(function, parameters);
     }
 
-    public static void main(String... args) {
-        Autosave autosave = new Autosave(2000, "save", "editor", "return editor.saveData( editor.id, editor.getData() );");
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setLenient();
-        Gson gson = gsonBuilder
-                .excludeFieldsWithoutExposeAnnotation()
-                .registerTypeAdapterFactory(new AutosaveAdapter())
-                .create();
-        System.out.println(gson.toJson(autosave));
-    }
-
-
 }
