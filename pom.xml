@@ -16,9 +16,7 @@
     <properties>
         <vaadin.version>14.3.5</vaadin.version>
         <vaadin-applayout-addon.version>4.0.0.rc5</vaadin-applayout-addon.version>
-
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.release>11</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -176,6 +174,14 @@
                             <directory>node_modules</directory>
                         </fileset>
                     </filesets>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <release>11</release>
                 </configuration>
             </plugin>
 
