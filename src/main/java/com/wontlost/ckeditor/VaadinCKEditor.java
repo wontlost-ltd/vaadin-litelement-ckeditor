@@ -84,9 +84,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
 
     private String editorData;
 
-    private BiConsumer<String, String> autosaveAction;
-
-    Logger vaddinCKEditorLog = Logger.getLogger(this.getClass().getName());
+    private static final Logger vaddinCKEditorLog = Logger.getLogger(VaadinCKEditor.class.getName());
 
     /**
      * Constructor of VaadinCKEditor.
@@ -147,24 +145,23 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
 
     @ClientCallable
     private void saveEditorData(String editorId, String editorData) {
-        Optional<BiConsumer<String, String>> save = getAutosaveAction();
-        save.orElse((id, data)-> vaddinCKEditorLog.log(Level.SEVERE, "Invalid consumer provided. If you have " +
-                "multiple editors in one page, you need to set autosave configurations for every editor."))
-                .accept(editorId, editorData);
+        IsAction autosaveAction = VaadinCKEditorAction.getActionRegister().get(VaadinCKEditorAction.AUTOSAVE);
+        Optional<BiConsumer<String, String>> save = Optional.empty();
+        if(autosaveAction instanceof AutosaveAction) {
+            save = Optional.of((AutosaveAction)autosaveAction);
+        }
+        save.orElse((id, data)-> vaddinCKEditorLog.log(Level.SEVERE, "Invalid action provided. " +
+                "You need to imply your own actions of saving editor data.")).accept(editorId, editorData);
     }
 
-    Optional<BiConsumer<String, String>> getAutosaveAction() {
-        return Optional.ofNullable(autosaveAction);
-    }
+//    Optional<BiConsumer<String, String>> getAutosaveAction() {
+//        return Optional.ofNullable(autosaveAction);
+//    }
 
-    /**
-     * Should be used with method setAutosave. Be aware that if you have multiple editors within one page, you need to
-     * set this for every editor. Otherwise the autosave function would not work as expected.
-     * @param dataConsumer Autosave Action handler
-     */
-    void setAutosaveAction(AutosaveAction dataConsumer) {
-        this.autosaveAction = dataConsumer;
-    }
+
+//    void setAutosaveAction(AutosaveAction dataConsumer) {
+//        this.autosaveAction = dataConsumer;
+//    }
 
     /**
      * Method calls client js funtion
