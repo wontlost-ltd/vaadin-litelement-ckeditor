@@ -18,8 +18,10 @@ public class VaadinCKEditorAction {
      */
     private static final AutosaveAction autosaveAction = new AutosaveAction() {
         public void accept(String editorId, String editorData) {
-            vaddinCKEditorActionLog.log(Level.WARNING, "Saved for ["+editorId+"] with data ["+editorData+"], This is" +
-                    " is a sample of autosave action. You need to fulfill your own action by extending AutosaveAction.");
+            vaddinCKEditorActionLog.log(Level.WARNING, "Saved for ["+editorId+"]," +
+                    " This is a sample of autosave action. You need to fulfill your own action by " +
+                    "extending AutosaveAction. And then register it by " +
+                    "registerAction(VaadinCKEditorAction.AUTOSAVE, AutosaveAtion).");
         }
     };
 
