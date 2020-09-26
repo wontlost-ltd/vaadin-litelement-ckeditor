@@ -659,6 +659,7 @@ public class Config {
         wproofReaderCloud.put("serviceId", Json.create(serviceId));
         wproofReaderCloud.put("srcUrl", Json.create(srcUrl==null || srcUrl.length()==0?defaultSrcUrl:srcUrl));
         configs.put(ConfigType.wproofreader, wproofReaderCloud);
+        enableWproofreaderPlugin();
     }
 
     /**
@@ -677,6 +678,7 @@ public class Config {
         wproofReaderServer.put("servicePath", Json.create(servicePath==null || servicePath.length()==0?"/":servicePath));
         wproofReaderServer.put("srcUrl", Json.create(srcUrl==null || srcUrl.length()==0?"":srcUrl));
         configs.put(ConfigType.wproofreader, wproofReaderServer);
+        enableWproofreaderPlugin();
     }
 
     private void enableWproofreaderPlugin() {
