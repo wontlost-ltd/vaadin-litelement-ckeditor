@@ -716,11 +716,4 @@ public class Config {
         configs.put(ConfigType.wordCount, wordCount);
     }
 
-    public static void main(String... str) {
-        Config config = new Config();
-        System.out.println(config.getConfigJson().toJson());
-        config.enableWproofreaderPlugin();
-        System.out.println(config.getConfigJson().toJson());
-    }
-
 }
