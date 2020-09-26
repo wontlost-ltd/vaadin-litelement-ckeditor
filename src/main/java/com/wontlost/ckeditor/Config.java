@@ -85,7 +85,7 @@ public class Config {
         configs.put(ConfigType.mediaEmbed, Json.createObject());
         configs.put(ConfigType.mention, Json.createObject());
         configs.put(ConfigType.placeholder, Json.create(""));
-        configs.put(ConfigType.removePlugins, toJsonArray(Plugins.WProofreader.name()));
+        configs.put(ConfigType.removePlugins, toJsonArray(Collections.singletonList(Plugins.WProofreader)));
         configs.put(ConfigType.restrictedEditing, Json.createObject());
         configs.put(ConfigType.simpleUpload, Json.createObject());
         configs.put(ConfigType.table, Json.createObject());
@@ -122,7 +122,7 @@ public class Config {
         configs.put(ConfigType.mention, jsonObject.get(ConfigType.mention.name()));
         configs.put(ConfigType.placeholder, jsonObject.get(ConfigType.placeholder.name()));
         configs.put(ConfigType.removePlugins, jsonObject.get(ConfigType.removePlugins.name())==null?
-                                                        toJsonArray(Plugins.WProofreader.name()):
+                                                        toJsonArray(Collections.singletonList(Plugins.WProofreader)):
                                                         jsonObject.get(ConfigType.removePlugins.name()));
         configs.put(ConfigType.restrictedEditing, jsonObject.get(ConfigType.restrictedEditing.name()));
         configs.put(ConfigType.simpleUpload, jsonObject.get(ConfigType.simpleUpload.name()));
@@ -201,18 +201,6 @@ public class Config {
         JsonObject alignment = Json.createObject();
         alignment.put("options", toJsonArray(options));
         configs.put(ConfigType.alignment, alignment);
-    }
-
-    /**
-     * The configuration of the autosave feature.
-     * @param waitingTime waiting time
-     */
-    public void setAutosave(int waitingTime) {
-        JsonObject autosave = Json.createObject();
-        autosave.put("waitingTime", Json.create(waitingTime));
-        JsonObject saveFunction = functionToJsonObject("save", "editor", "return editor.saveData( editor.id, editor.getData() )");
-        autosave.put("function", saveFunction);
-        configs.put(ConfigType.autosave, autosave);
     }
 
     /**
@@ -582,7 +570,7 @@ public class Config {
      * The list of plugins which should not be loaded despite being available in an editor build.
      * @param plugins names of plugin
      */
-    public void setRemovePlugins(List<String> plugins) {
+    public void setRemovePlugins(List<Plugins> plugins) {
         JsonObject removePlugins = Json.createObject();
         removePlugins.put("removePlugins", toJsonArray(Collections.singletonList(plugins)));
         configs.put(ConfigType.removePlugins, removePlugins);
@@ -691,6 +679,19 @@ public class Config {
         configs.put(ConfigType.wproofreader, wproofReaderServer);
     }
 
+    private void enableWproofreaderPlugin() {
+        JsonArray removePluginArray = (JsonArray) configs.get(ConfigType.removePlugins);
+        int index = -1;
+        for(int i=0; i<removePluginArray.length(); i++) {
+            if(Plugins.WProofreader.name().equals(removePluginArray.get(i).asString())){
+                index = i;
+            }
+        }
+        if(index>=0) {
+            removePluginArray.remove(index);
+        }
+    }
+
     /**
      * The configuration of the word count feature.
      * @param container Allows for providing the HTML element that the word count container will be appended to automatically.
@@ -713,38 +714,11 @@ public class Config {
         configs.put(ConfigType.wordCount, wordCount);
     }
 
-    /**
-     * Convert javascript function to JsonObject
-     * @param arguments function argument
-     * @param body function body
-     * @return JsonObject
-     */
-    private JsonObject functionToJsonObject(String name, String arguments, String body){
-        JsonObject functionObject = Json.createObject();
-        functionObject.put("name", name);
-        functionObject.put("arguments", arguments);
-        functionObject.put("body", body);
-        return functionObject;
-    }
-
-    /**
-     * Convert JsonObject to Function
-     * @param jsonObject JsonObject to be converted
-     * @return function string
-     */
-    private String jsonObjectToFunction(JsonObject jsonObject) {
-        return "let "+jsonObject.getString("name")+" = new Function("+jsonObject.getString("arguments")+", "
-                +jsonObject.getString("body")+")";
-    }
-
-    /**
-     * Run javascript on page
-     * @param page          Page where to run the function
-     * @param function      Function that will be executed
-     * @param parameters    Arguments of the function if any
-     */
-    public void runJsOnPage(Page page, String function, Serializable... parameters) {
-        page.executeJs(function, parameters);
+    public static void main(String... str) {
+        Config config = new Config();
+        System.out.println(config.getConfigJson().toJson());
+        config.enableWproofreaderPlugin();
+        System.out.println(config.getConfigJson().toJson());
     }
 
 }
