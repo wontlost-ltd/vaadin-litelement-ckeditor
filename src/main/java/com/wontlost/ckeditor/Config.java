@@ -682,7 +682,7 @@ public class Config {
     }
 
     /**
-     * Wproofreader is not disabled initially.
+     * Wproofreader is not enabled initially.
      */
     private void enableWproofreaderPlugin() {
         JsonArray removePluginArray = (JsonArray) configs.get(ConfigType.removePlugins);
