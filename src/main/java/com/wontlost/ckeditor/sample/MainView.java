@@ -8,6 +8,7 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 import com.wontlost.ckeditor.*;
+import com.wontlost.ckeditor.Constants.*;
 
 @Route("")
 @PWA(name = "CKEditor", shortName = "CK")
@@ -17,9 +18,10 @@ public class MainView extends VerticalLayout {
 		super();
 		Comment comment = new Comment();
 //		comment.setMessage("Message");
+		Config config = new Config();
+		config.setUILanguage(Language.km);
 		VaadinCKEditor editor = new VaadinCKEditorBuilder().with(builder -> {
 			builder.editorType = EditorType.CLASSIC;
-			builder.uiLanguage = Language.km;
 			builder.editorData = comment.getMessage();
 //			builder.theme= ThemeType.DARK;
 		}).createVaadinCKEditor();

@@ -15,7 +15,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <failOnMissingWebXml>false</failOnMissingWebXml>
 
-        <vaadin.version>14.2.3</vaadin.version>
+        <vaadin.version>14.3.7</vaadin.version>
         <flow.version>2.1.4</flow.version>
     </properties>
 
@@ -64,7 +64,7 @@
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>ckeditor-vaadin</artifactId>
-            <version>1.0.5</version>
+            <version>1.0.7</version>
         </dependency>
     </dependencies>
     <build>
@@ -139,7 +139,7 @@
                     <plugin>
                         <groupId>com.vaadin</groupId>
                         <artifactId>vaadin-maven-plugin</artifactId>
-                        <version>14.1.20</version>
+                        <version>14.3.7</version>
                         <executions>
                             <execution>
                                 <goals>
