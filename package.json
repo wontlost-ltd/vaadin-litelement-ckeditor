@@ -1,7 +1,7 @@
 {
   "devDependencies": {
     "chokidar": "^3.4.2",
-    "compression-webpack-plugin": "4.0.1",
+    "compression-webpack-plugin": "^6.0.2",
     "copy-webpack-plugin": "^6.0.3",
     "css-loader": "^4.2.1",
     "raw-loader": "^4.0.1",

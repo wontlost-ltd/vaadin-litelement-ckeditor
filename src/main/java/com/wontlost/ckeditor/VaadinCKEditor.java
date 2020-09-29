@@ -154,15 +154,6 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
                 "You need to imply your own actions of saving editor data.")).accept(editorId, editorData);
     }
 
-//    Optional<BiConsumer<String, String>> getAutosaveAction() {
-//        return Optional.ofNullable(autosaveAction);
-//    }
-
-
-//    void setAutosaveAction(AutosaveAction dataConsumer) {
-//        this.autosaveAction = dataConsumer;
-//    }
-
     /**
      * Method calls client js funtion
      * @param content editor content

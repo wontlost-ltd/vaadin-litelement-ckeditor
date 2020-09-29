@@ -1,15 +1,12 @@
 package com.wontlost.ckeditor;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.vaadin.flow.component.page.Page;
 import elemental.json.Json;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
 import elemental.json.JsonValue;
 import elemental.json.impl.JreJsonFactory;
 
-import java.io.Serializable;
 import java.util.*;
 
 import static com.wontlost.ckeditor.Constants.*;
@@ -681,6 +678,9 @@ public class Config {
         enableWproofreaderPlugin();
     }
 
+    /**
+     * Wproofreader is not enabled initially.
+     */
     private void enableWproofreaderPlugin() {
         JsonArray removePluginArray = (JsonArray) configs.get(ConfigType.removePlugins);
         int index = -1;
