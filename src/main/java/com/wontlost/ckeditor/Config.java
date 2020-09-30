@@ -52,12 +52,27 @@ public class Config {
             Toolbar.blockQuote,
             Toolbar.insertTable,
             Toolbar.mediaEmbed,
+            Toolbar.pipe,
+//            Toolbar.restrictedEditing,
+            Toolbar.restrictedEditingException,
+            Toolbar.pipe,
             Toolbar.undo,
             Toolbar.redo };
 
+    static List<String> removedPlugins = new ArrayList<>();
+
+//    static List<Plugins> plugins = new ArrayList<>();
+
     Map<ConfigType, JsonValue> configs = new HashMap<>();
 
+    private void initPlugins() {
+//        plugins.addAll(Arrays.asList(Plugins.values()));
+        removedPlugins.add(Plugins.WProofreader.name());
+        removedPlugins.add(Plugins.RestrictedEditingMode.name());
+    }
+
     public Config() {
+        initPlugins();
         configs.put(ConfigType.alignment, Json.createObject());
         configs.put(ConfigType.autosave, Json.createObject());
         configs.put(ConfigType.balloonToolbar, Json.createArray());
@@ -82,7 +97,8 @@ public class Config {
         configs.put(ConfigType.mediaEmbed, Json.createObject());
         configs.put(ConfigType.mention, Json.createObject());
         configs.put(ConfigType.placeholder, Json.create(""));
-        configs.put(ConfigType.removePlugins, toJsonArray(Collections.singletonList(Plugins.WProofreader)));
+//        configs.put(ConfigType.plugins, toJsonArray(Collections.singletonList(plugins)));
+        configs.put(ConfigType.removePlugins, toJsonArray(removedPlugins));
         configs.put(ConfigType.restrictedEditing, Json.createObject());
         configs.put(ConfigType.simpleUpload, Json.createObject());
         configs.put(ConfigType.table, Json.createObject());
@@ -94,6 +110,7 @@ public class Config {
     }
 
     Config(JsonObject jsonObject) {
+        initPlugins();
         configs.put(ConfigType.alignment, jsonObject.get(ConfigType.alignment.name()));
         configs.put(ConfigType.autosave, jsonObject.get(ConfigType.autosave.name()));
         configs.put(ConfigType.balloonToolbar, jsonObject.get(ConfigType.balloonToolbar.name()));
@@ -119,7 +136,7 @@ public class Config {
         configs.put(ConfigType.mention, jsonObject.get(ConfigType.mention.name()));
         configs.put(ConfigType.placeholder, jsonObject.get(ConfigType.placeholder.name()));
         configs.put(ConfigType.removePlugins, jsonObject.get(ConfigType.removePlugins.name())==null?
-                                                        toJsonArray(Collections.singletonList(Plugins.WProofreader)):
+                                                        toJsonArray(removedPlugins):
                                                         jsonObject.get(ConfigType.removePlugins.name()));
         configs.put(ConfigType.restrictedEditing, jsonObject.get(ConfigType.restrictedEditing.name()));
         configs.put(ConfigType.simpleUpload, jsonObject.get(ConfigType.simpleUpload.name()));
@@ -155,7 +172,11 @@ public class Config {
         return Json.instance().parse(toolbarJson);
     }
 
-    JsonArray toJsonArray(List<Object> options) {
+    JsonArray toJsonArray(List<String> options) {
+        return Json.instance().parse(new Gson().toJson(options));
+    }
+
+    JsonArray toJsonArray(String[][] options) {
         return Json.instance().parse(new Gson().toJson(options));
     }
 
@@ -425,9 +446,9 @@ public class Config {
      *                  { model: 'heading3', view: 'h4', title: 'Heading 3', class: 'ck-heading_heading3' }
      * 	              ]
      */
-    public void setHeading(List<String[]> options) {
+    public void setHeading(String[][] options) {
         JsonObject heading = Json.createObject();
-        heading.put("options", toJsonArray(Collections.singletonList(options)));
+        heading.put("options", toJsonArray(options));
         configs.put(ConfigType.heading, heading);
     }
 
@@ -451,9 +472,9 @@ public class Config {
      *                  }
      *                ]
      */
-    public void setHighlight(List<String[]> options) {
+    public void setHighlight(String[][] options) {
         JsonObject highlight = Json.createObject();
-        highlight.put("options", toJsonArray(Collections.singletonList(options)));
+        highlight.put("options", toJsonArray(options));
         configs.put(ConfigType.highlight, highlight);
     }
 
@@ -487,10 +508,10 @@ public class Config {
      * 	                types: [ 'png', 'jpeg' ]
      *              };
      */
-    public void setImage(List<String[]> resizeOptions, String resizeUnit, String[] styles,
+    public void setImage(String[][] resizeOptions, String resizeUnit, String[] styles,
                          String[] toolbar, String[] upload) {
         JsonObject image = Json.createObject();
-        image.put("resizeOptions", toJsonArray(Collections.singletonList(resizeOptions)));
+        image.put("resizeOptions", toJsonArray(resizeOptions));
         image.put("resizeUnit", Json.create(resizeUnit));
         image.put("styles", toJsonArray(styles));
         image.put("toolbar", toJsonArray(toolbar));
@@ -543,13 +564,13 @@ public class Config {
      * @param removeProviders The list of media providers that should not be used despite being available in config.mediaEmbed.providers and config.mediaEmbed.extraProviders
      * @param toolbar Items to be placed in the media embed toolbar. This option requires adding MediaEmbedToolbar to the plugin list.
      */
-    public void setMediaEmbed(Boolean previewsInData, List<JsonObject> providers, List<JsonObject> extraProviders, List<String> removeProviders, List<String> toolbar) {
+    public void setMediaEmbed(Boolean previewsInData, List<String> providers, List<String> extraProviders, List<String> removeProviders, List<String> toolbar) {
         JsonObject mediaEmbed = Json.createObject();
         mediaEmbed.put("previewsInData", Json.create(previewsInData));
-        mediaEmbed.put("providers", toJsonArray(Collections.singletonList(providers)));
-        mediaEmbed.put("extraProviders", toJsonArray(Collections.singletonList(extraProviders)));
-        mediaEmbed.put("removeProviders", toJsonArray(Collections.singletonList(removeProviders)));
-        mediaEmbed.put("toolbar", toJsonArray(Collections.singletonList(toolbar)));
+        mediaEmbed.put("providers", toJsonArray(providers));
+        mediaEmbed.put("extraProviders", toJsonArray(extraProviders));
+        mediaEmbed.put("removeProviders", toJsonArray(removeProviders));
+        mediaEmbed.put("toolbar", toJsonArray(toolbar));
         configs.put(ConfigType.mediaEmbed, mediaEmbed);
     }
 
@@ -557,9 +578,9 @@ public class Config {
      * The configuration of the mention feature.
      * @param feeds The list of mention feeds supported by the editor.
      */
-    public void setMention(List<JsonObject> feeds) {
+    public void setMention(List<String> feeds) {
         JsonObject mention = Json.createObject();
-        mention.put("feeds", toJsonArray(Collections.singletonList(feeds)));
+        mention.put("feeds", toJsonArray(feeds));
         configs.put(ConfigType.mention, mention);
     }
 
@@ -569,7 +590,11 @@ public class Config {
      */
     public void setRemovePlugins(List<Plugins> plugins) {
         JsonObject removePlugins = Json.createObject();
-        removePlugins.put("removePlugins", toJsonArray(Collections.singletonList(plugins)));
+        List<String> toBeRemoved = new ArrayList<>();
+        plugins.forEach(plugin -> {
+            toBeRemoved.add(plugin.name());
+        });
+        removePlugins.put("removePlugins", toJsonArray(toBeRemoved));
         configs.put(ConfigType.removePlugins, removePlugins);
     }
 
@@ -585,8 +610,8 @@ public class Config {
      */
     public void setRestrictedEditing(List<String> allowedAttributes, List<String> allowedCommands) {
         JsonObject restrictedEditing = Json.createObject();
-        restrictedEditing.put("allowedAttributes", toJsonArray(Collections.singletonList(allowedAttributes)));
-        restrictedEditing.put("allowedCommands", toJsonArray(Collections.singletonList(allowedCommands)));
+        restrictedEditing.put("allowedAttributes", toJsonArray(allowedAttributes));
+        restrictedEditing.put("allowedCommands", toJsonArray(allowedCommands));
         configs.put(ConfigType.restrictedEditing, restrictedEditing);
     }
 
@@ -600,11 +625,11 @@ public class Config {
      * @param headers An object that defines additional headers sent with the request to the server during the upload.
      *                This is the right place to implement security mechanisms like authentication and CSRF protection.
      */
-    public void setSimpleUpload(String uploadUrl, Boolean withCredentials, List<JsonObject> headers) {
+    public void setSimpleUpload(String uploadUrl, Boolean withCredentials, List<String> headers) {
         JsonObject simpleUpload = Json.createObject();
         simpleUpload.put("uploadUrl", Json.create(uploadUrl));
         simpleUpload.put("withCredentials", Json.create(withCredentials));
-        simpleUpload.put("headers", toJsonArray(Collections.singletonList(headers)));
+        simpleUpload.put("headers", toJsonArray(headers));
         configs.put(ConfigType.simpleUpload, simpleUpload);
     }
 
@@ -617,8 +642,8 @@ public class Config {
      */
     public void setTable(List<String> contentToolbar, List<String> tableToolbar, JsonObject tableCellProperties, JsonObject tableProperties) {
         JsonObject table = Json.createObject();
-        table.put("contentToolbar", toJsonArray(Collections.singletonList(contentToolbar)));
-        table.put("tableToolbar", toJsonArray(Collections.singletonList(tableToolbar)));
+        table.put("contentToolbar", toJsonArray(contentToolbar));
+        table.put("tableToolbar", toJsonArray(tableToolbar));
         table.put("tableCellProperties", tableCellProperties);
         table.put("tableProperties", tableCellProperties);
         configs.put(ConfigType.table, table);
@@ -656,7 +681,7 @@ public class Config {
         wproofReaderCloud.put("serviceId", Json.create(serviceId));
         wproofReaderCloud.put("srcUrl", Json.create(srcUrl==null || srcUrl.length()==0?defaultSrcUrl:srcUrl));
         configs.put(ConfigType.wproofreader, wproofReaderCloud);
-        enableWproofreaderPlugin();
+        setPluginStatus(Plugins.WProofreader, true); //Wproofreader is not enabled initially.
     }
 
     /**
@@ -675,22 +700,40 @@ public class Config {
         wproofReaderServer.put("servicePath", Json.create(servicePath==null || servicePath.length()==0?"/":servicePath));
         wproofReaderServer.put("srcUrl", Json.create(srcUrl==null || srcUrl.length()==0?"":srcUrl));
         configs.put(ConfigType.wproofreader, wproofReaderServer);
-        enableWproofreaderPlugin();
+        setPluginStatus(Plugins.WProofreader, true); //Wproofreader is not enabled initially.
     }
 
     /**
-     * Wproofreader is not enabled initially.
+     * All plugins are enabled by default
+     * @param plugin Plugin
+     * @param active Plugin status
      */
-    private void enableWproofreaderPlugin() {
+    public void setPluginStatus(Plugins plugin, boolean active) {
+//        JsonArray pluginArray = (JsonArray) configs.get(ConfigType.plugins);
         JsonArray removePluginArray = (JsonArray) configs.get(ConfigType.removePlugins);
+//        JsonArray extraPluginArray = (JsonArray) configs.get(ConfigType.extraPlugins);
         int index = -1;
-        for(int i=0; i<removePluginArray.length(); i++) {
-            if(Plugins.WProofreader.name().equals(removePluginArray.get(i).asString())){
-                index = i;
+        if(active) {
+            for(int i=0; i<removePluginArray.length(); i++) {
+                if(plugin.name().equals(removePluginArray.get(i).asString())){
+                    index = i;
+                }
             }
-        }
-        if(index>=0) {
-            removePluginArray.remove(index);
+            if(index>=0) {
+                removePluginArray.remove(index);
+            }/* else {//add it to extra Plugins if not exists within plugins list
+
+            }*/
+        } else {
+            for(int i=0; i<removePluginArray.length(); i++) {
+                if(plugin.name().equals(removePluginArray.get(i).asString())){
+                    index = i;
+                }
+            }
+
+            if(index<0) {
+                removePluginArray.set(removePluginArray.length(), plugin.name());
+            }
         }
     }
 

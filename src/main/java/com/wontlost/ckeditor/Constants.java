@@ -33,6 +33,7 @@ public class Constants {
         mediaEmbed,
         mention,
         placeholder,
+        plugins,
         removePlugins,
         restrictedEditing,
         simpleUpload,
