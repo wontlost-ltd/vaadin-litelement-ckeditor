@@ -712,29 +712,45 @@ public class Config {
 //        JsonArray pluginArray = (JsonArray) configs.get(ConfigType.plugins);
         JsonArray removePluginArray = (JsonArray) configs.get(ConfigType.removePlugins);
 //        JsonArray extraPluginArray = (JsonArray) configs.get(ConfigType.extraPlugins);
+        updateJsonArray(active, removePluginArray, plugin.name());
+    }
+
+    private void updateJsonArray(boolean active, JsonArray jsonArray, String name) {
         int index = -1;
-        if(active) {
-            for(int i=0; i<removePluginArray.length(); i++) {
-                if(plugin.name().equals(removePluginArray.get(i).asString())){
-                    index = i;
-                }
-            }
-            if(index>=0) {
-                removePluginArray.remove(index);
-            }/* else {//add it to extra Plugins if not exists within plugins list
-
-            }*/
-        } else {
-            for(int i=0; i<removePluginArray.length(); i++) {
-                if(plugin.name().equals(removePluginArray.get(i).asString())){
-                    index = i;
-                }
-            }
-
-            if(index<0) {
-                removePluginArray.set(removePluginArray.length(), plugin.name());
+        for(int i=0; i<jsonArray.length(); i++) {
+            if(name.equals(jsonArray.get(i).asString())){
+                index = i;
             }
         }
+        if(active && index>=0) {
+            jsonArray.remove(index);
+        }
+        if(!active && index<0) {
+            jsonArray.set(jsonArray.length(), name);
+        }
+    }
+
+    /**
+     * Update toolbar accordingly, because there is a conflict between standard edit mode and restrict edit mode.
+     * They have different actions in toolbar.
+     */
+    public void updateToolbar() {
+        JsonArray removePluginArray = (JsonArray) configs.get(ConfigType.removePlugins);
+        JsonArray toolbarArray = (JsonArray) configs.get(ConfigType.toolbar);
+        for(int i=0; i<removePluginArray.length(); i++) {
+            if(Plugins.RestrictedEditingMode.name().equals(removePluginArray.get(i).asString())) {
+                changeToolbarItem(Toolbar.restrictedEditing, true);
+                changeToolbarItem(Toolbar.restrictedEditingException, false);
+            } else {
+                changeToolbarItem(Toolbar.restrictedEditing, false);
+                changeToolbarItem(Toolbar.restrictedEditingException, true);
+            }
+        }
+    }
+
+    private void changeToolbarItem(Toolbar toolbar, boolean remove) {
+        JsonArray toolbarArray = (JsonArray) configs.get(ConfigType.toolbar);
+        updateJsonArray(remove, toolbarArray, toolbar.getValue());
     }
 
     /**
