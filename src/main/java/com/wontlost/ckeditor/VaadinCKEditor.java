@@ -92,7 +92,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
      */
     VaadinCKEditor(String editorData) {
         this.editorData = editorData;
-        getElement().setProperty("editorData", editorData==null?"":editorData);
+        getElement().setProperty("editorData", editorData);
     }
 
     protected String generateModelValue() {
@@ -127,7 +127,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
     public void setValue(String value) {
         super.setValue(value);
         this.editorData = value;
-        getElement().setProperty("editorData", editorData==null?"":editorData);
+        getElement().setProperty("editorData", value);
         updateValue(value);
     }
 

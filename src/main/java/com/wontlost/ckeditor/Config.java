@@ -53,22 +53,19 @@ public class Config {
             Toolbar.insertTable,
             Toolbar.mediaEmbed,
             Toolbar.pipe,
-//            Toolbar.restrictedEditing,
-            Toolbar.restrictedEditingException,
-            Toolbar.pipe,
             Toolbar.undo,
             Toolbar.redo };
 
-    static List<String> removedPlugins = new ArrayList<>();
-
-//    static List<Plugins> plugins = new ArrayList<>();
+    List<String> removedPlugins = new ArrayList<>();
 
     Map<ConfigType, JsonValue> configs = new HashMap<>();
 
     private void initPlugins() {
-//        plugins.addAll(Arrays.asList(Plugins.values()));
         removedPlugins.add(Plugins.WProofreader.name());
+        removedPlugins.add(Plugins.StandardEditingMode.name());
         removedPlugins.add(Plugins.RestrictedEditingMode.name());
+        configs.put(ConfigType.removePlugins, toJsonArray(removedPlugins));
+        configs.put(ConfigType.toolbar, toJsonArray(TOOLBAR));
     }
 
     public Config() {
@@ -97,13 +94,10 @@ public class Config {
         configs.put(ConfigType.mediaEmbed, Json.createObject());
         configs.put(ConfigType.mention, Json.createObject());
         configs.put(ConfigType.placeholder, Json.create(""));
-//        configs.put(ConfigType.plugins, toJsonArray(Collections.singletonList(plugins)));
-        configs.put(ConfigType.removePlugins, toJsonArray(removedPlugins));
         configs.put(ConfigType.restrictedEditing, Json.createObject());
         configs.put(ConfigType.simpleUpload, Json.createObject());
         configs.put(ConfigType.table, Json.createObject());
         configs.put(ConfigType.title, Json.createObject());
-        configs.put(ConfigType.toolbar, toJsonArray(TOOLBAR));
         configs.put(ConfigType.typing, Json.createObject());
         configs.put(ConfigType.wordCount, Json.createObject());
         configs.put(ConfigType.wproofreader, Json.createObject());
@@ -142,7 +136,6 @@ public class Config {
         configs.put(ConfigType.simpleUpload, jsonObject.get(ConfigType.simpleUpload.name()));
         configs.put(ConfigType.table, jsonObject.get(ConfigType.table.name()));
         configs.put(ConfigType.title, jsonObject.get(ConfigType.title.name()));
-        configs.put(ConfigType.toolbar, jsonObject.get(ConfigType.toolbar.name()));
         configs.put(ConfigType.typing, jsonObject.get(ConfigType.typing.name()));
         configs.put(ConfigType.wordCount, jsonObject.get(ConfigType.wordCount.name()));
         configs.put(ConfigType.wproofreader, jsonObject.get(ConfigType.wproofreader.name()));
@@ -536,9 +529,7 @@ public class Config {
      * @param initialData The initial editor data to be used instead of the provided element's HTML content.
      */
     public void setInitialData(String initialData) {
-        JsonObject indentBlock = Json.createObject();
-        indentBlock.put("initialData", Json.create(initialData));
-        configs.put(ConfigType.initialData, indentBlock);
+        configs.put(ConfigType.initialData, Json.create(initialData));
     }
 
     /**
@@ -715,6 +706,24 @@ public class Config {
         updateJsonArray(active, removePluginArray, plugin.name());
     }
 
+    /**
+     * Use standard editing mode by invoking this method
+     */
+    public void enableStandardMode() {
+        setPluginStatus(Plugins.StandardEditingMode, false);
+        setPluginStatus(Plugins.RestrictedEditingMode, true);
+        updateToolbar();
+    }
+
+    /**
+     * Use restricted editing mode by invoking this method
+     */
+    public void enableRestrictedMode() {
+        setPluginStatus(Plugins.StandardEditingMode, true);
+        setPluginStatus(Plugins.RestrictedEditingMode, false);
+        updateToolbar();
+    }
+
     private void updateJsonArray(boolean active, JsonArray jsonArray, String name) {
         int index = -1;
         for(int i=0; i<jsonArray.length(); i++) {
@@ -722,11 +731,14 @@ public class Config {
                 index = i;
             }
         }
-        if(active && index>=0) {
-            jsonArray.remove(index);
-        }
-        if(!active && index<0) {
-            jsonArray.set(jsonArray.length(), name);
+        if(index>=0) {
+            if(active)
+                jsonArray.remove(index);
+            else
+                jsonArray.set(index, name);
+        } else {
+            if(!active)
+                jsonArray.set(jsonArray.length(), name);
         }
     }
 
@@ -734,16 +746,17 @@ public class Config {
      * Update toolbar accordingly, because there is a conflict between standard edit mode and restrict edit mode.
      * They have different actions in toolbar.
      */
-    public void updateToolbar() {
+    private void updateToolbar() {
         JsonArray removePluginArray = (JsonArray) configs.get(ConfigType.removePlugins);
-        JsonArray toolbarArray = (JsonArray) configs.get(ConfigType.toolbar);
-        for(int i=0; i<removePluginArray.length(); i++) {
-            if(Plugins.RestrictedEditingMode.name().equals(removePluginArray.get(i).asString())) {
-                changeToolbarItem(Toolbar.restrictedEditing, true);
-                changeToolbarItem(Toolbar.restrictedEditingException, false);
-            } else {
-                changeToolbarItem(Toolbar.restrictedEditing, false);
-                changeToolbarItem(Toolbar.restrictedEditingException, true);
+        if(removePluginArray!=null) {
+            for(int i=0; i<removePluginArray.length(); i++) {
+                if(Plugins.RestrictedEditingMode.name().equals(removePluginArray.get(i).asString())) {
+                    changeToolbarItem(Toolbar.restrictedEditing, true);
+                    changeToolbarItem(Toolbar.restrictedEditingException, false);
+                } else if(Plugins.StandardEditingMode.name().equals(removePluginArray.get(i).asString())){
+                    changeToolbarItem(Toolbar.restrictedEditing, false);
+                    changeToolbarItem(Toolbar.restrictedEditingException, true);
+                }
             }
         }
     }
