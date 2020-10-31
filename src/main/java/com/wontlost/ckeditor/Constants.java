@@ -1,5 +1,7 @@
 package com.wontlost.ckeditor;
 
+import org.jsoup.safety.Whitelist;
+
 import java.util.Locale;
 
 public class Constants {
@@ -270,6 +272,29 @@ public class Constants {
         ExportWord,
         WProofreader,
         WordCount
+
+    }
+
+    /**
+     * All available plugins
+     */
+    public enum SanitizeType {
+
+        none(Whitelist.none()),
+        simpleText(Whitelist.simpleText()),
+        basic(Whitelist.basic()),
+        basicWithImages(Whitelist.basicWithImages()),
+        relaxed(Whitelist.relaxed());
+
+        private final Whitelist whitelist;
+
+        SanitizeType(Whitelist value) {
+            this.whitelist = value;
+        }
+
+        public Whitelist getValue(){
+            return this.whitelist;
+        }
 
     }
 

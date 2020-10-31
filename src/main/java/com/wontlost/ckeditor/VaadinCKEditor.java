@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.wontlost.ckeditor.Constants.*;
+import org.jsoup.Jsoup;
 
 /**
  * Used in @VaadinCKEditorBuilder.
@@ -222,6 +223,10 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
 
     public void setConfig(Config config) {
         getElement().setPropertyJson("config", config==null?new Config().getConfigJson():config.getConfigJson());
+    }
+
+    public String sanitizeHtml(String editorData, SanitizeType type){
+        return Jsoup.clean(editorData, type.getValue());
     }
 
 }
