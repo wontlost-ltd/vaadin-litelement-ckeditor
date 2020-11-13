@@ -52,6 +52,7 @@ public class Config {
             Toolbar.blockQuote,
             Toolbar.insertTable,
             Toolbar.mediaEmbed,
+            Toolbar.htmlEmbed,
             Toolbar.pipe,
             Toolbar.undo,
             Toolbar.redo };
