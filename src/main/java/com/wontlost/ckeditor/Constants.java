@@ -41,6 +41,7 @@ public class Constants {
         simpleUpload,
         table,
         title,
+        htmlEmbed,
         toolbar,
         typing,
         wordCount,
@@ -191,6 +192,7 @@ public class Constants {
         alignment("alignment"),
         codeBlock("codeBlock"),
         highlight("highlight"),
+        htmlEmbed("htmlEmbed"),
         fontSize("fontSize"),
         fontFamily("fontFamily"),
         fontColor("fontColor"),
@@ -240,6 +242,7 @@ public class Constants {
         Heading,
         Font,
         Highlight,
+        HtmlEmbed,
         HorizontalLine,
         Image,
         ImageCaption,
@@ -276,7 +279,7 @@ public class Constants {
     }
 
     /**
-     * All available plugins
+     * Sanitize type
      */
     public enum SanitizeType {
 
