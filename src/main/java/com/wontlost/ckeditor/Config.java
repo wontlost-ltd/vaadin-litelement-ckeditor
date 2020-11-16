@@ -27,6 +27,7 @@ public class Config {
             Toolbar.bold,
             Toolbar.italic,
             Toolbar.underline,
+            Toolbar.selectAll,
             Toolbar.strikethrough,
             Toolbar.subscript,
             Toolbar.superscript,
@@ -65,6 +66,7 @@ public class Config {
         removedPlugins.add(Plugins.WProofreader.name());
         removedPlugins.add(Plugins.StandardEditingMode.name());
         removedPlugins.add(Plugins.RestrictedEditingMode.name());
+        removedPlugins.add(Plugins.Markdown.name());
         configs.put(ConfigType.removePlugins, toJsonArray(removedPlugins));
         configs.put(ConfigType.toolbar, toJsonArray(TOOLBAR));
     }
