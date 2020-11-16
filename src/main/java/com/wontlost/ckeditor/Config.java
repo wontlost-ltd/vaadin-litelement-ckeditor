@@ -656,6 +656,7 @@ public class Config {
     /**
      * The configuration of the title feature.
      * @param undo Default to 20
+     * @param transformations Transformations
      */
     public void setTyping(int undo, JsonObject transformations) {
         JsonObject typing = Json.createObject();
