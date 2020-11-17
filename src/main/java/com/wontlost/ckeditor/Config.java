@@ -190,7 +190,7 @@ public class Config {
      * @param placeHolder Place holder of Editor
      */
     public void setPlaceHolder(String placeHolder){
-        configs.put(ConfigType.placeholder, Json.create(placeHolder==null?"Type the content here!":placeHolder));
+        configs.put(ConfigType.placeholder, Json.create(Optional.ofNullable(placeHolder).orElse("Type the content here!")));
     }
 
     /**
@@ -674,7 +674,7 @@ public class Config {
         JsonObject wproofReaderCloud = Json.createObject();
         String defaultSrcUrl = "https://svc.webspellchecker.net/spellcheck31/wscbundle/wscbundle.js";
         wproofReaderCloud.put("serviceId", Json.create(serviceId));
-        wproofReaderCloud.put("srcUrl", Json.create(srcUrl==null || srcUrl.length()==0?defaultSrcUrl:srcUrl));
+        wproofReaderCloud.put("srcUrl", Json.create(Optional.ofNullable(srcUrl).orElse(defaultSrcUrl)));
         configs.put(ConfigType.wproofreader, wproofReaderCloud);
         setPluginStatus(Plugins.WProofreader, true); //Wproofreader is not enabled initially.
     }
@@ -689,11 +689,11 @@ public class Config {
      */
     public void setWproofReaderServer(String serviceProtocol, String serviceHost, Integer servicePort, String servicePath, String srcUrl) {
         JsonObject wproofReaderServer = Json.createObject();
-        wproofReaderServer.put("serviceProtocol", Json.create(serviceProtocol==null || serviceProtocol.length()==0?"https":serviceProtocol));
-        wproofReaderServer.put("serviceHost", Json.create(serviceHost==null || serviceHost.length()==0?"localhost":serviceHost));
-        wproofReaderServer.put("servicePort", Json.create(servicePort));
-        wproofReaderServer.put("servicePath", Json.create(servicePath==null || servicePath.length()==0?"/":servicePath));
-        wproofReaderServer.put("srcUrl", Json.create(srcUrl==null || srcUrl.length()==0?"":srcUrl));
+        wproofReaderServer.put("serviceProtocol", Json.create(Optional.ofNullable(serviceProtocol).orElse("https")));
+        wproofReaderServer.put("serviceHost", Json.create(Optional.ofNullable(serviceHost).orElse("localhost")));
+        wproofReaderServer.put("servicePort", Json.create(Optional.ofNullable(servicePort).orElse(8080)));
+        wproofReaderServer.put("servicePath", Json.create(Optional.ofNullable(servicePath).orElse("/")));
+        wproofReaderServer.put("srcUrl", Json.create(Optional.ofNullable(srcUrl).orElse("/wscbundle/wscbundle.js")));
         configs.put(ConfigType.wproofreader, wproofReaderServer);
         setPluginStatus(Plugins.WProofreader, true); //Wproofreader is not enabled initially.
     }
