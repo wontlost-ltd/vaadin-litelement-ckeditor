@@ -91,6 +91,7 @@ public class Constants {
         fr("fr"),
         gl("gl"),
         gu("gu"),
+        hi("hi"),
         he("he"),
         hr("hr"),
         hu("hu"),

@@ -40,6 +40,7 @@ import com.wontlost.ckeditor.Constants.*;
 @JsModule("./translations/fr.js")
 @JsModule("./translations/gl.js")
 @JsModule("./translations/gu.js")
+@JsModule("./translations/hi.js")
 @JsModule("./translations/he.js")
 @JsModule("./translations/hr.js")
 @JsModule("./translations/hu.js")
