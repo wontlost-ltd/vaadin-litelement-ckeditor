@@ -1,5 +1,7 @@
 package com.wontlost.ckeditor;
 
+import org.jsoup.safety.Whitelist;
+
 import java.util.Locale;
 
 public class Constants {
@@ -39,6 +41,7 @@ public class Constants {
         simpleUpload,
         table,
         title,
+        htmlEmbed,
         toolbar,
         typing,
         wordCount,
@@ -183,6 +186,7 @@ public class Constants {
         code("code"),
         subscript("subscript"),
         superscript("superscript"),
+        selectAll("selectAll"),
         removeFormat("removeFormat"),
         horizontalLine("horizontalLine"),
         pageBreak("pageBreak"),
@@ -190,6 +194,7 @@ public class Constants {
         alignment("alignment"),
         codeBlock("codeBlock"),
         highlight("highlight"),
+        htmlEmbed("htmlEmbed"),
         fontSize("fontSize"),
         fontFamily("fontFamily"),
         fontColor("fontColor"),
@@ -239,6 +244,7 @@ public class Constants {
         Heading,
         Font,
         Highlight,
+        HtmlEmbed,
         HorizontalLine,
         Image,
         ImageCaption,
@@ -249,6 +255,7 @@ public class Constants {
         Indent,
         Link,
         List,
+        Markdown,
         MediaEmbed,
         Mention,
         Paragraph,
@@ -258,6 +265,7 @@ public class Constants {
         RemoveFormat,
         RemoveFormatLinks,
         RestrictedEditingMode,
+        SelectAll,
         StandardEditingMode,
         SpecialCharacters,
         SpecialCharactersEssentials,
@@ -271,6 +279,29 @@ public class Constants {
         ExportWord,
         WProofreader,
         WordCount
+
+    }
+
+    /**
+     * Sanitize type
+     */
+    public enum SanitizeType {
+
+        none(Whitelist.none()),
+        simpleText(Whitelist.simpleText()),
+        basic(Whitelist.basic()),
+        basicWithImages(Whitelist.basicWithImages()),
+        relaxed(Whitelist.relaxed());
+
+        private final Whitelist whitelist;
+
+        SanitizeType(Whitelist value) {
+            this.whitelist = value;
+        }
+
+        public Whitelist getValue(){
+            return this.whitelist;
+        }
 
     }
 
