@@ -228,10 +228,15 @@ class VaadinCKEditor extends LitElement {
     }
 
     contains(style) {
-        for (let i = 0; i < document.styleSheets.length; i++) {
-            for(let j=0; j<document.styleSheets[i].cssRules.length; j++) {
-                if(style===document.styleSheets[i].cssRules[j].selectorText) {
-                    return document.styleSheets[i].cssRules[j];
+        const styleSheets = Array.from(document.styleSheets).filter(
+            (styleSheet) => !styleSheet.href || styleSheet.href.startsWith(window.location.origin)
+        );
+        for (let styleSheet of styleSheets) {
+            if (styleSheet instanceof CSSStyleSheet && styleSheet.cssRules) {
+                for(let cssRule of styleSheet.cssRules) {
+                    if(style===cssRule.selectorText) {
+                        return cssRule;
+                    }
                 }
             }
         }
