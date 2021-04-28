@@ -1,6 +1,7 @@
 import {html, LitElement} from 'lit-element';
 import {classMap} from 'lit-html/directives/class-map';
 import {BalloonEditor, ClassicEditor, DcoupledEditor, InlineEditor} from './ckeditor';
+import Pagination from '@ckeditor/ckeditor5-pagination';
 
 class VaadinCKEditor extends LitElement {
 
