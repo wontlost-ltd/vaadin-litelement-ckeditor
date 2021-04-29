@@ -45,7 +45,8 @@ public class Constants {
         toolbar,
         typing,
         wordCount,
-        wproofreader
+        wproofreader,
+        pagination
 
     }
 
@@ -204,7 +205,10 @@ public class Constants {
         todoList("todoList"),
         exportPdf("exportPdf"),
         exportWord("exportWord"),
-        insertTable("insertTable");
+        insertTable("insertTable"),
+        previousPage("previousPage"),
+        nextPage("nextPage"),
+        pageNavigation("pageNavigation");
 
         private final String value;
 
@@ -278,7 +282,8 @@ public class Constants {
         ExportPdf,
         ExportWord,
         WProofreader,
-        WordCount
+        WordCount,
+        Pagination
 
     }
 
