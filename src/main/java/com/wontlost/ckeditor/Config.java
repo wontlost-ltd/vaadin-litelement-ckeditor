@@ -723,7 +723,7 @@ public class Config {
         pageMargins.put("right", Json.create(Optional.ofNullable(right).orElse("12mm")));
         pageMargins.put("left", Json.create(Optional.ofNullable(left).orElse("12mm")));
         
-        pagination.put("pageMargins", Json.create(pageMargins));
+        pagination.put("pageMargins", pageMargins);
         configs.put(ConfigType.pagination , pagination);
         setPluginStatus(Plugins.Pagination, true); //Pagination is not enabled initially.
     }
