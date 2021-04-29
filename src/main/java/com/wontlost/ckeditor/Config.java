@@ -56,7 +56,10 @@ public class Config {
             Toolbar.htmlEmbed,
             Toolbar.pipe,
             Toolbar.undo,
-            Toolbar.redo };
+            Toolbar.redo,
+            Toolbar.previousPage,
+            Toolbar.nextPage,
+            Toolbar.pageNavigation};
 
     List<String> removedPlugins = new ArrayList<>();
 
@@ -696,6 +699,33 @@ public class Config {
         wproofReaderServer.put("srcUrl", Json.create(Optional.ofNullable(srcUrl).orElse("/wscbundle/wscbundle.js")));
         configs.put(ConfigType.wproofreader, wproofReaderServer);
         setPluginStatus(Plugins.WProofreader, true); //Wproofreader is not enabled initially.
+    }
+    
+     /**
+     * If you are going to use Pagination, you have to add this config.
+     * Page Size:
+     * @param pageWidth Default to '21cm'.
+     * @param pageHeight Default to '29.7cm'.
+     * Page Margins:
+     * @param top Default to '20mm'.
+     * @param bottom Default to '20mm'.
+     * @param right Default to '12mm'.
+     * @param left Default to '12mm'.
+     */
+    public void setPagination(String pageWidth, String pageHeight, String top, String bottom, String right, String left) {
+        JsonObject pagination = Json.createObject();
+        pagination.put("pageWidth", Json.create(Optional.ofNullable(pageWidth).orElse("21cm")));
+        pagination.put("pageHeight", Json.create(Optional.ofNullable(pageHeight).orElse("29.7cm")));
+        
+        JsonObject pageMargins = Json.createObject();
+        pageMargins.put("top", Json.create(Optional.ofNullable(top).orElse("20mm")));
+        pageMargins.put("bottom", Json.create(Optional.ofNullable(bottom).orElse("20mm")));
+        pageMargins.put("right", Json.create(Optional.ofNullable(right).orElse("12mm")));
+        pageMargins.put("left", Json.create(Optional.ofNullable(left).orElse("12mm")));
+        
+        pagination.put("pageMargins", Json.create(pageMargins));
+        configs.put(ConfigType.pagination , pagination);
+        setPluginStatus(Plugins.Pagination, true); //Pagination is not enabled initially.
     }
 
     /**
