@@ -27,6 +27,7 @@ public class Config {
             Toolbar.bold,
             Toolbar.italic,
             Toolbar.underline,
+            Toolbar.findAndReplace,
             Toolbar.selectAll,
             Toolbar.strikethrough,
             Toolbar.subscript,
@@ -44,6 +45,7 @@ public class Config {
             Toolbar.indent,
             Toolbar.outdent,
             Toolbar.code,
+            Toolbar.sourceEditing,
             Toolbar.codeBlock,
             Toolbar.pipe,
             Toolbar.specialCharacters,
@@ -60,6 +62,8 @@ public class Config {
 
     List<String> removedPlugins = new ArrayList<>();
 
+    List<String> extraPlugins = new ArrayList<>();
+
     Map<ConfigType, JsonValue> configs = new HashMap<>();
 
     private void initPlugins() {
@@ -67,8 +71,17 @@ public class Config {
         removedPlugins.add(Plugins.StandardEditingMode.name());
         removedPlugins.add(Plugins.RestrictedEditingMode.name());
         removedPlugins.add(Plugins.Markdown.name());
+        removedPlugins.add(Plugins.Pagination.name());
+        removedPlugins.add(Plugins.Minimap.name());
         configs.put(ConfigType.removePlugins, toJsonArray(removedPlugins));
         configs.put(ConfigType.toolbar, toJsonArray(TOOLBAR));
+    }
+
+    public void addExtraPlugin(Plugins plugin) {
+        if(!extraPlugins.contains(plugin)) {
+            extraPlugins.add(plugin.name());
+        }
+        configs.put(ConfigType.extraPlugins, toJsonArray(extraPlugins));
     }
 
     public Config() {
@@ -720,6 +733,19 @@ public class Config {
     }
 
     /**
+     * Premium feature which needs to set a license by #setLicenseKey
+     * Pagination works only for decoupled editor
+     */
+    public void enablePagination() {
+        setPluginStatus(Plugins.Pagination, true);
+        updateToolbar();
+    }
+
+    public void enableMinimap() {
+        setPluginStatus(Plugins.Minimap, true);
+    }
+
+    /**
      * Use restricted editing mode by invoking this method
      */
     public void enableRestrictedMode() {
@@ -752,6 +778,7 @@ public class Config {
      */
     private void updateToolbar() {
         JsonArray removePluginArray = (JsonArray) configs.get(ConfigType.removePlugins);
+        boolean paginationEnabled = true;
         if(removePluginArray!=null) {
             for(int i=0; i<removePluginArray.length(); i++) {
                 if(Plugins.RestrictedEditingMode.name().equals(removePluginArray.get(i).asString())) {
@@ -760,8 +787,15 @@ public class Config {
                 } else if(Plugins.StandardEditingMode.name().equals(removePluginArray.get(i).asString())){
                     changeToolbarItem(Toolbar.restrictedEditing, false);
                     changeToolbarItem(Toolbar.restrictedEditingException, true);
+                } else if(Plugins.Pagination.name().equals(removePluginArray.get(i).asString())) {
+                    paginationEnabled = false;
                 }
             }
+        }
+        if(paginationEnabled) {
+            changeToolbarItem(Toolbar.previousPage, false);
+            changeToolbarItem(Toolbar.nextPage, false);
+            changeToolbarItem(Toolbar.pageNavigation, false);
         }
     }
 
@@ -790,6 +824,37 @@ public class Config {
         wordCount.put("displayWords", Json.create(displayWords));
         wordCount.put("onUpdate", onUpdate);
         configs.put(ConfigType.wordCount, wordCount);
+    }
+
+    /**
+     * Defaulted to A4 paper
+     * @param pageWidth default 21cm
+     * @param pageHeight default 29.7cm
+     * @param top   default 20mm
+     * @param left  default 12mm
+     * @param bottom defalt 20mm
+     * @param right default 12mm
+     */
+    public void setPagination(String pageWidth, String pageHeight, String top, String left, String bottom, String right) {
+        JsonObject pagination = Json.createObject();
+        pagination.put("pageWidth", pageWidth);
+        pagination.put("pageHeight", pageHeight);
+        JsonObject pageMargins = Json.createObject();
+        pageMargins.put("top", top);
+        pageMargins.put("bottom", bottom);
+        pageMargins.put("right", right);
+        pageMargins.put("left", left);
+        pagination.put("pageMargins", pageMargins);
+        configs.put(ConfigType.pagination, pagination);
+    }
+
+    public void setPaginationA4() {
+        this.setPagination("21cm", "29.7cm", "20mm", "12mm", "20mm", "12mm");
+    }
+
+    public void setLicenseKey(String license) {
+        assert license != null && !license.trim().isEmpty();
+        configs.put(ConfigType.licenseKey, Json.create(license));
     }
 
 }

@@ -7,9 +7,7 @@ class VaadinCKEditor extends LitElement {
     constructor() {
         super();
         this.classes = {
-            'editable-container' : true,
-            'document-editor__editable'  : true,
-            'ck-editor__editable' : true
+            'editor-content'  : true
         };
         this.editorMap = {};
         this.config = {};
@@ -41,6 +39,7 @@ class VaadinCKEditor extends LitElement {
                  editorHeight: String,
                  themeType: String,
                  errorMessage: String,
+                 miniMapEnabled:Boolean,
                  isReadOnly: Boolean,
                  isFirefox: Boolean,
                  isChrome: Boolean,
@@ -130,7 +129,7 @@ class VaadinCKEditor extends LitElement {
     }
 
     getConfig() {//check if contains function
-        return this.autosave===true? {
+        let configuration = this.autosave===true? {
             ...this.config,
             ...{
                 autosave: {
@@ -141,6 +140,19 @@ class VaadinCKEditor extends LitElement {
                 }
             }
         } : this.config;
+        let minimap = {
+                minimap: {
+                    container: document.querySelector( '.minimap-container' )
+            }
+        };
+        if(this.editorType==='decoupled') {
+            return {
+                ...minimap,
+                ...configuration
+            };
+        } else {
+            return configuration;
+        }
     }
 
 
@@ -150,7 +162,8 @@ class VaadinCKEditor extends LitElement {
             editor.isReadOnly = this.isReadOnly;
             editor.setData(this.editorData?this.editorData:'');
             this.style.width = this.isChrome?'-webkit-fill-available':
-                               this.isFirefox?'-moz-available':'100%';
+                               this.isFirefox?'-moz-available':
+                               this.style.width?this.style.width:'100%';
             this.style.height='100%';
             if(this.required) {
                 this.showIndicator(true);
@@ -182,8 +195,9 @@ class VaadinCKEditor extends LitElement {
             }
             this.editorMap[this.editorId] = editor;
             if(this.editorType==='decoupled') {
-                document.querySelector( '.toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
-                document.querySelector( '.editable-container' ).appendChild( editor.ui.view.editable.element );
+                document.querySelector( '#toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
+                // document.querySelector( "#"+this.editorId ).appendChild( editor.ui.view.editable.element );
+                editor.ui.update();
             }
         } ).catch( err => {
             console.error( err.stack );
@@ -277,9 +291,21 @@ class VaadinCKEditor extends LitElement {
                     }
                 </style>`: html``} 
             ${this.editorType==='decoupled' ? html`
-                <div class="toolbar-container"></div>
-                <div class="editable-container"></div>
-                <div id="${this.editorId}" class=${classMap(this.classes)}/>
+                <div id="document-container">
+                    <div id="toolbar-container">
+                        <!-- This is where the document editor toolbar will be inserted. -->
+                    </div>
+                    <div class="minimap-wrapper">
+                        <div class="editor-container">
+                            <div id="${this.editorId}" class=${classMap(this.classes)}>
+                                <!-- This is where the edited content will render (the page). -->
+                            </div>
+                        </div>
+                        <div class="minimap-container" style="display: ${ this.miniMapEnabled ? 'block' : 'none' }">
+                            <!-- This is where the minimap will be inserted. -->
+                        </div>
+                    </div>
+                </div>
             `:html`<div id="${this.editorId}"/>`}
         `;
     }

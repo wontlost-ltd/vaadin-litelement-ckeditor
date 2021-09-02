@@ -174,6 +174,13 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
     }
 
     /**
+     * @param enabled if minimap is enabled. This only works for decoupled editor.
+     */
+    public void minimap(Boolean enabled) {
+        getElement().setProperty("miniMapEnabled", enabled);
+    }
+
+    /**
      * @param editorWidth   Width of editor, default value is 'auto'.
      */
     public void setWidth(String editorWidth) {
