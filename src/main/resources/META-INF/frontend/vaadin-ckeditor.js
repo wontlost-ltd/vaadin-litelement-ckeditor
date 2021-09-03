@@ -278,18 +278,19 @@ class VaadinCKEditor extends LitElement {
         return errorStyle;
     }
 
+//     ${this.editorWidth !== 'auto'? html`
+//                 <style>
+//                     .ck.ck-editor {
+//                         width: ${this.editorWidth};
+//      }
+//      </style>`: html``}
     render() {
         return html`
             <label part="label" id="label_${this.editorId}">${this.label} </label>
             <ul part="label-ul"><li part="label-li">
                 <div part="error-message" id="error_${this.editorId}">${this.errorMessage}</div>
             </li></ul>
-            ${this.editorWidth !== 'auto'? html`
-                <style>
-                    .ck.ck-editor {
-                        width: ${this.editorWidth};
-                    }
-                </style>`: html``} 
+            
             ${this.editorType==='decoupled' ? html`
                 <div id="document-container">
                     <div id="toolbar-container">
