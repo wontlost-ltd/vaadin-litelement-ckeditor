@@ -598,9 +598,7 @@ public class Config {
     public void setRemovePlugins(List<Plugins> plugins) {
         JsonObject removePlugins = Json.createObject();
         List<String> toBeRemoved = new ArrayList<>();
-        plugins.forEach(plugin -> {
-            toBeRemoved.add(plugin.name());
-        });
+        plugins.forEach(plugin -> toBeRemoved.add(plugin.name()));
         removePlugins.put("removePlugins", toJsonArray(toBeRemoved));
         configs.put(ConfigType.removePlugins, removePlugins);
     }
