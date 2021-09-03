@@ -161,9 +161,9 @@ class VaadinCKEditor extends LitElement {
             editor.id = this.editorId;
             editor.isReadOnly = this.isReadOnly;
             editor.setData(this.editorData?this.editorData:'');
-            this.style.width = this.isChrome?'-webkit-fill-available':
-                               this.isFirefox?'-moz-available':
-                               this.style.width?this.style.width:'100%';
+            this.style.width = this.style.width ? this.style.width :
+                               this.isChrome ? '-webkit-fill-available':
+                               this.isFirefox ? '-moz-available': '100%';
             this.style.height='100%';
             if(this.required) {
                 this.showIndicator(true);
