@@ -160,6 +160,12 @@ class VaadinCKEditor extends LitElement {
         this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , this.getConfig()).then( editor => {
             editor.id = this.editorId;
             editor.isReadOnly = this.isReadOnly;
+            console.log("editor initialized....");
+            if(this.editorType === 'classic' && typeof editor.ui.element.children[1] !== 'undefined') {
+                editor.ui.element.children[1].style.position='sticky';
+                editor.ui.element.children[1].style.top=0;
+                editor.ui.element.children[1].style.boxShadow='0 1.5px 1px -1px darkgrey';
+            }
             editor.setData(this.editorData?this.editorData:'');
             this.style.width = this.style.width ? this.style.width :
                                this.isChrome ? '-webkit-fill-available':
@@ -177,10 +183,22 @@ class VaadinCKEditor extends LitElement {
                 //     writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
                 // }
             } );
+            editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
+                if(this.editorType === 'classic') {
+                    editor.ui.view.stickyPanel.element.children[0].style.display="none";
+                    editor.ui.view.stickyPanel.element.children[1].classList.remove("ck-sticky-panel__content_sticky");
+                    editor.ui.view.stickyPanel.element.children[1].style = "";
+                }
+            } );
             editor.model.document.on( 'change:data', (event, batch) => {
                 this.$server.setEditorData(editor.getData());
                 this.showIndicator(''===editor.getData() && this.required);
                 this.showError(this.invalid || (''===editor.getData() && this.required));
+                // if (typeof editor.ui.view.stickyPanel !== 'undefined'
+                //     && typeof editor.ui.view.stickyPanel.isSticky !== 'undefined') {
+                //     editor.ui.view.stickyPanel.isSticky = true;
+                // }
+                // console.log('*================' + window.document.documentElement.scrollTop);
             } );
             editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
                 this.focusedColor(isFocused);

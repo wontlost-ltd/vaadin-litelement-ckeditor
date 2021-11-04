@@ -115,6 +115,7 @@ public class Config {
         configs.put(ConfigType.table, Json.createObject());
         configs.put(ConfigType.title, Json.createObject());
         configs.put(ConfigType.typing, Json.createObject());
+        configs.put(ConfigType.ui, Json.createObject());
         configs.put(ConfigType.wordCount, Json.createObject());
         configs.put(ConfigType.wproofreader, Json.createObject());
     }
@@ -154,6 +155,7 @@ public class Config {
         configs.put(ConfigType.title, jsonObject.get(ConfigType.title.name()));
         configs.put(ConfigType.typing, jsonObject.get(ConfigType.typing.name()));
         configs.put(ConfigType.wordCount, jsonObject.get(ConfigType.wordCount.name()));
+        configs.put(ConfigType.ui, jsonObject.get(ConfigType.ui.name()));
         configs.put(ConfigType.wproofreader, jsonObject.get(ConfigType.wproofreader.name()));
     }
 
@@ -211,6 +213,16 @@ public class Config {
      */
     public void setEditorToolBar(Toolbar[] editorToolBar) {
         configs.put(ConfigType.toolbar, toJsonArray(editorToolBar));
+    }
+
+    /**
+     * @param editorToolBar Toolbar of Editor, refer to enum @Constants.Toolbar
+     */
+    public void setEditorToolBarObject(Toolbar[] editorToolBar, Boolean shouldNotGroupWhenFull) {
+        JsonObject toolbar = Json.createObject();
+        toolbar.put("items", toJsonArray(editorToolBar));
+        toolbar.put("shouldNotGroupWhenFull", shouldNotGroupWhenFull);
+        configs.put(ConfigType.toolbar, toolbar);
     }
 
     /**
@@ -301,6 +313,17 @@ public class Config {
         cloudServices.put("uploadUrl", Json.create(uploadUrl));
         cloudServices.put("webSocketUrl", Json.create(webSocketUrl));
         configs.put(ConfigType.cloudServices, cloudServices);
+    }
+
+    public void setUiViewportOffset(Double top, Double left, Double bottom, Double right) {
+        JsonObject ui = Json.createObject();
+        JsonObject viewportOffset = Json.createObject();
+        viewportOffset.put("top", top);
+        viewportOffset.put("left", left);
+        viewportOffset.put("bottom", bottom);
+        viewportOffset.put("right", right);
+        ui.put("viewportOffset", viewportOffset);
+        configs.put(ConfigType.ui, ui);
     }
 
     /**

@@ -47,6 +47,7 @@ public class Constants {
         wordCount,
         licenseKey,
         pagination,
+        ui,
         wproofreader
 
     }
