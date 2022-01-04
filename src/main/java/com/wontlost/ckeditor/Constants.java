@@ -1,6 +1,6 @@
 package com.wontlost.ckeditor;
 
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 
 import java.util.Locale;
 
@@ -133,6 +133,7 @@ public class Constants {
         tt("tt"),
         ug("ug"),
         uk("uk"),
+        uz("uz"),
         vi("vi"),
         zh("zh"),
         zh_cn("zh-cn");
@@ -150,6 +151,93 @@ public class Constants {
     }
 
     /**
+     * Language sets
+     */
+    public enum TextPartLanguage {
+
+        af("Afrikaans", "af"),
+        ar("Arabic","ar"),
+        ast("Galician","ast"),
+        az("Azerbaijani","az"),
+        bg("Bulgarian","bg"),
+        ca("Catalan","ca"),
+        cs("Czech","cs"),
+        da("Danis","da"),
+        de("German","de"),
+        de_ch("German Dutch","de-ch"),
+        el("Greek","el"),
+        en_au("English Australia","en-au"),
+        en_gb("English Britain", "en-gb"),
+        eo("Esperanto", "eo"),
+        es("Spanish", "es"),
+        et("Estonian", "et"),
+        eu("Basque", "eu"),
+        fa("Persian", "fa"),
+        fi("Finnish", "fi"),
+        fr("French", "fr"),
+        gl("Galician", "gl"),
+        gu("Gujarati", "gu"),
+        hi("Hindi", "hi"),
+        he("Hebrew", "he"),
+        hr("Croatian", "hr"),
+        hu("Hungarian","hu"),
+        id("Indonesian", "id"),
+        it("Italian", "it"),
+        ja("Japanese", "ja"),
+        km("Cambodian", "km"),
+        kn("Kannada", "kn"),
+        ko("Korean","ko"),
+        ku("Kurdish", "ku"),
+        lt("Lithuanian", "lt"),
+        lv("Latvian", "lv"),
+        ms("Malay", "ms"),
+        nb("Norwegian","nb"),
+        ne("Nepali", "ne"),
+        nl("Dutch", "nl"),
+        no("Danish", "no"),
+        oc("Occitan", "oc"),
+        pl("Polish", "pl"),
+        pt("Portuguese", "pt"),
+        pt_br("Portuguese BR", "pt-br"),
+        ro("Romanian", "ro"),
+        ru("Russian", "ru"),
+        si("Singhalese", "si"),
+        sk("Slovak", "sk"),
+        sl("Slovenian", "sl"),
+        sq("Albanian","sq"),
+        sr("Serbian", "sr"),
+        sr_latn("Latin", "sr-latn"),
+        sv("Swedish", "sv"),
+        th("Thai", "th"),
+        tr("Turkish", "tr"),
+        tt("Tatar", "tt"),
+        ug("Uigur", "ug"),
+        uk("Ukrainian", "uk"),
+        uz("Uzbek","uz"),
+        vi("Vietnamese", "vi"),
+        zh("Chinese Traditional", "zh"),
+        zh_cn("Chinese Simple", "zh-cn");
+
+        private final String title;
+
+        private final String language;
+
+        TextPartLanguage(String title, String language) {
+            this.title = title;
+            this.language = language;
+        }
+
+        public String getTitle() {
+            return this.title;
+        }
+
+        public String getLanguage(){
+            return this.language;
+        }
+
+    }
+
+    /**
      * Theme
      */
     public enum ThemeType {
@@ -157,6 +245,7 @@ public class Constants {
         DARK,
         LIGHT;
 
+        @Override
         public String toString() {
             return name().toLowerCase(Locale.ENGLISH);
         }
@@ -169,6 +258,7 @@ public class Constants {
      */
     public enum Toolbar {
 
+        textPartLanguage("textPartLanguage"),
         heading("heading"),
         pipe("|"),
         blockQuote("blockQuote"),
@@ -184,6 +274,7 @@ public class Constants {
         numberedList("numberedList"),
         bulletedList("bulletedList"),
         mediaEmbed("mediaEmbed"),
+        insertImage("insertImage"),
         findAndReplace("findAndReplace"),
         previousPage("previousPage"),
         nextPage("nextPage"),
@@ -252,6 +343,8 @@ public class Constants {
         ImageInline,
         ImageBlock,
         LinkImage,
+        ImageInsert,
+        AutoImage,
         GeneralHtmlSupport,
         HtmlComment,
         SourceEditing,
@@ -305,19 +398,19 @@ public class Constants {
      */
     public enum SanitizeType {
 
-        none(Whitelist.none()),
-        simpleText(Whitelist.simpleText()),
-        basic(Whitelist.basic()),
-        basicWithImages(Whitelist.basicWithImages()),
-        relaxed(Whitelist.relaxed());
+        none(Safelist.none()),
+        simpleText(Safelist.simpleText()),
+        basic(Safelist.basic()),
+        basicWithImages(Safelist.basicWithImages()),
+        relaxed(Safelist.relaxed());
 
-        private final Whitelist whitelist;
+        private final Safelist whitelist;
 
-        SanitizeType(Whitelist value) {
+        SanitizeType(Safelist value) {
             this.whitelist = value;
         }
 
-        public Whitelist getValue(){
+        public Safelist getValue(){
             return this.whitelist;
         }
 

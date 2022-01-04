@@ -165,7 +165,7 @@ class VaadinCKEditor extends LitElement {
                 editor.ui.element.children[1].style.position='sticky';
                 editor.ui.element.children[1].style.top=0;
                 editor.ui.element.children[1].style.boxShadow='0 1.5px 1px -1px darkgrey';
-                editor.ui.element.children[1].style.zIndex=99999;
+                editor.ui.element.children[1].style.zIndex=2;
             }
             editor.setData(this.editorData?this.editorData:'');
             this.style.width = this.style.width ? this.style.width :

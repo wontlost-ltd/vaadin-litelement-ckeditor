@@ -16,9 +16,14 @@ import static com.wontlost.ckeditor.Constants.*;
  */
 public class Config {
 
+    static final String options = "options";
+
+    static final String uploadUrl = "uploadUrl";
+
     static final Toolbar[] TOOLBAR = new Toolbar[] {
-            Toolbar.heading,
+            Toolbar.textPartLanguage,
             Toolbar.pipe,
+            Toolbar.heading,
             Toolbar.fontSize,
             Toolbar.fontFamily,
             Toolbar.fontColor,
@@ -78,7 +83,7 @@ public class Config {
     }
 
     public void addExtraPlugin(Plugins plugin) {
-        if(!extraPlugins.contains(plugin)) {
+        if(!extraPlugins.contains(plugin.name())) {
             extraPlugins.add(plugin.name());
         }
         configs.put(ConfigType.extraPlugins, toJsonArray(extraPlugins));
@@ -183,6 +188,13 @@ public class Config {
         return Json.instance().parse(toolbarJson);
     }
 
+    JsonArray toJsonArray(TextPartLanguage... textPartLanguages) {
+        List<String> values = new ArrayList<>();
+        Arrays.stream(textPartLanguages).forEach(item -> values.add(item.toString()));
+        String toolbarJson = new Gson().toJson(values);
+        return Json.instance().parse(toolbarJson);
+    }
+
     JsonArray toJsonArray(List<String> options) {
         return Json.instance().parse(new Gson().toJson(options));
     }
@@ -232,13 +244,28 @@ public class Config {
         configs.put(ConfigType.language, Json.create(uiLanguage==null?"en":uiLanguage.getLanguage()));
     }
 
+    public void setLanguage(Language uiLanguage, Language contentLanguage, TextPartLanguage[] textPartLanguages) {
+        JsonObject language = Json.createObject();
+        JsonArray jsonArray = Json.createArray();
+        for(int i=0; i<textPartLanguages.length; i++) {
+            JsonObject langCode = Json.createObject();
+            langCode.put("title", textPartLanguages[i].getTitle());
+            langCode.put("languageCode", textPartLanguages[i].getLanguage());
+            jsonArray.set(i, langCode);
+        }
+        language.put("ui", uiLanguage.getLanguage());
+        language.put("content", contentLanguage.getLanguage());
+        language.put("textPartLanguage", jsonArray);
+        configs.put(ConfigType.language, language);
+    }
+
     /**
      * Configuation of alignment
      * @param options The available options are: 'left', 'right', 'center' and 'justify'. Other values are ignored.
      */
     public void setAlignment(String[] options) {
         JsonObject alignment = Json.createObject();
-        alignment.put("options", toJsonArray(options));
+        alignment.put(Config.options, toJsonArray(options));
         configs.put(ConfigType.alignment, alignment);
     }
 
@@ -274,13 +301,13 @@ public class Config {
     public void setCKFinder(String openerMethod, String uploadUrl, Map<String, String> options) {
         JsonObject ckfinder = Json.createObject();
         ckfinder.put("openerMethod", Json.create(openerMethod));
-        ckfinder.put("uploadUrl", Json.create(uploadUrl));
+        ckfinder.put(Config.uploadUrl, Json.create(uploadUrl));
         JsonObject ckfinderOptions = Json.createObject();
         ckfinderOptions.put("connectorInfo", options.get("connectorInfo"));
         ckfinderOptions.put("connectorPath", options.get("connectorPath"));
         ckfinderOptions.put("height", options.get("height"));
         ckfinderOptions.put("width", options.get("width"));
-        ckfinder.put("options", ckfinderOptions);
+        ckfinder.put(Config.options, ckfinderOptions);
         configs.put(ConfigType.ckfinder, ckfinder);
     }
 
@@ -310,7 +337,7 @@ public class Config {
         JsonObject cloudServices = Json.createObject();
         cloudServices.put("bundleVersion", Json.create(bundleVersion));
         cloudServices.put("tokenUrl", Json.create(tokenUrl));
-        cloudServices.put("uploadUrl", Json.create(uploadUrl));
+        cloudServices.put(Config.uploadUrl, Json.create(uploadUrl));
         cloudServices.put("webSocketUrl", Json.create(webSocketUrl));
         configs.put(ConfigType.cloudServices, cloudServices);
     }
@@ -448,7 +475,7 @@ public class Config {
     public void setFontFamily(boolean supportAllValues, String[] options) {
         JsonObject fontFamily = Json.createObject();
         fontFamily.put("supportAllValues", Json.create(supportAllValues));
-        fontFamily.put("options", toJsonArray(options));
+        fontFamily.put(Config.options, toJsonArray(options));
         configs.put(ConfigType.fontFamily, fontFamily);
     }
 
@@ -464,7 +491,7 @@ public class Config {
     public void setFontSize(boolean supportAllValues, String[] options) {
         JsonObject fontSize = Json.createObject();
         fontSize.put("supportAllValues", Json.create(supportAllValues));
-        fontSize.put("options", toJsonArray(options));
+        fontSize.put(Config.options, toJsonArray(options));
         configs.put(ConfigType.fontSize, fontSize);
     }
 
@@ -480,7 +507,7 @@ public class Config {
      */
     public void setHeading(String[][] options) {
         JsonObject heading = Json.createObject();
-        heading.put("options", toJsonArray(options));
+        heading.put(Config.options, toJsonArray(options));
         configs.put(ConfigType.heading, heading);
     }
 
@@ -506,7 +533,7 @@ public class Config {
      */
     public void setHighlight(String[][] options) {
         JsonObject highlight = Json.createObject();
-        highlight.put("options", toJsonArray(options));
+        highlight.put(Config.options, toJsonArray(options));
         configs.put(ConfigType.highlight, highlight);
     }
 
@@ -655,7 +682,7 @@ public class Config {
      */
     public void setSimpleUpload(String uploadUrl, Boolean withCredentials, List<String> headers) {
         JsonObject simpleUpload = Json.createObject();
-        simpleUpload.put("uploadUrl", Json.create(uploadUrl));
+        simpleUpload.put(Config.uploadUrl, Json.create(uploadUrl));
         simpleUpload.put("withCredentials", Json.create(withCredentials));
         simpleUpload.put("headers", toJsonArray(headers));
         configs.put(ConfigType.simpleUpload, simpleUpload);
@@ -874,8 +901,9 @@ public class Config {
     }
 
     public void setLicenseKey(String license) {
-        assert license != null && !license.trim().isEmpty();
-        configs.put(ConfigType.licenseKey, Json.create(license));
+        if (license != null && !license.trim().isEmpty()) {
+            configs.put(ConfigType.licenseKey, Json.create(license));
+        }
     }
 
 }

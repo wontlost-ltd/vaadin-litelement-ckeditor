@@ -5,14 +5,16 @@ import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
+import com.wontlost.ckeditor.Constants.EditorType;
+import com.wontlost.ckeditor.Constants.SanitizeType;
+import com.wontlost.ckeditor.Constants.ThemeType;
+import org.jsoup.Jsoup;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.wontlost.ckeditor.Constants.*;
-import org.jsoup.Jsoup;
 
 /**
  * Used in @VaadinCKEditorBuilder.
@@ -77,6 +79,7 @@ import org.jsoup.Jsoup;
 @JsModule("./translations/tr.js")
 @JsModule("./translations/tt.js")
 @JsModule("./translations/ug.js")
+@JsModule("./translations/uz.js")
 @JsModule("./translations/uk.js")
 @JsModule("./translations/vi.js")
 @JsModule("./translations/zh.js")
@@ -105,10 +108,12 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
         this.editorData = newPresentationValue;
     }
 
+    @Override
     public void setId(String id) {
-        getElement().setProperty("editorId", id==null? "editor_"+Math.abs(new Random().nextInt()): id);
+        getElement().setProperty("editorId", id==null? "editor_"+Math.abs(new Random().nextInt()+1): id);
     }
 
+    @Override
     public Optional<String> getId() {
         return Optional.of(getElement().getProperty("editorId"));
     }
@@ -117,6 +122,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
      * Get content of editor.
      * @return Data in editor text area.
      */
+    @Override
     public String getValue() {
         return editorData;
     }
@@ -126,6 +132,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
      * Together with calling updateValue method to refresh editor content
      * @param value  Data in editor text area.
      */
+    @Override
     public void setValue(String value) {
         super.setValue(value);
         this.editorData = value;
@@ -133,6 +140,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
         updateValue(value);
     }
 
+    @Override
     protected void setModelValue(String value, boolean fromClient){
         super.setModelValue(value, fromClient);
         String oldEditorData = this.editorData;
@@ -183,6 +191,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
     /**
      * @param editorWidth   Width of editor, default value is 'auto'.
      */
+    @Override
     public void setWidth(String editorWidth) {
         super.setWidth(editorWidth);
         getElement().setProperty("editorWidth", editorWidth==null?"auto":editorWidth);
@@ -191,6 +200,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
     /**
      * @param editorHeight  Height of editor, default value is 'auto'.
      */
+    @Override
     public void setHeight(String editorHeight) {
         super.setHeight(editorHeight);
         getElement().setProperty("editorHeight", editorHeight==null?"auto":editorHeight);
@@ -199,6 +209,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
     /**
      * @param readOnly Make editor readonly
      */
+    @Override
     public void setReadOnly(boolean readOnly) {
         getElement().setProperty("isReadOnly", readOnly);
     }
@@ -225,10 +236,12 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
         getElement().setProperty("autosave", autosave);
     }
 
+    @Override
     public void clear() {
         updateValue(null);
     }
 
+    @Override
     public void setConfig(Config config) {
         getElement().setPropertyJson("config", config==null?new Config().getConfigJson():config.getConfigJson());
     }

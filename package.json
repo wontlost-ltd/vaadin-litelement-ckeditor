@@ -4,7 +4,7 @@
       "lit-element": "2.5.1",
       "@polymer/polymer": "3.2.0",
       "@webcomponents/webcomponentsjs": "^2.2.10",
-      "construct-style-sheets-polyfill": "2.4.16",
+      "construct-style-sheets-polyfill": "3.0.4",
       "lit-html": "1.4.1"
     },
     "devDependencies": {
@@ -33,7 +33,7 @@
     "lit-element": "2.5.1",
     "@polymer/polymer": "3.2.0",
     "@webcomponents/webcomponentsjs": "^2.2.10",
-    "construct-style-sheets-polyfill": "2.4.16",
+    "construct-style-sheets-polyfill": "3.0.4",
     "lit-html": "1.4.1"
   },
   "devDependencies": {
