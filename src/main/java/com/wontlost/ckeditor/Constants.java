@@ -150,6 +150,10 @@ public class Constants {
 
     }
 
+    public enum EditingMode {
+        Restricted, Standard
+    }
+
     /**
      * Language sets
      */

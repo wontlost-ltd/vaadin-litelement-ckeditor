@@ -600,15 +600,15 @@ public class Config {
 
     /**
      * The configuration of the link feature.
-     * @param defaultProtocal    When set, the editor will add the given protocol to the link when the user creates a link without one. For example, when the user is creating a link and types
+     * @param defaultProtocol    When set, the editor will add the given protocol to the link when the user creates a link without one. For example, when the user is creating a link and types
      *                           ckeditor.com in the link form input, during link submission the editor will automatically add the http:// protocol, so the link will look as follows: http://ckeditor.com.
      *                           The feature also provides email address auto-detection. When you submit hello@example.com, the plugin will automatically change it to mailto:hello@example.com.
      * @param addTargetToExternalLinks When set to true, the target="blank" and rel="noopener noreferrer"
      *                                 attributes are automatically added to all external links in the editor. "External links" are all links in the editor content starting with http, https, or //.
      */
-    public void setLink(String defaultProtocal, Boolean addTargetToExternalLinks) {
+    public void setLink(String defaultProtocol, Boolean addTargetToExternalLinks) {
         JsonObject link = Json.createObject();
-        link.put("defaultProtocal", Json.create(defaultProtocal));
+        link.put("defaultProtocol", Json.create(defaultProtocol));
         link.put("addTargetToExternalLinks", Json.create(addTargetToExternalLinks));
         configs.put(ConfigType.link, link);
     }
@@ -773,10 +773,11 @@ public class Config {
 
     /**
      * Use standard editing mode by invoking this method
+     * @deprecated use setEditingMode(EditingMode editingMode) instead
      */
     public void enableStandardMode() {
-        setPluginStatus(Plugins.StandardEditingMode, false);
-        setPluginStatus(Plugins.RestrictedEditingMode, true);
+        setPluginStatus(Plugins.StandardEditingMode, true);
+        setPluginStatus(Plugins.RestrictedEditingMode, false);
         updateToolbar();
     }
 
@@ -794,11 +795,27 @@ public class Config {
     }
 
     /**
+     * Used for restricted editing
+     * @param editingMode
+     */
+    public void setEditingMode(EditingMode editingMode) {
+        if(EditingMode.Restricted.equals(editingMode)) {
+            setPluginStatus(Plugins.StandardEditingMode, false);
+            setPluginStatus(Plugins.RestrictedEditingMode, true);
+        } else {
+            setPluginStatus(Plugins.StandardEditingMode, true);
+            setPluginStatus(Plugins.RestrictedEditingMode, false);
+        }
+        updateToolbar();
+    }
+
+    /**
      * Use restricted editing mode by invoking this method
+     * @deprecated use setEditingMode(EditingMode editingMode) instead
      */
     public void enableRestrictedMode() {
-        setPluginStatus(Plugins.StandardEditingMode, true);
-        setPluginStatus(Plugins.RestrictedEditingMode, false);
+        setPluginStatus(Plugins.StandardEditingMode, false);
+        setPluginStatus(Plugins.RestrictedEditingMode, true);
         updateToolbar();
     }
 
