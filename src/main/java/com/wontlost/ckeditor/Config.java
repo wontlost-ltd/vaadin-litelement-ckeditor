@@ -1,6 +1,7 @@
 package com.wontlost.ckeditor;
 
 import com.google.gson.Gson;
+import com.wontlost.ckeditor.mention.MentionConfig;
 import elemental.json.Json;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
@@ -19,6 +20,10 @@ public class Config {
     static final String options = "options";
 
     static final String uploadUrl = "uploadUrl";
+
+    static final String[] HEADING_OPTION = {"model", "view", "title", "class"};
+    static final String[] CODEBLOCK_LANGUAGE = {"language", "label", "class"};
+    static final String[] IMAGE_RESIZEOPTION = {"name", "value", "label"};
 
     static final Toolbar[] TOOLBAR = new Toolbar[] {
             Toolbar.textPartLanguage,
@@ -195,6 +200,26 @@ public class Config {
         return Json.instance().parse(toolbarJson);
     }
 
+    JsonObject toJsonObjectArray(String member, String[] names, String[][] values) {
+        List<Map<String,String>> list = new ArrayList<>();
+        for(String[] object : values) {
+            Map<String, String> map = new LinkedHashMap<>();
+            for(int i = 0; i < names.length && i < object.length; i++)
+                if(object[i] != null)
+                    map.put(names[i], object[i]);
+            list.add(map);
+        }
+        String json = new Gson().toJson(list);
+        String jsonObject = "{'"+ member +"':" + json + "}";
+        return Json.parse(jsonObject);
+    }
+
+    JsonArray toJsonObjectArray(String[] names, String[][] values) {
+        String member = "temp";
+        JsonObject json = toJsonObjectArray(member, names, values);
+        return json.getArray(member);
+    }
+
     JsonArray toJsonArray(List<String> options) {
         return Json.instance().parse(new Gson().toJson(options));
     }
@@ -368,11 +393,20 @@ public class Config {
      *                    { language: 'php', label: 'PHP', class: 'php-code' }
      *                   ]
      *                   class is optional
+     * updated by Thomas Kohler (tko@hp23.at)
      */
-    public void setCodeBlock(String indentSequence, String[] languages) {
+    //public void setCodeBlock(String indentSequence, String[] languages) {
+    //    JsonObject codeBlock = Json.createObject();
+    //    codeBlock.put("indentSequence", Json.create(indentSequence));
+    //    codeBlock.put("languages", toJsonArray(languages));
+    //    configs.put(ConfigType.codeBlock, codeBlock);
+    //}
+    public void setCodeBlock(String indentSequence, String[][] languages) {
         JsonObject codeBlock = Json.createObject();
-        codeBlock.put("indentSequence", Json.create(indentSequence));
-        codeBlock.put("languages", toJsonArray(languages));
+        if(indentSequence != null)
+            codeBlock.put("indentSequence", Json.create(indentSequence));
+        if(languages != null && languages.length > 0)
+            codeBlock.put("languages", toJsonObjectArray(CODEBLOCK_LANGUAGE, languages));
         configs.put(ConfigType.codeBlock, codeBlock);
     }
 
@@ -504,10 +538,17 @@ public class Config {
      *                  { model: 'heading2', view: 'h3', title: 'Heading 2', class: 'ck-heading_heading2' },
      *                  { model: 'heading3', view: 'h4', title: 'Heading 3', class: 'ck-heading_heading3' }
      * 	              ]
+     * updated by Thomas Kohler (tko@hp23.at)
      */
+    //public void setHeading(String[][] options) {
+    //    JsonObject heading = Json.createObject();
+    //    heading.put(Config.options, toJsonArray(options));
+    //    configs.put(ConfigType.heading, heading);
+    //}
     public void setHeading(String[][] options) {
         JsonObject heading = Json.createObject();
-        heading.put(Config.options, toJsonArray(options));
+        if(options != null && options.length > 0)
+            heading.put("options", toJsonObjectArray(HEADING_OPTION, options));
         configs.put(ConfigType.heading, heading);
     }
 
@@ -559,22 +600,40 @@ public class Config {
      *                const imageConfig = {
      * 	                  toolbar: [ 'imageStyle:full', 'imageStyle:side', '|', 'imageTextAlternative' ]
      *                };
-     * @param upload The image upload configuration.
+     * @param uploadTypes The image upload configuration.
      *               The list of accepted image types.
      *               The accepted types of images can be customized to allow only certain types of images:
      *               // Allow only JPEG and PNG images:
      *              const imageUploadConfig = {
      * 	                types: [ 'png', 'jpeg' ]
      *              };
+     *  updated by Thomas Kohler (tko@hp23.at)
      */
-    public void setImage(String[][] resizeOptions, String resizeUnit, String[] styles,
-                         String[] toolbar, String[] upload) {
+    //public void setImage(String[][] resizeOptions, String resizeUnit, String[] styles,
+    //                     String[] toolbar, String[] upload) {
+    //    JsonObject image = Json.createObject();
+    //    image.put("resizeOptions", toJsonArray(resizeOptions));
+    //    image.put("resizeUnit", Json.create(resizeUnit));
+    //    image.put("styles", toJsonArray(styles));
+    //    image.put("toolbar", toJsonArray(toolbar));
+    //    image.put("types", toJsonArray(upload));
+    //    configs.put(ConfigType.image, image);
+    //}
+    public void setImage(String[][] resizeOptions, String resizeUnit, String[] styles, String[] toolbar, String[] uploadTypes) {
         JsonObject image = Json.createObject();
-        image.put("resizeOptions", toJsonArray(resizeOptions));
-        image.put("resizeUnit", Json.create(resizeUnit));
-        image.put("styles", toJsonArray(styles));
-        image.put("toolbar", toJsonArray(toolbar));
-        image.put("types", toJsonArray(upload));
+        if(resizeOptions != null && resizeOptions.length > 0)
+            image.put("options", toJsonObjectArray(IMAGE_RESIZEOPTION, resizeOptions));
+        if(resizeUnit != null)
+            image.put("resizeUnit", Json.create(resizeUnit));
+        if(styles.length > 0)
+            image.put("styles", toJsonArray(styles));
+        if(toolbar.length > 0)
+            image.put("toolbar", toJsonArray(toolbar));
+        if(uploadTypes.length > 0) {
+            JsonObject upload = Json.createObject();
+            upload.put("types", toJsonArray(uploadTypes));
+            image.put("upload", upload);
+        }
         configs.put(ConfigType.image, image);
     }
 
@@ -633,12 +692,12 @@ public class Config {
 
     /**
      * The configuration of the mention feature.
-     * @param feeds The list of mention feeds supported by the editor.
+     * refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_mention_mention-MentionConfig.html
+     * @param mentionConfig configuration on mention.
      */
-    public void setMention(List<String> feeds) {
-        JsonObject mention = Json.createObject();
-        mention.put("feeds", toJsonArray(feeds));
-        configs.put(ConfigType.mention, mention);
+    public void setMention(MentionConfig mentionConfig) {
+        String jsonStr = new Gson().toJson(mentionConfig);
+        configs.put(ConfigType.mention, Json.instance().parse(jsonStr));
     }
 
     /**
