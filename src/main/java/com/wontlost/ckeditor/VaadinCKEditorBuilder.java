@@ -15,6 +15,7 @@ public class VaadinCKEditorBuilder {
     public ThemeType theme;
     public Boolean readOnly = false;
     public Boolean autosave = false;
+    public Boolean minimap = false;
 
     public EditorType editorType = EditorType.CLASSIC;
 
@@ -34,6 +35,9 @@ public class VaadinCKEditorBuilder {
         editor.setReadOnly(readOnly);
         editor.setAutosave(autosave);
         editor.setEditorType(editorType);
+        if(editorType.equals(EditorType.DECOUPLED)) {
+            editor.minimap(minimap);
+        }
         return editor;
     }
 

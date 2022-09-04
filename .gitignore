@@ -17,3 +17,4 @@ node_modules
 frontend/main.js
 src/main/webapp/build/stats.json
 webpack.generated.js
+/.github/

@@ -1,6 +1,7 @@
 package com.wontlost.ckeditor;
 
 import com.google.gson.Gson;
+import com.wontlost.ckeditor.mention.MentionConfig;
 import elemental.json.Json;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
@@ -16,9 +17,18 @@ import static com.wontlost.ckeditor.Constants.*;
  */
 public class Config {
 
+    static final String options = "options";
+
+    static final String uploadUrl = "uploadUrl";
+
+    static final String[] HEADING_OPTION = {"model", "view", "title", "class"};
+    static final String[] CODEBLOCK_LANGUAGE = {"language", "label", "class"};
+    static final String[] IMAGE_RESIZEOPTION = {"name", "value", "label"};
+
     static final Toolbar[] TOOLBAR = new Toolbar[] {
-            Toolbar.heading,
+            Toolbar.textPartLanguage,
             Toolbar.pipe,
+            Toolbar.heading,
             Toolbar.fontSize,
             Toolbar.fontFamily,
             Toolbar.fontColor,
@@ -27,6 +37,7 @@ public class Config {
             Toolbar.bold,
             Toolbar.italic,
             Toolbar.underline,
+            Toolbar.findAndReplace,
             Toolbar.selectAll,
             Toolbar.strikethrough,
             Toolbar.subscript,
@@ -44,6 +55,7 @@ public class Config {
             Toolbar.indent,
             Toolbar.outdent,
             Toolbar.code,
+            Toolbar.sourceEditing,
             Toolbar.codeBlock,
             Toolbar.pipe,
             Toolbar.specialCharacters,
@@ -60,6 +72,8 @@ public class Config {
 
     List<String> removedPlugins = new ArrayList<>();
 
+    List<String> extraPlugins = new ArrayList<>();
+
     Map<ConfigType, JsonValue> configs = new HashMap<>();
 
     private void initPlugins() {
@@ -67,8 +81,17 @@ public class Config {
         removedPlugins.add(Plugins.StandardEditingMode.name());
         removedPlugins.add(Plugins.RestrictedEditingMode.name());
         removedPlugins.add(Plugins.Markdown.name());
+        removedPlugins.add(Plugins.Pagination.name());
+        removedPlugins.add(Plugins.Minimap.name());
         configs.put(ConfigType.removePlugins, toJsonArray(removedPlugins));
         configs.put(ConfigType.toolbar, toJsonArray(TOOLBAR));
+    }
+
+    public void addExtraPlugin(Plugins plugin) {
+        if(!extraPlugins.contains(plugin.name())) {
+            extraPlugins.add(plugin.name());
+        }
+        configs.put(ConfigType.extraPlugins, toJsonArray(extraPlugins));
     }
 
     public Config() {
@@ -102,6 +125,7 @@ public class Config {
         configs.put(ConfigType.table, Json.createObject());
         configs.put(ConfigType.title, Json.createObject());
         configs.put(ConfigType.typing, Json.createObject());
+        configs.put(ConfigType.ui, Json.createObject());
         configs.put(ConfigType.wordCount, Json.createObject());
         configs.put(ConfigType.wproofreader, Json.createObject());
     }
@@ -141,6 +165,7 @@ public class Config {
         configs.put(ConfigType.title, jsonObject.get(ConfigType.title.name()));
         configs.put(ConfigType.typing, jsonObject.get(ConfigType.typing.name()));
         configs.put(ConfigType.wordCount, jsonObject.get(ConfigType.wordCount.name()));
+        configs.put(ConfigType.ui, jsonObject.get(ConfigType.ui.name()));
         configs.put(ConfigType.wproofreader, jsonObject.get(ConfigType.wproofreader.name()));
     }
 
@@ -166,6 +191,33 @@ public class Config {
         Arrays.stream(toolbar).forEach(item -> values.add(item.getValue()));
         String toolbarJson = new Gson().toJson(values);
         return Json.instance().parse(toolbarJson);
+    }
+
+    JsonArray toJsonArray(TextPartLanguage... textPartLanguages) {
+        List<String> values = new ArrayList<>();
+        Arrays.stream(textPartLanguages).forEach(item -> values.add(item.toString()));
+        String toolbarJson = new Gson().toJson(values);
+        return Json.instance().parse(toolbarJson);
+    }
+
+    JsonObject toJsonObjectArray(String member, String[] names, String[][] values) {
+        List<Map<String,String>> list = new ArrayList<>();
+        for(String[] object : values) {
+            Map<String, String> map = new LinkedHashMap<>();
+            for(int i = 0; i < names.length && i < object.length; i++)
+                if(object[i] != null)
+                    map.put(names[i], object[i]);
+            list.add(map);
+        }
+        String json = new Gson().toJson(list);
+        String jsonObject = "{'"+ member +"':" + json + "}";
+        return Json.parse(jsonObject);
+    }
+
+    JsonArray toJsonObjectArray(String[] names, String[][] values) {
+        String member = "temp";
+        JsonObject json = toJsonObjectArray(member, names, values);
+        return json.getArray(member);
     }
 
     JsonArray toJsonArray(List<String> options) {
@@ -201,10 +253,35 @@ public class Config {
     }
 
     /**
+     * @param editorToolBar Toolbar of Editor, refer to enum @Constants.Toolbar
+     */
+    public void setEditorToolBarObject(Toolbar[] editorToolBar, Boolean shouldNotGroupWhenFull) {
+        JsonObject toolbar = Json.createObject();
+        toolbar.put("items", toJsonArray(editorToolBar));
+        toolbar.put("shouldNotGroupWhenFull", shouldNotGroupWhenFull);
+        configs.put(ConfigType.toolbar, toolbar);
+    }
+
+    /**
      * @param uiLanguage Language of user interface, refer to enum @Language
      */
     public void setUILanguage(Language uiLanguage) {
         configs.put(ConfigType.language, Json.create(uiLanguage==null?"en":uiLanguage.getLanguage()));
+    }
+
+    public void setLanguage(Language uiLanguage, Language contentLanguage, TextPartLanguage[] textPartLanguages) {
+        JsonObject language = Json.createObject();
+        JsonArray jsonArray = Json.createArray();
+        for(int i=0; i<textPartLanguages.length; i++) {
+            JsonObject langCode = Json.createObject();
+            langCode.put("title", textPartLanguages[i].getTitle());
+            langCode.put("languageCode", textPartLanguages[i].getLanguage());
+            jsonArray.set(i, langCode);
+        }
+        language.put("ui", uiLanguage.getLanguage());
+        language.put("content", contentLanguage.getLanguage());
+        language.put("textPartLanguage", jsonArray);
+        configs.put(ConfigType.language, language);
     }
 
     /**
@@ -213,7 +290,7 @@ public class Config {
      */
     public void setAlignment(String[] options) {
         JsonObject alignment = Json.createObject();
-        alignment.put("options", toJsonArray(options));
+        alignment.put(Config.options, toJsonArray(options));
         configs.put(ConfigType.alignment, alignment);
     }
 
@@ -249,13 +326,13 @@ public class Config {
     public void setCKFinder(String openerMethod, String uploadUrl, Map<String, String> options) {
         JsonObject ckfinder = Json.createObject();
         ckfinder.put("openerMethod", Json.create(openerMethod));
-        ckfinder.put("uploadUrl", Json.create(uploadUrl));
+        ckfinder.put(Config.uploadUrl, Json.create(uploadUrl));
         JsonObject ckfinderOptions = Json.createObject();
         ckfinderOptions.put("connectorInfo", options.get("connectorInfo"));
         ckfinderOptions.put("connectorPath", options.get("connectorPath"));
         ckfinderOptions.put("height", options.get("height"));
         ckfinderOptions.put("width", options.get("width"));
-        ckfinder.put("options", ckfinderOptions);
+        ckfinder.put(Config.options, ckfinderOptions);
         configs.put(ConfigType.ckfinder, ckfinder);
     }
 
@@ -285,9 +362,20 @@ public class Config {
         JsonObject cloudServices = Json.createObject();
         cloudServices.put("bundleVersion", Json.create(bundleVersion));
         cloudServices.put("tokenUrl", Json.create(tokenUrl));
-        cloudServices.put("uploadUrl", Json.create(uploadUrl));
+        cloudServices.put(Config.uploadUrl, Json.create(uploadUrl));
         cloudServices.put("webSocketUrl", Json.create(webSocketUrl));
         configs.put(ConfigType.cloudServices, cloudServices);
+    }
+
+    public void setUiViewportOffset(Double top, Double left, Double bottom, Double right) {
+        JsonObject ui = Json.createObject();
+        JsonObject viewportOffset = Json.createObject();
+        viewportOffset.put("top", top);
+        viewportOffset.put("left", left);
+        viewportOffset.put("bottom", bottom);
+        viewportOffset.put("right", right);
+        ui.put("viewportOffset", viewportOffset);
+        configs.put(ConfigType.ui, ui);
     }
 
     /**
@@ -305,11 +393,20 @@ public class Config {
      *                    { language: 'php', label: 'PHP', class: 'php-code' }
      *                   ]
      *                   class is optional
+     * updated by Thomas Kohler (tko@hp23.at)
      */
-    public void setCodeBlock(String indentSequence, String[] languages) {
+    //public void setCodeBlock(String indentSequence, String[] languages) {
+    //    JsonObject codeBlock = Json.createObject();
+    //    codeBlock.put("indentSequence", Json.create(indentSequence));
+    //    codeBlock.put("languages", toJsonArray(languages));
+    //    configs.put(ConfigType.codeBlock, codeBlock);
+    //}
+    public void setCodeBlock(String indentSequence, String[][] languages) {
         JsonObject codeBlock = Json.createObject();
-        codeBlock.put("indentSequence", Json.create(indentSequence));
-        codeBlock.put("languages", toJsonArray(languages));
+        if(indentSequence != null)
+            codeBlock.put("indentSequence", Json.create(indentSequence));
+        if(languages != null && languages.length > 0)
+            codeBlock.put("languages", toJsonObjectArray(CODEBLOCK_LANGUAGE, languages));
         configs.put(ConfigType.codeBlock, codeBlock);
     }
 
@@ -412,7 +509,7 @@ public class Config {
     public void setFontFamily(boolean supportAllValues, String[] options) {
         JsonObject fontFamily = Json.createObject();
         fontFamily.put("supportAllValues", Json.create(supportAllValues));
-        fontFamily.put("options", toJsonArray(options));
+        fontFamily.put(Config.options, toJsonArray(options));
         configs.put(ConfigType.fontFamily, fontFamily);
     }
 
@@ -428,7 +525,7 @@ public class Config {
     public void setFontSize(boolean supportAllValues, String[] options) {
         JsonObject fontSize = Json.createObject();
         fontSize.put("supportAllValues", Json.create(supportAllValues));
-        fontSize.put("options", toJsonArray(options));
+        fontSize.put(Config.options, toJsonArray(options));
         configs.put(ConfigType.fontSize, fontSize);
     }
 
@@ -441,10 +538,17 @@ public class Config {
      *                  { model: 'heading2', view: 'h3', title: 'Heading 2', class: 'ck-heading_heading2' },
      *                  { model: 'heading3', view: 'h4', title: 'Heading 3', class: 'ck-heading_heading3' }
      * 	              ]
+     * updated by Thomas Kohler (tko@hp23.at)
      */
+    //public void setHeading(String[][] options) {
+    //    JsonObject heading = Json.createObject();
+    //    heading.put(Config.options, toJsonArray(options));
+    //    configs.put(ConfigType.heading, heading);
+    //}
     public void setHeading(String[][] options) {
         JsonObject heading = Json.createObject();
-        heading.put("options", toJsonArray(options));
+        if(options != null && options.length > 0)
+            heading.put("options", toJsonObjectArray(HEADING_OPTION, options));
         configs.put(ConfigType.heading, heading);
     }
 
@@ -470,7 +574,7 @@ public class Config {
      */
     public void setHighlight(String[][] options) {
         JsonObject highlight = Json.createObject();
-        highlight.put("options", toJsonArray(options));
+        highlight.put(Config.options, toJsonArray(options));
         configs.put(ConfigType.highlight, highlight);
     }
 
@@ -496,22 +600,40 @@ public class Config {
      *                const imageConfig = {
      * 	                  toolbar: [ 'imageStyle:full', 'imageStyle:side', '|', 'imageTextAlternative' ]
      *                };
-     * @param upload The image upload configuration.
+     * @param uploadTypes The image upload configuration.
      *               The list of accepted image types.
      *               The accepted types of images can be customized to allow only certain types of images:
      *               // Allow only JPEG and PNG images:
      *              const imageUploadConfig = {
      * 	                types: [ 'png', 'jpeg' ]
      *              };
+     *  updated by Thomas Kohler (tko@hp23.at)
      */
-    public void setImage(String[][] resizeOptions, String resizeUnit, String[] styles,
-                         String[] toolbar, String[] upload) {
+    //public void setImage(String[][] resizeOptions, String resizeUnit, String[] styles,
+    //                     String[] toolbar, String[] upload) {
+    //    JsonObject image = Json.createObject();
+    //    image.put("resizeOptions", toJsonArray(resizeOptions));
+    //    image.put("resizeUnit", Json.create(resizeUnit));
+    //    image.put("styles", toJsonArray(styles));
+    //    image.put("toolbar", toJsonArray(toolbar));
+    //    image.put("types", toJsonArray(upload));
+    //    configs.put(ConfigType.image, image);
+    //}
+    public void setImage(String[][] resizeOptions, String resizeUnit, String[] styles, String[] toolbar, String[] uploadTypes) {
         JsonObject image = Json.createObject();
-        image.put("resizeOptions", toJsonArray(resizeOptions));
-        image.put("resizeUnit", Json.create(resizeUnit));
-        image.put("styles", toJsonArray(styles));
-        image.put("toolbar", toJsonArray(toolbar));
-        image.put("types", toJsonArray(upload));
+        if(resizeOptions != null && resizeOptions.length > 0)
+            image.put("options", toJsonObjectArray(IMAGE_RESIZEOPTION, resizeOptions));
+        if(resizeUnit != null)
+            image.put("resizeUnit", Json.create(resizeUnit));
+        if(styles.length > 0)
+            image.put("styles", toJsonArray(styles));
+        if(toolbar.length > 0)
+            image.put("toolbar", toJsonArray(toolbar));
+        if(uploadTypes.length > 0) {
+            JsonObject upload = Json.createObject();
+            upload.put("types", toJsonArray(uploadTypes));
+            image.put("upload", upload);
+        }
         configs.put(ConfigType.image, image);
     }
 
@@ -537,15 +659,15 @@ public class Config {
 
     /**
      * The configuration of the link feature.
-     * @param defaultProtocal    When set, the editor will add the given protocol to the link when the user creates a link without one. For example, when the user is creating a link and types
+     * @param defaultProtocol    When set, the editor will add the given protocol to the link when the user creates a link without one. For example, when the user is creating a link and types
      *                           ckeditor.com in the link form input, during link submission the editor will automatically add the http:// protocol, so the link will look as follows: http://ckeditor.com.
      *                           The feature also provides email address auto-detection. When you submit hello@example.com, the plugin will automatically change it to mailto:hello@example.com.
      * @param addTargetToExternalLinks When set to true, the target="blank" and rel="noopener noreferrer"
      *                                 attributes are automatically added to all external links in the editor. "External links" are all links in the editor content starting with http, https, or //.
      */
-    public void setLink(String defaultProtocal, Boolean addTargetToExternalLinks) {
+    public void setLink(String defaultProtocol, Boolean addTargetToExternalLinks) {
         JsonObject link = Json.createObject();
-        link.put("defaultProtocal", Json.create(defaultProtocal));
+        link.put("defaultProtocol", Json.create(defaultProtocol));
         link.put("addTargetToExternalLinks", Json.create(addTargetToExternalLinks));
         configs.put(ConfigType.link, link);
     }
@@ -570,12 +692,12 @@ public class Config {
 
     /**
      * The configuration of the mention feature.
-     * @param feeds The list of mention feeds supported by the editor.
+     * refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_mention_mention-MentionConfig.html
+     * @param mentionConfig configuration on mention.
      */
-    public void setMention(List<String> feeds) {
-        JsonObject mention = Json.createObject();
-        mention.put("feeds", toJsonArray(feeds));
-        configs.put(ConfigType.mention, mention);
+    public void setMention(MentionConfig mentionConfig) {
+        String jsonStr = new Gson().toJson(mentionConfig);
+        configs.put(ConfigType.mention, Json.instance().parse(jsonStr));
     }
 
     /**
@@ -585,9 +707,7 @@ public class Config {
     public void setRemovePlugins(List<Plugins> plugins) {
         JsonObject removePlugins = Json.createObject();
         List<String> toBeRemoved = new ArrayList<>();
-        plugins.forEach(plugin -> {
-            toBeRemoved.add(plugin.name());
-        });
+        plugins.forEach(plugin -> toBeRemoved.add(plugin.name()));
         removePlugins.put("removePlugins", toJsonArray(toBeRemoved));
         configs.put(ConfigType.removePlugins, removePlugins);
     }
@@ -621,7 +741,7 @@ public class Config {
      */
     public void setSimpleUpload(String uploadUrl, Boolean withCredentials, List<String> headers) {
         JsonObject simpleUpload = Json.createObject();
-        simpleUpload.put("uploadUrl", Json.create(uploadUrl));
+        simpleUpload.put(Config.uploadUrl, Json.create(uploadUrl));
         simpleUpload.put("withCredentials", Json.create(withCredentials));
         simpleUpload.put("headers", toJsonArray(headers));
         configs.put(ConfigType.simpleUpload, simpleUpload);
@@ -712,19 +832,49 @@ public class Config {
 
     /**
      * Use standard editing mode by invoking this method
+     * @deprecated use setEditingMode(EditingMode editingMode) instead
      */
     public void enableStandardMode() {
-        setPluginStatus(Plugins.StandardEditingMode, false);
-        setPluginStatus(Plugins.RestrictedEditingMode, true);
+        setPluginStatus(Plugins.StandardEditingMode, true);
+        setPluginStatus(Plugins.RestrictedEditingMode, false);
+        updateToolbar();
+    }
+
+    /**
+     * Premium feature which needs to set a license by #setLicenseKey
+     * Pagination works only for decoupled editor
+     */
+    public void enablePagination() {
+        setPluginStatus(Plugins.Pagination, true);
+        updateToolbar();
+    }
+
+    public void enableMinimap() {
+        setPluginStatus(Plugins.Minimap, true);
+    }
+
+    /**
+     * Used for restricted editing
+     * @param editingMode
+     */
+    public void setEditingMode(EditingMode editingMode) {
+        if(EditingMode.Restricted.equals(editingMode)) {
+            setPluginStatus(Plugins.StandardEditingMode, false);
+            setPluginStatus(Plugins.RestrictedEditingMode, true);
+        } else {
+            setPluginStatus(Plugins.StandardEditingMode, true);
+            setPluginStatus(Plugins.RestrictedEditingMode, false);
+        }
         updateToolbar();
     }
 
     /**
      * Use restricted editing mode by invoking this method
+     * @deprecated use setEditingMode(EditingMode editingMode) instead
      */
     public void enableRestrictedMode() {
-        setPluginStatus(Plugins.StandardEditingMode, true);
-        setPluginStatus(Plugins.RestrictedEditingMode, false);
+        setPluginStatus(Plugins.StandardEditingMode, false);
+        setPluginStatus(Plugins.RestrictedEditingMode, true);
         updateToolbar();
     }
 
@@ -752,6 +902,7 @@ public class Config {
      */
     private void updateToolbar() {
         JsonArray removePluginArray = (JsonArray) configs.get(ConfigType.removePlugins);
+        boolean paginationEnabled = true;
         if(removePluginArray!=null) {
             for(int i=0; i<removePluginArray.length(); i++) {
                 if(Plugins.RestrictedEditingMode.name().equals(removePluginArray.get(i).asString())) {
@@ -760,8 +911,15 @@ public class Config {
                 } else if(Plugins.StandardEditingMode.name().equals(removePluginArray.get(i).asString())){
                     changeToolbarItem(Toolbar.restrictedEditing, false);
                     changeToolbarItem(Toolbar.restrictedEditingException, true);
+                } else if(Plugins.Pagination.name().equals(removePluginArray.get(i).asString())) {
+                    paginationEnabled = false;
                 }
             }
+        }
+        if(paginationEnabled) {
+            changeToolbarItem(Toolbar.previousPage, false);
+            changeToolbarItem(Toolbar.nextPage, false);
+            changeToolbarItem(Toolbar.pageNavigation, false);
         }
     }
 
@@ -790,6 +948,38 @@ public class Config {
         wordCount.put("displayWords", Json.create(displayWords));
         wordCount.put("onUpdate", onUpdate);
         configs.put(ConfigType.wordCount, wordCount);
+    }
+
+    /**
+     * Defaulted to A4 paper
+     * @param pageWidth default 21cm
+     * @param pageHeight default 29.7cm
+     * @param top   default 20mm
+     * @param left  default 12mm
+     * @param bottom defalt 20mm
+     * @param right default 12mm
+     */
+    public void setPagination(String pageWidth, String pageHeight, String top, String left, String bottom, String right) {
+        JsonObject pagination = Json.createObject();
+        pagination.put("pageWidth", pageWidth);
+        pagination.put("pageHeight", pageHeight);
+        JsonObject pageMargins = Json.createObject();
+        pageMargins.put("top", top);
+        pageMargins.put("bottom", bottom);
+        pageMargins.put("right", right);
+        pageMargins.put("left", left);
+        pagination.put("pageMargins", pageMargins);
+        configs.put(ConfigType.pagination, pagination);
+    }
+
+    public void setPaginationA4() {
+        this.setPagination("21cm", "29.7cm", "20mm", "12mm", "20mm", "12mm");
+    }
+
+    public void setLicenseKey(String license) {
+        if (license != null && !license.trim().isEmpty()) {
+            configs.put(ConfigType.licenseKey, Json.create(license));
+        }
     }
 
 }

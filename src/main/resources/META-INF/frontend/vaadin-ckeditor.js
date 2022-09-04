@@ -1,15 +1,13 @@
-import {html, LitElement} from 'lit-element';
-import {classMap} from 'lit-html/directives/class-map';
+import {html, LitElement} from 'lit';
+import {classMap} from 'lit/directives/class-map';
 import {BalloonEditor, ClassicEditor, DcoupledEditor, InlineEditor} from './ckeditor';
 
-class VaadinCKEditor extends LitElement {
+export class VaadinCKEditor extends LitElement {
 
     constructor() {
         super();
         this.classes = {
-            'editable-container' : true,
-            'document-editor__editable'  : true,
-            'ck-editor__editable' : true
+            'editor-content'  : true
         };
         this.editorMap = {};
         this.config = {};
@@ -41,6 +39,7 @@ class VaadinCKEditor extends LitElement {
                  editorHeight: String,
                  themeType: String,
                  errorMessage: String,
+                 miniMapEnabled:Boolean,
                  isReadOnly: Boolean,
                  isFirefox: Boolean,
                  isChrome: Boolean,
@@ -130,7 +129,7 @@ class VaadinCKEditor extends LitElement {
     }
 
     getConfig() {//check if contains function
-        return this.autosave===true? {
+        let configuration = this.autosave===true? {
             ...this.config,
             ...{
                 autosave: {
@@ -141,16 +140,41 @@ class VaadinCKEditor extends LitElement {
                 }
             }
         } : this.config;
+        let minimap = {
+                minimap: {
+                    container: document.querySelector( '.minimap-container' )
+            }
+        };
+        if(this.editorType==='decoupled') {
+            return {
+                ...minimap,
+                ...configuration
+            };
+        } else {
+            return configuration;
+        }
     }
 
 
     createEditor() {
         this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , this.getConfig()).then( editor => {
             editor.id = this.editorId;
-            editor.isReadOnly = this.isReadOnly;
+            if(this.isReadOnly) {
+                editor.enableReadOnlyMode( this.editorId );
+            } else {
+                editor.disableReadOnlyMode(this.editorId);
+            }
+            console.log("editor initialized....");
+            if(this.editorType === 'classic' && typeof editor.ui.element.children[1] !== 'undefined') {
+                editor.ui.element.children[1].style.position='sticky';
+                editor.ui.element.children[1].style.top=0;
+                editor.ui.element.children[1].style.boxShadow='0 1.5px 1px -1px darkgrey';
+                editor.ui.element.children[1].style.zIndex=2;
+            }
             editor.setData(this.editorData?this.editorData:'');
-            this.style.width = this.isChrome?'-webkit-fill-available':
-                               this.isFirefox?'-moz-available':'100%';
+            this.style.width = this.style.width ? this.style.width :
+                               this.isChrome ? '-webkit-fill-available':
+                               this.isFirefox ? '-moz-available': '100%';
             this.style.height='100%';
             if(this.required) {
                 this.showIndicator(true);
@@ -164,10 +188,22 @@ class VaadinCKEditor extends LitElement {
                 //     writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
                 // }
             } );
+            editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
+                if(this.editorType === 'classic') {
+                    editor.ui.view.stickyPanel.element.children[0].style.display="none";
+                    editor.ui.view.stickyPanel.element.children[1].classList.remove("ck-sticky-panel__content_sticky");
+                    editor.ui.view.stickyPanel.element.children[1].style = "";
+                }
+            } );
             editor.model.document.on( 'change:data', (event, batch) => {
                 this.$server.setEditorData(editor.getData());
                 this.showIndicator(''===editor.getData() && this.required);
                 this.showError(this.invalid || (''===editor.getData() && this.required));
+                // if (typeof editor.ui.view.stickyPanel !== 'undefined'
+                //     && typeof editor.ui.view.stickyPanel.isSticky !== 'undefined') {
+                //     editor.ui.view.stickyPanel.isSticky = true;
+                // }
+                // console.log('*================' + window.document.documentElement.scrollTop);
             } );
             editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
                 this.focusedColor(isFocused);
@@ -182,8 +218,9 @@ class VaadinCKEditor extends LitElement {
             }
             this.editorMap[this.editorId] = editor;
             if(this.editorType==='decoupled') {
-                document.querySelector( '.toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
-                document.querySelector( '.editable-container' ).appendChild( editor.ui.view.editable.element );
+                document.querySelector( '#toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
+                // document.querySelector( "#"+this.editorId ).appendChild( editor.ui.view.editable.element );
+                editor.ui.update();
             }
         } ).catch( err => {
             console.error( err.stack );
@@ -264,22 +301,35 @@ class VaadinCKEditor extends LitElement {
         return errorStyle;
     }
 
+//     ${this.editorWidth !== 'auto'? html`
+//                 <style>
+//                     .ck.ck-editor {
+//                         width: ${this.editorWidth};
+//      }
+//      </style>`: html``}
     render() {
         return html`
             <label part="label" id="label_${this.editorId}">${this.label} </label>
             <ul part="label-ul"><li part="label-li">
                 <div part="error-message" id="error_${this.editorId}">${this.errorMessage}</div>
             </li></ul>
-            ${this.editorWidth !== 'auto'? html`
-                <style>
-                    .ck.ck-editor {
-                        width: ${this.editorWidth};
-                    }
-                </style>`: html``} 
+            
             ${this.editorType==='decoupled' ? html`
-                <div class="toolbar-container"></div>
-                <div class="editable-container"></div>
-                <div id="${this.editorId}" class=${classMap(this.classes)}/>
+                <div id="document-container">
+                    <div id="toolbar-container">
+                        <!-- This is where the document editor toolbar will be inserted. -->
+                    </div>
+                    <div class="minimap-wrapper">
+                        <div class="editor-container">
+                            <div id="${this.editorId}" class=${classMap(this.classes)}>
+                                <!-- This is where the edited content will render (the page). -->
+                            </div>
+                        </div>
+                        <div class="minimap-container" style="display: ${ this.miniMapEnabled ? 'block' : 'none' }">
+                            <!-- This is where the minimap will be inserted. -->
+                        </div>
+                    </div>
+                </div>
             `:html`<div id="${this.editorId}"/>`}
         `;
     }
