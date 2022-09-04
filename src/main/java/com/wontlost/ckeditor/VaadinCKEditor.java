@@ -5,13 +5,14 @@ import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.dependency.NpmPackage;
 import com.wontlost.ckeditor.Constants.EditorType;
 import com.wontlost.ckeditor.Constants.SanitizeType;
 import com.wontlost.ckeditor.Constants.ThemeType;
 import org.jsoup.Jsoup;
 
 import java.util.Optional;
-import java.util.Random;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +27,8 @@ import java.util.logging.Logger;
 @JsModule("./translations/ast.js")
 @JsModule("./translations/az.js")
 @JsModule("./translations/bg.js")
+@JsModule("./translations/bn.js")
+@JsModule("./translations/bs.js")
 @JsModule("./translations/ca.js")
 @JsModule("./translations/cs.js")
 @JsModule("./translations/da.js")
@@ -50,6 +53,7 @@ import java.util.logging.Logger;
 @JsModule("./translations/id.js")
 @JsModule("./translations/it.js")
 @JsModule("./translations/ja.js")
+@JsModule("./translations/jv.js")
 @JsModule("./translations/km.js")
 @JsModule("./translations/kn.js")
 @JsModule("./translations/ko.js")
@@ -81,10 +85,12 @@ import java.util.logging.Logger;
 @JsModule("./translations/ug.js")
 @JsModule("./translations/uz.js")
 @JsModule("./translations/uk.js")
+@JsModule("./translations/ur.js")
 @JsModule("./translations/vi.js")
 @JsModule("./translations/zh.js")
 @JsModule("./translations/zh-cn.js")
 @CssImport("./ckeditor.css")
+@NpmPackage(value = "lit", version = "^2.2.0")
 public class VaadinCKEditor extends CustomField<String> implements HasConfig {
 
     private String editorData;
@@ -110,7 +116,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
 
     @Override
     public void setId(String id) {
-        getElement().setProperty("editorId", id==null? "editor_"+Math.abs(new Random().nextInt()+1): id);
+        getElement().setProperty("editorId", id==null? "editor_"+ UUID.randomUUID(): id);
     }
 
     @Override
@@ -169,9 +175,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
      * @param content editor content
      */
     private void updateValue(String content) {
-        if(getId().isPresent()) {
-            getElement().executeJs("this.updateData($0, $1)", getId().get(), content==null?"":content);
-        }
+        getId().ifPresent(id -> getElement().executeJs("this.updateData($0, $1)", id, content==null?"":content));
     }
 
     /**

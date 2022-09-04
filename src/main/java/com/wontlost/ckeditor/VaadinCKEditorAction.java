@@ -7,21 +7,24 @@ import java.util.logging.Logger;
 
 public class VaadinCKEditorAction {
 
-    public static String AUTOSAVE="autosave";
+    public static final String AUTOSAVE="autosave";
 
     private static final Map<String, IsAction> actionRegister = new HashMap<>();
 
     private static final Logger vaddinCKEditorActionLog = Logger.getLogger(VaadinCKEditorAction.class.getName());
 
+    private VaadinCKEditorAction() {
+
+    }
     /**
      * Should be used with method setAutosave. This is a default action.
      */
     private static final AutosaveAction autosaveAction = new AutosaveAction() {
         public void accept(String editorId, String editorData) {
-            vaddinCKEditorActionLog.log(Level.WARNING, "Saved for ["+editorId+"]," +
+            vaddinCKEditorActionLog.log(Level.WARNING, "Saved for [{0}]," +
                     " This is a sample of autosave action. You need to fulfill your own action by " +
                     "extending AutosaveAction. And then register it by " +
-                    "registerAction(VaadinCKEditorAction.AUTOSAVE, AutosaveAtion).");
+                    "registerAction(VaadinCKEditorAction.AUTOSAVE, AutosaveAtion).", editorId);
         }
     };
 

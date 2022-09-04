@@ -1,8 +1,8 @@
-import {html, LitElement} from 'lit-element';
-import {classMap} from 'lit-html/directives/class-map';
+import {html, LitElement} from 'lit';
+import {classMap} from 'lit/directives/class-map';
 import {BalloonEditor, ClassicEditor, DcoupledEditor, InlineEditor} from './ckeditor';
 
-class VaadinCKEditor extends LitElement {
+export class VaadinCKEditor extends LitElement {
 
     constructor() {
         super();
@@ -159,7 +159,11 @@ class VaadinCKEditor extends LitElement {
     createEditor() {
         this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , this.getConfig()).then( editor => {
             editor.id = this.editorId;
-            editor.isReadOnly = this.isReadOnly;
+            if(this.isReadOnly) {
+                editor.enableReadOnlyMode( this.editorId );
+            } else {
+                editor.disableReadOnlyMode(this.editorId);
+            }
             console.log("editor initialized....");
             if(this.editorType === 'classic' && typeof editor.ui.element.children[1] !== 'undefined') {
                 editor.ui.element.children[1].style.position='sticky';
