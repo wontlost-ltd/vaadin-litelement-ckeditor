@@ -44,6 +44,7 @@ export class VaadinCKEditor extends LitElement {
                  isFirefox: Boolean,
                  isChrome: Boolean,
                  autosave: Boolean,
+                 hideToolbar: Boolean,
                  editorMap: Object,
                  config: Object};
     }
@@ -159,10 +160,18 @@ export class VaadinCKEditor extends LitElement {
     createEditor() {
         this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , this.getConfig()).then( editor => {
             editor.id = this.editorId;
+            const toolbar = editor.ui.view.toolbar;
             if(this.isReadOnly) {
                 editor.enableReadOnlyMode( this.editorId );
             } else {
                 editor.disableReadOnlyMode(this.editorId);
+            }
+            if(toolbar) {
+                if(this.hideToolbar) {
+                    toolbar.element.style.display = 'none';
+                } else {
+                    toolbar.element.style.display = 'flex';
+                }
             }
             console.log("editor initialized....");
             if(this.editorType === 'classic' && typeof editor.ui.element.children[1] !== 'undefined') {
@@ -208,6 +217,21 @@ export class VaadinCKEditor extends LitElement {
             editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
                 this.focusedColor(isFocused);
             } );
+
+            editor.on( 'change:isReadOnly', ( evt, propertyName, isReadOnly ) => {
+                if ( isReadOnly ) {
+                    editor.enableReadOnlyMode( this.editorId );
+                } else {
+                    editor.disableReadOnlyMode(this.editorId);
+                }
+                if(toolbar) {
+                    if ( this.hideToolbar ) {
+                        toolbar.element.style.display = 'none';
+                    } else {
+                        toolbar.element.style.display = 'flex';
+                    }
+                }
+            } );
             window.saveData = function( editorId, editorData ) {
                 return new Promise( resolve => {
                     setTimeout( () => {
@@ -230,6 +254,12 @@ export class VaadinCKEditor extends LitElement {
     updateData(editorId, value) {
         if(this.editorMap && this.editorMap[editorId]) {
             this.editorMap[editorId].setData(value);
+        }
+    }
+
+    fire(editorId, event, property, value) {
+        if(this.editorMap && this.editorMap[editorId]) {
+            this.editorMap[editorId].fire(event, property, value);
         }
     }
 

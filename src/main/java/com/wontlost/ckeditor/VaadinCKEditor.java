@@ -216,6 +216,20 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
     @Override
     public void setReadOnly(boolean readOnly) {
         getElement().setProperty("isReadOnly", readOnly);
+        getId().ifPresent(id->getElement().executeJs("this.fire($0, $1, $2, $3)", id, "change:isReadOnly", "isReadOnly", readOnly));
+    }
+
+    public void setReadOnlyWithToolbarAction(boolean readOnly) {
+        setReadOnly(readOnly);
+        setHideToolbar(readOnly);
+    }
+
+    public void setHideToolbar(boolean hideToolbar) {
+        getElement().setProperty("hideToolbar", hideToolbar);
+    }
+
+    public boolean isReadOnly() {
+        return getElement().getProperty("isReadOnly", false);
     }
 
     /**

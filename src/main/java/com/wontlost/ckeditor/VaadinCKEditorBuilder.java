@@ -1,8 +1,9 @@
 package com.wontlost.ckeditor;
 
-import java.util.function.Consumer;
+import com.wontlost.ckeditor.Constants.EditorType;
+import com.wontlost.ckeditor.Constants.ThemeType;
 
-import com.wontlost.ckeditor.Constants.*;
+import java.util.function.Consumer;
 
 public class VaadinCKEditorBuilder {
 
@@ -15,6 +16,8 @@ public class VaadinCKEditorBuilder {
     public ThemeType theme;
     public Boolean readOnly = false;
     public Boolean autosave = false;
+
+    public Boolean hideToolbar = false;
     public Boolean minimap = false;
 
     public EditorType editorType = EditorType.CLASSIC;
@@ -34,6 +37,7 @@ public class VaadinCKEditorBuilder {
         editor.setConfig(config);
         editor.setReadOnly(readOnly);
         editor.setAutosave(autosave);
+        editor.setHideToolbar(hideToolbar);
         editor.setEditorType(editorType);
         if(editorType.equals(EditorType.DECOUPLED)) {
             editor.minimap(minimap);
