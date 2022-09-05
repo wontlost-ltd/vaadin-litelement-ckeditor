@@ -268,4 +268,12 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
         return Jsoup.clean(editorData, type.getValue());
     }
 
+    /**
+     *
+     * @return content without html tags
+     */
+    public String getContentText() {
+        return Jsoup.parse(this.editorData).text();
+    }
+
 }
