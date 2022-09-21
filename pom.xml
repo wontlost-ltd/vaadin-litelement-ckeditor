@@ -5,7 +5,7 @@
     <groupId>com.wontlost</groupId>
     <artifactId>ckeditor-vaadin</artifactId>
     <packaging>jar</packaging>
-    <version>3.0.1</version>
+    <version>3.1.1</version>
     <name>CKEditorVaadin</name>
     <description>Integration of CKEditor 5 for Vaadin</description>
     <scm>
@@ -14,14 +14,11 @@
         <developerConnection>scm:git:git@https://github.com/eroself/vaadin-litelement-ckeditor.git</developerConnection>
     </scm>
     <properties>
-        <vaadin.version>23.1.7</vaadin.version>
+        <vaadin.version>23.2.1</vaadin.version>
         <vaadin-applayout-addon.version>4.0.0.rc5</vaadin-applayout-addon.version>
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-        <drivers.dir>${project.basedir}/drivers</drivers.dir>
-
         <jetty.version>9.4.27.v20200227</jetty.version>
     </properties>
     <organization>
