@@ -3,4 +3,4 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
   export PATH=$PATH:$JAVA_HOME/bin
 fi
 rm -rf target &&
-mvn install -Pdirectory
+mvn clean install -Pdirectory
