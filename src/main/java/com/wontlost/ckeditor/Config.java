@@ -21,6 +21,10 @@ public class Config {
 
     static final String uploadUrl = "uploadUrl";
 
+    static final String allow = "allow";
+
+    static final String disallow = "disallow";
+
     static final String[] HEADING_OPTION = {"model", "view", "title", "class"};
     static final String[] CODEBLOCK_LANGUAGE = {"language", "label", "class"};
     static final String[] IMAGE_RESIZEOPTION = {"name", "value", "label"};
@@ -236,6 +240,10 @@ public class Config {
         List<String> values = Arrays.asList(list==null?new String[0]:list);
         String toolbarJson = new Gson().toJson(values);
         return Json.instance().parse(toolbarJson);
+    }
+
+    JsonArray mapToJsonArray(List<Map<String, Object>> mapList) {
+        return Json.instance().parse(new Gson().toJson(mapList));
     }
 
     /**

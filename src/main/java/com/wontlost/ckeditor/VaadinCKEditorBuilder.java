@@ -17,6 +17,7 @@ public class VaadinCKEditorBuilder {
     public Boolean readOnly = false;
     public Boolean autosave = false;
 
+    public Boolean ghsEnabled = false;
     public Boolean hideToolbar = false;
     public Boolean minimap = false;
 
@@ -39,6 +40,7 @@ public class VaadinCKEditorBuilder {
         editor.setAutosave(autosave);
         editor.setHideToolbar(hideToolbar);
         editor.setEditorType(editorType);
+        editor.enableGHS(ghsEnabled);
         if(editorType.equals(EditorType.DECOUPLED)) {
             editor.minimap(minimap);
         }

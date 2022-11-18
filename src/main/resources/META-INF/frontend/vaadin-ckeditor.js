@@ -44,6 +44,7 @@ export class VaadinCKEditor extends LitElement {
                  isFirefox: Boolean,
                  isChrome: Boolean,
                  autosave: Boolean,
+                 ghsEnabled: Boolean,
                  hideToolbar: Boolean,
                  editorMap: Object,
                  config: Object};
@@ -130,6 +131,24 @@ export class VaadinCKEditor extends LitElement {
     }
 
     getConfig() {//check if contains function
+        let htmlSupport = {
+            htmlSupport: {
+                allow: [
+                    {
+                        name: /.*/,
+                        attributes: true,
+                        classes: true,
+                        styles: true
+                    }
+                ]
+            }
+        };
+        if(this.ghsEnabled) {
+            this.config = {
+                ...htmlSupport,
+                ...this.config
+            };
+        }
         let configuration = this.autosave===true? {
             ...this.config,
             ...{
