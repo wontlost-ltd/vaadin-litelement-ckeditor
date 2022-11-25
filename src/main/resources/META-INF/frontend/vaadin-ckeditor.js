@@ -11,6 +11,7 @@ export class VaadinCKEditor extends LitElement {
         };
         this.editorMap = {};
         this.config = {};
+        this.version = 'v3.1.5';
         this.autosave = false;
         this.isFirefox = typeof InstallTrigger !== 'undefined';
         this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
@@ -131,24 +132,6 @@ export class VaadinCKEditor extends LitElement {
     }
 
     getConfig() {//check if contains function
-        let htmlSupport = {
-            htmlSupport: {
-                allow: [
-                    {
-                        name: /.*/,
-                        attributes: true,
-                        classes: true,
-                        styles: true
-                    }
-                ]
-            }
-        };
-        if(this.ghsEnabled) {
-            this.config = {
-                ...htmlSupport,
-                ...this.config
-            };
-        }
         let configuration = this.autosave===true? {
             ...this.config,
             ...{
@@ -160,6 +143,21 @@ export class VaadinCKEditor extends LitElement {
                 }
             }
         } : this.config;
+        configuration = this.ghsEnabled===true? {
+            ...configuration,
+            ...{
+                htmlSupport: {
+                    allow: [
+                        {
+                            name: /.*/,
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        }
+                    ]
+                }
+            }
+        } : configuration;
         let minimap = {
                 minimap: {
                     container: document.querySelector( '.minimap-container' )
@@ -192,7 +190,8 @@ export class VaadinCKEditor extends LitElement {
                     toolbar.element.style.display = 'flex';
                 }
             }
-            console.log("editor initialized....");
+            console.log({...{"ckeditor-vaadin":this.version},
+                         ...this.getConfig()});
             if(this.editorType === 'classic' && typeof editor.ui.element.children[1] !== 'undefined') {
                 editor.ui.element.children[1].style.position='sticky';
                 editor.ui.element.children[1].style.top=0;
