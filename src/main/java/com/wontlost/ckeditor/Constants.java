@@ -90,6 +90,7 @@ public class Constants {
         en_gb("en-gb"),
         eo("eo"),
         es("es"),
+        es_co("es-co"),
         et("et"),
         eu("eu"),
         fa("fa"),

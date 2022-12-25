@@ -1,6 +1,6 @@
 import {html, LitElement} from 'lit';
 import {classMap} from 'lit/directives/class-map.js';
-import {BalloonEditor, ClassicEditor, DcoupledEditor, InlineEditor} from './ckeditor';
+import * as EDITORS from './ckeditor';
 
 export class VaadinCKEditor extends LitElement {
 
@@ -11,7 +11,7 @@ export class VaadinCKEditor extends LitElement {
         };
         this.editorMap = {};
         this.config = {};
-        this.version = 'v3.1.5';
+        this.version = 'v3.2.0';
         this.autosave = false;
         this.isFirefox = typeof InstallTrigger !== 'undefined';
         this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
@@ -116,17 +116,17 @@ export class VaadinCKEditor extends LitElement {
 
     getEditorByType(editorType) {
         if(typeof CKEDITOR !== 'undefined' && CKEDITOR !== null) {
-            return 'classic'===editorType?CKEDITOR.ClassicEditor:
-                   'inline'===editorType?CKEDITOR.InlineEditor:
-                   'balloon'===editorType?CKEDITOR.BalloonEditor:
-                   'decoupled'===editorType?CKEDITOR.DcoupledEditor:
+            return 'classic'===editorType?CKEDITOR.VaadinClassicEditor:
+                   'inline'===editorType?CKEDITOR.VaadinInlineEditor:
+                   'balloon'===editorType?CKEDITOR.VaadinBalloonEditor:
+                   'decoupled'===editorType?CKEDITOR.VaadinDcoupledEditor:
                    ClassicEditor;
         } else {
-            return 'classic'===editorType?ClassicEditor:
-                   'inline'===editorType?InlineEditor:
-                   'balloon'===editorType?BalloonEditor:
-                   'decoupled'===editorType?DcoupledEditor:
-                   ClassicEditor;
+            return 'classic'===editorType?EDITORS.CKEDITOR.VaadinClassicEditor:
+                   'inline'===editorType?EDITORS.CKEDITOR.VaadinInlineEditor:
+                   'balloon'===editorType?EDITORS.CKEDITOR.VaadinBalloonEditor:
+                   'decoupled'===editorType?EDITORS.CKEDITOR.VaadinDcoupledEditor:
+                   EDITORS.CKEDITOR.VaadinClassicEditor;
         }
 
     }
