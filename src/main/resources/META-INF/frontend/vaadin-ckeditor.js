@@ -9,9 +9,8 @@ export class VaadinCKEditor extends LitElement {
         this.classes = {
             'editor-content'  : true
         };
-        this.editorMap = {};
         this.config = {};
-        this.version = 'v3.2.0';
+        this.version = 'v3.2.1';
         this.autosave = false;
         this.isFirefox = typeof InstallTrigger !== 'undefined';
         this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
@@ -137,7 +136,7 @@ export class VaadinCKEditor extends LitElement {
             ...{
                 autosave: {
                     save( editor ) {
-                        return window.saveData( editor.id, editor.getData() );
+                        return window.vaadinCKEditor.saveData( editor.id, editor.getData() );
                     },
                     waitingTime: 2000
                 }
@@ -178,6 +177,7 @@ export class VaadinCKEditor extends LitElement {
         this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , this.getConfig()).then( editor => {
             editor.id = this.editorId;
             const toolbar = editor.ui.view.toolbar;
+            window.vaadinCKEditor.serverMap[editor.id] = this.$server;
             if(this.isReadOnly) {
                 editor.enableReadOnlyMode( this.editorId );
             } else {
@@ -204,9 +204,8 @@ export class VaadinCKEditor extends LitElement {
                                this.isFirefox ? '-moz-available': '100%';
             this.style.height='100%';
             if(this.required) {
-                this.showIndicator(true);
+                window.vaadinCKEditor.showIndicator(editor,true);
             }
-            window.server = this.$server;
             editor.editing.view.change( writer => {
                 if(this.editorHeight) {
                     writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
@@ -215,17 +214,41 @@ export class VaadinCKEditor extends LitElement {
                 //     writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
                 // }
             } );
-            editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
+            // editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
+            //     if(this.editorType === 'classic') {
+            //         editor.ui.view.stickyPanel.element.children[0].style.display="none";
+            //         editor.ui.view.stickyPanel.element.children[1].classList.remove("ck-sticky-panel__content_sticky");
+            //         editor.ui.view.stickyPanel.element.children[1].style = "";
+            //     }
+            // } );
+            window.vaadinCKEditor.sourceEditObserver(editor, this.required, this.invalid);
+
+            editor.ui.focusTracker.on( 'change:isFocused', ( evt, data, isFocused ) => {
                 if(this.editorType === 'classic') {
                     editor.ui.view.stickyPanel.element.children[0].style.display="none";
                     editor.ui.view.stickyPanel.element.children[1].classList.remove("ck-sticky-panel__content_sticky");
                     editor.ui.view.stickyPanel.element.children[1].style = "";
                 }
+                if(evt.source.focusedElement && typeof evt.source.focusedElement !== 'undefined') {
+                    let sourceEdit = evt.source.focusedElement?.offsetParent;
+                    if(sourceEdit && sourceEdit.className === 'ck-source-editing-area') {
+                        window.vaadinCKEditor.sourceDataObserverMap[editor.id]?.observe(sourceEdit, {
+                            attributes: true //configure it to listen to attribute changes
+                        });
+                    }
+                } else {
+                    let sourceEdit = document.querySelector("#"+editor.id).parentElement.querySelector("div.ck-source-editing-area");
+                    if(sourceEdit) {//loose focus action in source edit mode
+                        let sourceEditValue = sourceEdit.getAttribute("data-value");
+                        window.vaadinCKEditor.setAndCheck(editor, sourceEditValue, this.required, this.invalid);
+                    }
+                }
             } );
+
             editor.model.document.on( 'change:data', (event, batch) => {
-                this.$server.setEditorData(editor.getData());
-                this.showIndicator(''===editor.getData() && this.required);
-                this.showError(this.invalid || (''===editor.getData() && this.required));
+                window.vaadinCKEditor.serverMap[editor.id].setEditorData(editor.getData());
+                window.vaadinCKEditor.showIndicator(editor,''===editor.getData() && this.required);
+                window.vaadinCKEditor.showError(editor,this.invalid || (''===editor.getData() && this.required));
                 // if (typeof editor.ui.view.stickyPanel !== 'undefined'
                 //     && typeof editor.ui.view.stickyPanel.isSticky !== 'undefined') {
                 //     editor.ui.view.stickyPanel.isSticky = true;
@@ -233,14 +256,14 @@ export class VaadinCKEditor extends LitElement {
                 // console.log('*================' + window.document.documentElement.scrollTop);
             } );
             editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
-                this.focusedColor(isFocused);
+                window.vaadinCKEditor.focusedColor(editor, isFocused);
             } );
 
             editor.on( 'change:isReadOnly', ( evt, propertyName, isReadOnly ) => {
                 if ( isReadOnly ) {
-                    editor.enableReadOnlyMode( this.editorId );
+                    editor.enableReadOnlyMode( editor.id );
                 } else {
-                    editor.disableReadOnlyMode(this.editorId);
+                    editor.disableReadOnlyMode( editor.id );
                 }
                 if(toolbar) {
                     if ( this.hideToolbar ) {
@@ -250,15 +273,15 @@ export class VaadinCKEditor extends LitElement {
                     }
                 }
             } );
-            window.saveData = function( editorId, editorData ) {
+            window.vaadinCKEditor.saveData = function( editorId, editorData ) {
                 return new Promise( resolve => {
                     setTimeout( () => {
-                        server.saveEditorData(editorId, editorData);
+                        window.vaadinCKEditor.serverMap[editorId].saveEditorData(editorData);
                         resolve();
                     }, 400 );
                 } );
             }
-            this.editorMap[this.editorId] = editor;
+            window.vaadinCKEditor.editorMap[editor.id] = editor;
             if(this.editorType==='decoupled') {
                 document.querySelector( '#toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
                 // document.querySelector( "#"+this.editorId ).appendChild( editor.ui.view.editable.element );
@@ -270,84 +293,84 @@ export class VaadinCKEditor extends LitElement {
     }
 
     updateData(editorId, value) {
-        if(this.editorMap && this.editorMap[editorId]) {
-            this.editorMap[editorId].setData(value);
+        if(window.vaadinCKEditor.editorMap && window.vaadinCKEditor.editorMap[editorId]) {
+            window.vaadinCKEditor.editorMap[editorId].setData(value);
         }
     }
 
     fire(editorId, event, property, value) {
-        if(this.editorMap && this.editorMap[editorId]) {
-            this.editorMap[editorId].fire(event, property, value);
+        if(window.vaadinCKEditor.editorMap && window.vaadinCKEditor.editorMap[editorId]) {
+            window.vaadinCKEditor.editorMap[editorId].fire(event, property, value);
         }
     }
 
-    showIndicator(shown) {
-        let labelId = 'label_'+this.editorId;
-        let newStyle = this.contains('#'+labelId+'::after');
-        if(!newStyle) {
-            document.head.appendChild(shown?this.opacity(1):this.opacity(0));
-        } else {
-            newStyle.style.opacity = shown ? 1 : 0;
-        }
-    }
-
-    showError(shown) {
-        let errorId = 'error_'+this.editorId;
-        let errorStyle = this.contains('#'+errorId);
-        if(!errorStyle) {
-            document.head.appendChild(shown?this.display('block'):this.display('none'));
-        } else {
-            errorStyle.style.display = shown ? 'block' : 'none';
-        }
-    }
-
-    focusedColor(isFocused) {
-        let id = 'label_'+this.editorId;
-        let newColor = this.contains('#'+id);
-        if(!newColor) {
-            document.head.appendChild(isFocused? this.color('var(--lumo-primary-text-color)'):
-                this.color('var(--lumo-secondary-text-color)'));
-        } else {
-            newColor.style.color=isFocused?'var(--lumo-primary-text-color)':'var(--lumo-secondary-text-color)';
-        }
-    }
-
-    contains(style) {
-        const styleSheets = Array.from(document.styleSheets).filter(
-            (styleSheet) => !styleSheet.href || styleSheet.href.startsWith(window.location.origin)
-        );
-        for (let styleSheet of styleSheets) {
-            if (styleSheet instanceof CSSStyleSheet && styleSheet.cssRules) {
-                for(let cssRule of styleSheet.cssRules) {
-                    if(style===cssRule.selectorText) {
-                        return cssRule;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    opacity(value) {
-        let labelId = 'label_'+this.editorId;
-        let newLabelAfter = document.createElement('style');
-        newLabelAfter.innerHTML = `#`+labelId+`::after{ opacity:`+value+` }`;
-        return newLabelAfter;
-    }
-
-    color(value) {
-        let labelId = 'label_'+this.editorId;
-        let newColor = document.createElement('style');
-        newColor.innerHTML = `#`+labelId+`{ color :`+value+` }`;
-        return newColor;
-    }
-
-    display(value) {
-        let errorId = 'error_'+this.editorId;
-        let errorStyle = document.createElement('style');
-        errorStyle.innerHTML = `#`+errorId+`{ display :`+value+` }`;
-        return errorStyle;
-    }
+    // showIndicator(shown) {
+    //     let labelId = 'label_'+this.editorId;
+    //     let newStyle = this.contains('#'+labelId+'::after');
+    //     if(!newStyle) {
+    //         document.head.appendChild(shown?this.opacity(1):this.opacity(0));
+    //     } else {
+    //         newStyle.style.opacity = shown ? 1 : 0;
+    //     }
+    // }
+    //
+    // showError(shown) {
+    //     let errorId = 'error_'+this.editorId;
+    //     let errorStyle = this.contains('#'+errorId);
+    //     if(!errorStyle) {
+    //         document.head.appendChild(shown?this.display('block'):this.display('none'));
+    //     } else {
+    //         errorStyle.style.display = shown ? 'block' : 'none';
+    //     }
+    // }
+    //
+    // focusedColor(isFocused) {
+    //     let id = 'label_'+this.editorId;
+    //     let newColor = this.contains('#'+id);
+    //     if(!newColor) {
+    //         document.head.appendChild(isFocused? this.color('var(--lumo-primary-text-color)'):
+    //             this.color('var(--lumo-secondary-text-color)'));
+    //     } else {
+    //         newColor.style.color=isFocused?'var(--lumo-primary-text-color)':'var(--lumo-secondary-text-color)';
+    //     }
+    // }
+    //
+    // contains(style) {
+    //     const styleSheets = Array.from(document.styleSheets).filter(
+    //         (styleSheet) => !styleSheet.href || styleSheet.href.startsWith(window.location.origin)
+    //     );
+    //     for (let styleSheet of styleSheets) {
+    //         if (styleSheet instanceof CSSStyleSheet && styleSheet.cssRules) {
+    //             for(let cssRule of styleSheet.cssRules) {
+    //                 if(style===cssRule.selectorText) {
+    //                     return cssRule;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     return false;
+    // }
+    //
+    // opacity(value) {
+    //     let labelId = 'label_'+this.editorId;
+    //     let newLabelAfter = document.createElement('style');
+    //     newLabelAfter.innerHTML = `#`+labelId+`::after{ opacity:`+value+` }`;
+    //     return newLabelAfter;
+    // }
+    //
+    // color(value) {
+    //     let labelId = 'label_'+this.editorId;
+    //     let newColor = document.createElement('style');
+    //     newColor.innerHTML = `#`+labelId+`{ color :`+value+` }`;
+    //     return newColor;
+    // }
+    //
+    // display(value) {
+    //     let errorId = 'error_'+this.editorId;
+    //     let errorStyle = document.createElement('style');
+    //     errorStyle.innerHTML = `#`+errorId+`{ display :`+value+` }`;
+    //     return errorStyle;
+    // }
 
 //     ${this.editorWidth !== 'auto'? html`
 //                 <style>

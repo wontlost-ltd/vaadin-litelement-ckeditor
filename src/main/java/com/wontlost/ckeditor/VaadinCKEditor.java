@@ -13,7 +13,7 @@ import org.jsoup.Jsoup;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,6 +21,7 @@ import java.util.logging.Logger;
  * Used in @VaadinCKEditorBuilder.
  */
 @Tag("vaadin-ckeditor")
+@JsModule("./vaadin-ckeditor-utils.js")
 @JsModule("./vaadin-ckeditor.js")
 @JsModule("./translations/af.js")
 @JsModule("./translations/ar.js")
@@ -39,6 +40,7 @@ import java.util.logging.Logger;
 @JsModule("./translations/en-gb.js")
 @JsModule("./translations/eo.js")
 @JsModule("./translations/es.js")
+@JsModule("./translations/es-co.js")
 @JsModule("./translations/et.js")
 @JsModule("./translations/eu.js")
 @JsModule("./translations/fa.js")
@@ -89,8 +91,9 @@ import java.util.logging.Logger;
 @JsModule("./translations/vi.js")
 @JsModule("./translations/zh.js")
 @JsModule("./translations/zh-cn.js")
+
 @CssImport("./ckeditor.css")
-@NpmPackage(value = "lit", version = "^2.3.0")
+@NpmPackage(value = "lit", version = "^2.6.1")
 public class VaadinCKEditor extends CustomField<String> implements HasConfig {
 
     private String editorData;
@@ -160,14 +163,14 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
     }
 
     @ClientCallable
-    private void saveEditorData(String editorId, String editorData) {
+    private void saveEditorData(String editorData) {
         IsAction autosaveAction = VaadinCKEditorAction.getActionRegister().get(VaadinCKEditorAction.AUTOSAVE);
-        Optional<BiConsumer<String, String>> save = Optional.empty();
+        Optional<Consumer<String>> save = Optional.empty();
         if(autosaveAction instanceof AutosaveAction) {
             save = Optional.of((AutosaveAction)autosaveAction);
         }
-        save.orElse((id, data)-> vaddinCKEditorLog.log(Level.SEVERE, "Invalid action provided. " +
-                "You need to imply your own actions of saving editor data.")).accept(editorId, editorData);
+        save.orElse((data)-> vaddinCKEditorLog.log(Level.SEVERE, "Invalid action provided. " +
+                "You need to imply your own actions of saving editor data.")).accept(editorData);
     }
 
     /**

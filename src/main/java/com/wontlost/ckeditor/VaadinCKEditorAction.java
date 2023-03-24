@@ -20,11 +20,11 @@ public class VaadinCKEditorAction {
      * Should be used with method setAutosave. This is a default action.
      */
     private static final AutosaveAction autosaveAction = new AutosaveAction() {
-        public void accept(String editorId, String editorData) {
-            vaddinCKEditorActionLog.log(Level.WARNING, "Saved for [{0}]," +
+        public void accept(String editorData) {
+            vaddinCKEditorActionLog.log(Level.WARNING, "Saving data [{0}]," +
                     " This is a sample of autosave action. You need to fulfill your own action by " +
                     "extending AutosaveAction. And then register it by " +
-                    "registerAction(VaadinCKEditorAction.AUTOSAVE, AutosaveAtion).", editorId);
+                    "registerAction(VaadinCKEditorAction.AUTOSAVE, AutosaveAtion).", editorData);
         }
     };
 
