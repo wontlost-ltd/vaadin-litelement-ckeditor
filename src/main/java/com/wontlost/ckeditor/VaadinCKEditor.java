@@ -283,4 +283,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
         return Jsoup.parse(this.editorData).text();
     }
 
+    public void setOverrideCssUrl(String overrideCssUrl) {
+        Optional.ofNullable(overrideCssUrl).ifPresent(url->getElement().setProperty("overrideCssUrl", url));
+    }
 }

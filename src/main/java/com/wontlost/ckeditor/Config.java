@@ -713,11 +713,9 @@ public class Config {
      * @param plugins names of plugin
      */
     public void setRemovePlugins(List<Plugins> plugins) {
-        JsonObject removePlugins = Json.createObject();
         List<String> toBeRemoved = new ArrayList<>();
         plugins.forEach(plugin -> toBeRemoved.add(plugin.name()));
-        removePlugins.put("removePlugins", toJsonArray(toBeRemoved));
-        configs.put(ConfigType.removePlugins, removePlugins);
+        configs.put(ConfigType.removePlugins, toJsonArray(toBeRemoved));
     }
 
     /**

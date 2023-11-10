@@ -10,7 +10,7 @@ export class VaadinCKEditor extends LitElement {
             'editor-content'  : true
         };
         this.config = {};
-        this.version = 'v3.2.1';
+        this.version = 'v3.2.2';
         this.autosave = false;
         this.isFirefox = typeof InstallTrigger !== 'undefined';
         this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
@@ -39,6 +39,7 @@ export class VaadinCKEditor extends LitElement {
                  editorHeight: String,
                  themeType: String,
                  errorMessage: String,
+            	 overrideCssUrl: String,
                  miniMapEnabled:Boolean,
                  isReadOnly: Boolean,
                  isFirefox: Boolean,
@@ -110,6 +111,7 @@ export class VaadinCKEditor extends LitElement {
         if(this.themeType==='dark') {
             this.initDarkTheme();
         }
+
         this.createEditor();
     }
 
@@ -174,7 +176,7 @@ export class VaadinCKEditor extends LitElement {
 
 
     createEditor() {
-        this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , this.getConfig()).then( editor => {
+        this.getEditorByType(this.editorType).create(this.shadowRoot.querySelector( "#"+this.editorId ) , this.getConfig()).then( editor => {
             editor.id = this.editorId;
             const toolbar = editor.ui.view.toolbar;
             window.vaadinCKEditor.serverMap[editor.id] = this.$server;
@@ -286,6 +288,10 @@ export class VaadinCKEditor extends LitElement {
                 document.querySelector( '#toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
                 // document.querySelector( "#"+this.editorId ).appendChild( editor.ui.view.editable.element );
                 editor.ui.update();
+            }
+
+            if(this.overrideCssUrl) {
+                window.vaadinCKEditor.importStyle(this, this.overrideCssUrl);
             }
         } ).catch( err => {
             console.error( err.stack );
