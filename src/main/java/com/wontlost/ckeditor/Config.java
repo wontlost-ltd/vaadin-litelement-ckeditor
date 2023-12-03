@@ -58,6 +58,7 @@ public class Config {
             Toolbar.todoList,
             Toolbar.indent,
             Toolbar.outdent,
+            Toolbar.lineHeight,
             Toolbar.code,
             Toolbar.sourceEditing,
             Toolbar.codeBlock,
@@ -117,6 +118,7 @@ public class Config {
         configs.put(ConfigType.heading, Json.createObject());
         configs.put(ConfigType.highlight, Json.createObject());
         configs.put(ConfigType.image, Json.createObject());
+        configs.put(ConfigType.lineHeight, Json.createObject());
         configs.put(ConfigType.indentBlock, Json.createObject());
         configs.put(ConfigType.initialData, Json.create(""));
         configs.put(ConfigType.language, Json.create("en"));
@@ -152,6 +154,7 @@ public class Config {
         configs.put(ConfigType.fontSize, jsonObject.get(ConfigType.fontSize.name()));
         configs.put(ConfigType.heading, jsonObject.get(ConfigType.heading.name()));
         configs.put(ConfigType.highlight, jsonObject.get(ConfigType.highlight.name()));
+        configs.put(ConfigType.lineHeight, jsonObject.get(ConfigType.lineHeight.name()));
         configs.put(ConfigType.image, jsonObject.get(ConfigType.image.name()));
         configs.put(ConfigType.indentBlock, jsonObject.get(ConfigType.indentBlock.name()));
         configs.put(ConfigType.initialData, jsonObject.get(ConfigType.initialData.name()));
@@ -224,7 +227,7 @@ public class Config {
         return json.getArray(member);
     }
 
-    JsonArray toJsonArray(List<String> options) {
+    JsonArray toJsonArray(List<?> options) {
         return Json.instance().parse(new Gson().toJson(options));
     }
 
@@ -767,6 +770,16 @@ public class Config {
         table.put("tableCellProperties", tableCellProperties);
         table.put("tableProperties", tableCellProperties);
         configs.put(ConfigType.table, table);
+    }
+
+    /**
+     * The configuration of the line height feature.
+     * @param options Items to be placed in the line height toolbar
+     */
+    public void setLineHeight(List<Integer> options) {
+        JsonObject lineHeight = Json.createObject();
+        lineHeight.put("options", toJsonArray(options));
+        configs.put(ConfigType.lineHeight, lineHeight);
     }
 
     /**

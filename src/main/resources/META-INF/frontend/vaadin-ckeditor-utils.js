@@ -18,6 +18,16 @@ window.vaadinCKEditor.contains = function(style) {
     }
     return false;
 }
+
+window.vaadinCKEditor.saveData = function( editorId, editorData ) {
+    return new Promise( resolve => {
+        setTimeout( () => {
+            window.vaadinCKEditor.serverMap[editorId].saveEditorData(editorData);
+            resolve();
+        }, 400 );
+    } );
+}
+
 window.vaadinCKEditor.showIndicator = function(editor, shown) {
     let labelId = 'label_'+editor.id;
     let newStyle = window.vaadinCKEditor.contains('#'+labelId+'::after');
@@ -91,27 +101,27 @@ window.vaadinCKEditor.initEditorObserver = function(editor, required, invalid) {
     }
 }
 
-window.vaadinCKEditor.importStyle = async function(editor, cssUrl) {
-        let editorStyle = editor.querySelector("style[override-cke='true']");
-        if(!editorStyle) {
-            console.log("read file from " + cssUrl);
-            let newStyle = document.createElement("style");
-            newStyle.setAttribute('override-cke', 'true');
-            const reader = new FileReader();
-            reader.addEventListener(
-                "load",
-                () => {
-                    // this will then display a text file
-                    newStyle.innerText = ''+reader.result;
-					editor.appendChild(newStyle);
-                },
-                false,
-            );
-            if (cssUrl) {
-                (await fetch(cssUrl)).blob().then(b=>reader.readAsText(b));
-            }
-        }
-}
+// window.vaadinCKEditor.importStyle = async function(editor, cssUrl) {
+//         let editorStyle = editor.querySelector("style[override-cke='true']");
+//         if(!editorStyle) {
+//             console.log("read file from " + cssUrl);
+//             let newStyle = document.createElement("style");
+//             newStyle.setAttribute('override-cke', 'true');
+//             const reader = new FileReader();
+//             reader.addEventListener(
+//                 "load",
+//                 () => {
+//                     // this will then display a text file
+//                     newStyle.innerText = ''+reader.result;
+// 					editor.appendChild(newStyle);
+//                 },
+//                 false,
+//             );
+//             if (cssUrl) {
+//                 (await fetch(cssUrl)).blob().then(b=>reader.readAsText(b));
+//             }
+//         }
+// }
 
 window.vaadinCKEditor.sourceEditObserver = function(editor) {
     window.vaadinCKEditor.initEditorObserver(editor);

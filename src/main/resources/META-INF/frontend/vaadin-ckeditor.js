@@ -10,7 +10,7 @@ export class VaadinCKEditor extends LitElement {
             'editor-content'  : true
         };
         this.config = {};
-        this.version = 'v3.2.2';
+        this.version = 'v4.0.0'
         this.autosave = false;
         this.isFirefox = typeof InstallTrigger !== 'undefined';
         this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
@@ -48,11 +48,11 @@ export class VaadinCKEditor extends LitElement {
                  ghsEnabled: Boolean,
                  hideToolbar: Boolean,
                  editorMap: Object,
-                 config: Object};
+                 config: Object}
     }
 
     createRenderRoot() {
-        return this;
+        return this
     }
 
     initDarkTheme() {
@@ -106,28 +106,24 @@ export class VaadinCKEditor extends LitElement {
     }
 
     firstUpdated(changedProperties) {
-        super.firstUpdated(changedProperties);
+        super.firstUpdated(changedProperties)
 
         if(this.themeType==='dark') {
-            this.initDarkTheme();
+            this.initDarkTheme()
         }
 
-        this.createEditor();
+        this.createEditor()
     }
 
     getEditorByType(editorType) {
-        if(typeof CKEDITOR !== 'undefined' && CKEDITOR !== null) {
-            return 'classic'===editorType?CKEDITOR.VaadinClassicEditor:
-                   'inline'===editorType?CKEDITOR.VaadinInlineEditor:
-                   'balloon'===editorType?CKEDITOR.VaadinBalloonEditor:
-                   'decoupled'===editorType?CKEDITOR.VaadinDcoupledEditor:
-                   ClassicEditor;
+        if(window.SUPER_CKEDITOR) {
+            return 'classic'===editorType?window.SUPER_CKEDITOR.VaadinClassicEditor:
+                   'inline'===editorType?window.SUPER_CKEDITOR.VaadinInlineEditor:
+                   'balloon'===editorType?window.SUPER_CKEDITOR.VaadinBalloonEditor:
+                   'decoupled'===editorType?window.SUPER_CKEDITOR.VaadinDcoupledEditor:
+                       window.SUPER_CKEDITOR.VaadinClassicEditor
         } else {
-            return 'classic'===editorType?EDITORS.CKEDITOR.VaadinClassicEditor:
-                   'inline'===editorType?EDITORS.CKEDITOR.VaadinInlineEditor:
-                   'balloon'===editorType?EDITORS.CKEDITOR.VaadinBalloonEditor:
-                   'decoupled'===editorType?EDITORS.CKEDITOR.VaadinDcoupledEditor:
-                   EDITORS.CKEDITOR.VaadinClassicEditor;
+            throw new Error('CKEditor is not loaded!')
         }
 
     }
@@ -176,7 +172,7 @@ export class VaadinCKEditor extends LitElement {
 
 
     createEditor() {
-        this.getEditorByType(this.editorType).create(this.shadowRoot.querySelector( "#"+this.editorId ) , this.getConfig()).then( editor => {
+        this.getEditorByType(this.editorType).create(this.querySelector( "#"+this.editorId ) , this.getConfig()).then( editor => {
             editor.id = this.editorId;
             const toolbar = editor.ui.view.toolbar;
             window.vaadinCKEditor.serverMap[editor.id] = this.$server;
@@ -248,7 +244,7 @@ export class VaadinCKEditor extends LitElement {
             } );
 
             editor.model.document.on( 'change:data', (event, batch) => {
-                window.vaadinCKEditor.serverMap[editor.id].setEditorData(editor.getData());
+                // window.vaadinCKEditor.serverMap[editor.id].setEditorData(editor.getData());
                 window.vaadinCKEditor.showIndicator(editor,''===editor.getData() && this.required);
                 window.vaadinCKEditor.showError(editor,this.invalid || (''===editor.getData() && this.required));
                 // if (typeof editor.ui.view.stickyPanel !== 'undefined'
@@ -259,6 +255,9 @@ export class VaadinCKEditor extends LitElement {
             } );
             editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
                 window.vaadinCKEditor.focusedColor(editor, isFocused);
+                window.vaadinCKEditor.serverMap[editor.id].setEditorData(editor.getData());
+                window.vaadinCKEditor.showIndicator(editor,''===editor.getData() && this.required);
+                window.vaadinCKEditor.showError(editor,this.invalid || (''===editor.getData() && this.required));
             } );
 
             editor.on( 'change:isReadOnly', ( evt, propertyName, isReadOnly ) => {

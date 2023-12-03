@@ -91,7 +91,7 @@ import java.util.logging.Logger;
 @JsModule("./translations/vi.js")
 @JsModule("./translations/zh.js")
 @JsModule("./translations/zh-cn.js")
-
+@CssImport("./styles.css")
 @CssImport("./ckeditor.css")
 @NpmPackage(value = "lit", version = "^2.6.1")
 public class VaadinCKEditor extends CustomField<String> implements HasConfig {
@@ -159,7 +159,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
 
     @ClientCallable
     private void setEditorData(String editorData) {
-        setModelValue(editorData, true);
+        setModelValue(editorData, false);
     }
 
     @ClientCallable
