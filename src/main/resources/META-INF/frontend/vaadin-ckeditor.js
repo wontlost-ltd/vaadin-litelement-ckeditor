@@ -10,7 +10,7 @@ export class VaadinCKEditor extends LitElement {
             'editor-content'  : true
         };
         this.config = {};
-        this.version = 'v3.2.1';
+        this.version = 'v4.0.0'
         this.autosave = false;
         this.isFirefox = typeof InstallTrigger !== 'undefined';
         this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
@@ -39,6 +39,7 @@ export class VaadinCKEditor extends LitElement {
                  editorHeight: String,
                  themeType: String,
                  errorMessage: String,
+            	 overrideCssUrl: String,
                  miniMapEnabled:Boolean,
                  isReadOnly: Boolean,
                  isFirefox: Boolean,
@@ -47,11 +48,11 @@ export class VaadinCKEditor extends LitElement {
                  ghsEnabled: Boolean,
                  hideToolbar: Boolean,
                  editorMap: Object,
-                 config: Object};
+                 config: Object}
     }
 
     createRenderRoot() {
-        return this;
+        return this
     }
 
     initDarkTheme() {
@@ -105,27 +106,24 @@ export class VaadinCKEditor extends LitElement {
     }
 
     firstUpdated(changedProperties) {
-        super.firstUpdated(changedProperties);
+        super.firstUpdated(changedProperties)
 
         if(this.themeType==='dark') {
-            this.initDarkTheme();
+            this.initDarkTheme()
         }
-        this.createEditor();
+
+        this.createEditor()
     }
 
     getEditorByType(editorType) {
-        if(typeof CKEDITOR !== 'undefined' && CKEDITOR !== null) {
-            return 'classic'===editorType?CKEDITOR.VaadinClassicEditor:
-                   'inline'===editorType?CKEDITOR.VaadinInlineEditor:
-                   'balloon'===editorType?CKEDITOR.VaadinBalloonEditor:
-                   'decoupled'===editorType?CKEDITOR.VaadinDcoupledEditor:
-                   ClassicEditor;
+        if(window.SUPER_CKEDITOR) {
+            return 'classic'===editorType?window.SUPER_CKEDITOR.VaadinClassicEditor:
+                   'inline'===editorType?window.SUPER_CKEDITOR.VaadinInlineEditor:
+                   'balloon'===editorType?window.SUPER_CKEDITOR.VaadinBalloonEditor:
+                   'decoupled'===editorType?window.SUPER_CKEDITOR.VaadinDcoupledEditor:
+                       window.SUPER_CKEDITOR.VaadinClassicEditor
         } else {
-            return 'classic'===editorType?EDITORS.CKEDITOR.VaadinClassicEditor:
-                   'inline'===editorType?EDITORS.CKEDITOR.VaadinInlineEditor:
-                   'balloon'===editorType?EDITORS.CKEDITOR.VaadinBalloonEditor:
-                   'decoupled'===editorType?EDITORS.CKEDITOR.VaadinDcoupledEditor:
-                   EDITORS.CKEDITOR.VaadinClassicEditor;
+            throw new Error('CKEditor is not loaded!')
         }
 
     }
@@ -174,7 +172,7 @@ export class VaadinCKEditor extends LitElement {
 
 
     createEditor() {
-        this.getEditorByType(this.editorType).create(document.querySelector( "#"+this.editorId ) , this.getConfig()).then( editor => {
+        this.getEditorByType(this.editorType).create(this.querySelector( "#"+this.editorId ) , this.getConfig()).then( editor => {
             editor.id = this.editorId;
             const toolbar = editor.ui.view.toolbar;
             window.vaadinCKEditor.serverMap[editor.id] = this.$server;
@@ -205,6 +203,7 @@ export class VaadinCKEditor extends LitElement {
             this.style.height='100%';
             if(this.required) {
                 window.vaadinCKEditor.showIndicator(editor,true);
+                window.vaadinCKEditor.showError(editor,this.invalid);
             }
             editor.editing.view.change( writer => {
                 if(this.editorHeight) {
@@ -243,20 +242,30 @@ export class VaadinCKEditor extends LitElement {
                         window.vaadinCKEditor.setAndCheck(editor, sourceEditValue, this.required, this.invalid);
                     }
                 }
+
+                // let poweredBy = document.querySelector(".ck-powered-by-balloon");
+                // poweredBy?.remove();
             } );
 
-            editor.model.document.on( 'change:data', (event, batch) => {
-                window.vaadinCKEditor.serverMap[editor.id].setEditorData(editor.getData());
-                window.vaadinCKEditor.showIndicator(editor,''===editor.getData() && this.required);
-                window.vaadinCKEditor.showError(editor,this.invalid || (''===editor.getData() && this.required));
+            // editor.model.document.on( 'change:data', (event, batch) => {
+                // window.vaadinCKEditor.serverMap[editor.id].setEditorData(editor.getData());
+                // window.vaadinCKEditor.showIndicator(editor,''===editor.getData() && this.required);
+                // window.vaadinCKEditor.showError(editor,this.invalid || (''===editor.getData() && this.required));
                 // if (typeof editor.ui.view.stickyPanel !== 'undefined'
                 //     && typeof editor.ui.view.stickyPanel.isSticky !== 'undefined') {
                 //     editor.ui.view.stickyPanel.isSticky = true;
                 // }
                 // console.log('*================' + window.document.documentElement.scrollTop);
-            } );
+            // } );
             editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
+                let editorData = editor.getData();
+                let indicated = window.vaadinCKEditor.empty.includes(editorData) && this.required;
                 window.vaadinCKEditor.focusedColor(editor, isFocused);
+                window.vaadinCKEditor.serverMap[editor.id].setEditorData(editorData);
+                window.vaadinCKEditor.showIndicator(editor, indicated);
+                window.vaadinCKEditor.showError(editor,this.invalid || indicated);
+                // let poweredBy = document.querySelector(".ck-powered-by-balloon");
+                // poweredBy?.remove();
             } );
 
             editor.on( 'change:isReadOnly', ( evt, propertyName, isReadOnly ) => {
@@ -286,6 +295,10 @@ export class VaadinCKEditor extends LitElement {
                 document.querySelector( '#toolbar-container' ).appendChild( editor.ui.view.toolbar.element );
                 // document.querySelector( "#"+this.editorId ).appendChild( editor.ui.view.editable.element );
                 editor.ui.update();
+            }
+
+            if(this.overrideCssUrl) {
+                window.vaadinCKEditor.importStyle(this, this.overrideCssUrl);
             }
         } ).catch( err => {
             console.error( err.stack );

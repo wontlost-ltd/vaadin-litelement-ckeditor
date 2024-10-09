@@ -29,6 +29,7 @@ public class Constants {
         highlight,
         image,
         indentBlock,
+        lineHeight,
         initialData,
         language,
         link,
@@ -277,6 +278,8 @@ public class Constants {
         imageUpload("imageUpload"),
         indent("indent"),
         outdent("outdent"),
+
+        lineHeight("lineHeight"),
         link("link"),
         linkImage("linkImage"),
         sourceEditing("sourceEditing"),

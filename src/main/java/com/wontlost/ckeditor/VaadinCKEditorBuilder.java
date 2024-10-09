@@ -9,6 +9,8 @@ public class VaadinCKEditorBuilder {
 
     public String editorId;
     public String editorData;
+
+    public String overrideCssUrl;
     public String width;
     public String height;
     public String margin;
@@ -41,6 +43,7 @@ public class VaadinCKEditorBuilder {
         editor.setHideToolbar(hideToolbar);
         editor.setEditorType(editorType);
         editor.enableGHS(ghsEnabled);
+        editor.setOverrideCssUrl(overrideCssUrl);
         if(editorType.equals(EditorType.DECOUPLED)) {
             editor.minimap(minimap);
         }
