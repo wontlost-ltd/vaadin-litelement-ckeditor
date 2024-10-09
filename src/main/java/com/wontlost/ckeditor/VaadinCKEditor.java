@@ -159,7 +159,7 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
 
     @ClientCallable
     private void setEditorData(String editorData) {
-        setModelValue(editorData, false);
+        setModelValue(editorData, true);
     }
 
     @ClientCallable

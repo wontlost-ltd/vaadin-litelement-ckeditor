@@ -203,6 +203,7 @@ export class VaadinCKEditor extends LitElement {
             this.style.height='100%';
             if(this.required) {
                 window.vaadinCKEditor.showIndicator(editor,true);
+                window.vaadinCKEditor.showError(editor,this.invalid);
             }
             editor.editing.view.change( writer => {
                 if(this.editorHeight) {
@@ -241,23 +242,30 @@ export class VaadinCKEditor extends LitElement {
                         window.vaadinCKEditor.setAndCheck(editor, sourceEditValue, this.required, this.invalid);
                     }
                 }
+
+                // let poweredBy = document.querySelector(".ck-powered-by-balloon");
+                // poweredBy?.remove();
             } );
 
-            editor.model.document.on( 'change:data', (event, batch) => {
+            // editor.model.document.on( 'change:data', (event, batch) => {
                 // window.vaadinCKEditor.serverMap[editor.id].setEditorData(editor.getData());
-                window.vaadinCKEditor.showIndicator(editor,''===editor.getData() && this.required);
-                window.vaadinCKEditor.showError(editor,this.invalid || (''===editor.getData() && this.required));
+                // window.vaadinCKEditor.showIndicator(editor,''===editor.getData() && this.required);
+                // window.vaadinCKEditor.showError(editor,this.invalid || (''===editor.getData() && this.required));
                 // if (typeof editor.ui.view.stickyPanel !== 'undefined'
                 //     && typeof editor.ui.view.stickyPanel.isSticky !== 'undefined') {
                 //     editor.ui.view.stickyPanel.isSticky = true;
                 // }
                 // console.log('*================' + window.document.documentElement.scrollTop);
-            } );
+            // } );
             editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
+                let editorData = editor.getData();
+                let indicated = window.vaadinCKEditor.empty.includes(editorData) && this.required;
                 window.vaadinCKEditor.focusedColor(editor, isFocused);
-                window.vaadinCKEditor.serverMap[editor.id].setEditorData(editor.getData());
-                window.vaadinCKEditor.showIndicator(editor,''===editor.getData() && this.required);
-                window.vaadinCKEditor.showError(editor,this.invalid || (''===editor.getData() && this.required));
+                window.vaadinCKEditor.serverMap[editor.id].setEditorData(editorData);
+                window.vaadinCKEditor.showIndicator(editor, indicated);
+                window.vaadinCKEditor.showError(editor,this.invalid || indicated);
+                // let poweredBy = document.querySelector(".ck-powered-by-balloon");
+                // poweredBy?.remove();
             } );
 
             editor.on( 'change:isReadOnly', ( evt, propertyName, isReadOnly ) => {

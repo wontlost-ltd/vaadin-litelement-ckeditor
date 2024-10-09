@@ -2,6 +2,7 @@ window.vaadinCKEditor = window.vaadinCKEditor || {};
 window.vaadinCKEditor.serverMap = window.vaadinCKEditor.serverMap || {};
 window.vaadinCKEditor.sourceDataObserverMap= window.vaadinCKEditor.sourceDataObserverMap || {};
 window.vaadinCKEditor.editorMap = window.vaadinCKEditor.editorMap || {};
+window.vaadinCKEditor.empty = ['', '<p>&nbsp;</p>'];
 
 window.vaadinCKEditor.contains = function(style) {
     const styleSheets = Array.from(document.styleSheets).filter(
