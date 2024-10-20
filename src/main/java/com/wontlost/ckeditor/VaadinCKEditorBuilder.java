@@ -18,7 +18,8 @@ public class VaadinCKEditorBuilder {
     public ThemeType theme;
     public Boolean readOnly = false;
     public Boolean autosave = false;
-
+    public Integer waitingTime = 2000;
+    public Boolean sync = true;
     public Boolean ghsEnabled = false;
     public Boolean hideToolbar = false;
     public Boolean minimap = false;
@@ -39,10 +40,11 @@ public class VaadinCKEditorBuilder {
         editor.setEditorTheme(theme);
         editor.setConfig(config);
         editor.setReadOnly(readOnly);
-        editor.setAutosave(autosave);
+        editor.setAutosave(autosave, waitingTime);
         editor.setHideToolbar(hideToolbar);
         editor.setEditorType(editorType);
         editor.enableGHS(ghsEnabled);
+        editor.isSynchronizd(sync);
         editor.setOverrideCssUrl(overrideCssUrl);
         if(editorType.equals(EditorType.DECOUPLED)) {
             editor.minimap(minimap);
