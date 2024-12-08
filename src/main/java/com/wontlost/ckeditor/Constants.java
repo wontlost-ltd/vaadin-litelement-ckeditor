@@ -278,7 +278,7 @@ public class Constants {
         imageUpload("imageUpload"),
         indent("indent"),
         outdent("outdent"),
-
+        showBlocks("showBlocks"),
         lineHeight("lineHeight"),
         link("link"),
         linkImage("linkImage"),
@@ -355,6 +355,8 @@ public class Constants {
         ImageInline,
         ImageBlock,
         LinkImage,
+        LineHeight,
+        ShowBlocks,
         ImageInsert,
         AutoImage,
         GeneralHtmlSupport,

@@ -81,6 +81,22 @@ window.vaadinCKEditor.display = function(editor, value) {
     return errorStyle;
 }
 
+/**
+ * This function is used to add a scroll event listener to the vaadin vertical layout object where the editor sits in.
+ * @param editor the element of editor
+ */
+window.vaadinCKEditor.activateScroll = function(editor) {
+    //get div of the scrollable element
+    let container = editor.ui.element.parentElement?.parentElement?.assignedSlot?.parentElement;
+    if(container) {
+        container.addEventListener('scroll', (e) => {
+            editor?.ui?.view?.stickyPanel?.checkIfShouldBeSticky();
+            let poweredBy = document.querySelector(".ck-powered-by-balloon");
+            poweredBy?.remove();
+        })
+    }
+}
+
 window.vaadinCKEditor.setAndCheck = function(editor, value, required, invalid) {
     console.log("=============>"+value);
     // editor.setData(value);

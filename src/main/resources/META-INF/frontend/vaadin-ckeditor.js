@@ -1,6 +1,6 @@
 import {html, LitElement} from 'lit';
 import {classMap} from 'lit/directives/class-map.js';
-import * as EDITORS from './ckeditor';
+import   './ckeditor';
 
 export class VaadinCKEditor extends LitElement {
 
@@ -10,8 +10,10 @@ export class VaadinCKEditor extends LitElement {
             'editor-content'  : true
         };
         this.config = {};
-        this.version = 'v4.0.0'
+        this.version = 'v4.1.2'
         this.autosave = false;
+        this.sync = true;
+        this.position = 0;
         this.isFirefox = typeof InstallTrigger !== 'undefined';
         this.isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
     }
@@ -40,11 +42,14 @@ export class VaadinCKEditor extends LitElement {
                  themeType: String,
                  errorMessage: String,
             	 overrideCssUrl: String,
+                 text: String,
                  miniMapEnabled:Boolean,
                  isReadOnly: Boolean,
                  isFirefox: Boolean,
                  isChrome: Boolean,
                  autosave: Boolean,
+                 waitingTime: Number,
+                 sync: Boolean,
                  ghsEnabled: Boolean,
                  hideToolbar: Boolean,
                  editorMap: Object,
@@ -116,12 +121,12 @@ export class VaadinCKEditor extends LitElement {
     }
 
     getEditorByType(editorType) {
-        if(window.SUPER_CKEDITOR) {
-            return 'classic'===editorType?window.SUPER_CKEDITOR.VaadinClassicEditor:
-                   'inline'===editorType?window.SUPER_CKEDITOR.VaadinInlineEditor:
-                   'balloon'===editorType?window.SUPER_CKEDITOR.VaadinBalloonEditor:
-                   'decoupled'===editorType?window.SUPER_CKEDITOR.VaadinDcoupledEditor:
-                       window.SUPER_CKEDITOR.VaadinClassicEditor
+        if(window.CKEDITOR) {
+            return 'classic'===editorType?window.CKEDITOR.VaadinClassicEditor:
+                   'inline'===editorType?window.CKEDITOR.VaadinInlineEditor:
+                   'balloon'===editorType?window.CKEDITOR.VaadinBalloonEditor:
+                   'decoupled'===editorType?window.CKEDITOR.VaadinDcoupledEditor:
+                       window.CKEDITOR.VaadinClassicEditor
         } else {
             throw new Error('CKEditor is not loaded!')
         }
@@ -136,7 +141,7 @@ export class VaadinCKEditor extends LitElement {
                     save( editor ) {
                         return window.vaadinCKEditor.saveData( editor.id, editor.getData() );
                     },
-                    waitingTime: 2000
+                    waitingTime: this.waitingTime?this.waitingTime:2000
                 }
             }
         } : this.config;
@@ -190,12 +195,7 @@ export class VaadinCKEditor extends LitElement {
             }
             console.log({...{"ckeditor-vaadin":this.version},
                          ...this.getConfig()});
-            if(this.editorType === 'classic' && typeof editor.ui.element.children[1] !== 'undefined') {
-                editor.ui.element.children[1].style.position='sticky';
-                editor.ui.element.children[1].style.top=0;
-                editor.ui.element.children[1].style.boxShadow='0 1.5px 1px -1px darkgrey';
-                editor.ui.element.children[1].style.zIndex=2;
-            }
+
             editor.setData(this.editorData?this.editorData:'');
             this.style.width = this.style.width ? this.style.width :
                                this.isChrome ? '-webkit-fill-available':
@@ -209,25 +209,15 @@ export class VaadinCKEditor extends LitElement {
                 if(this.editorHeight) {
                     writer.setStyle( 'height', this.editorHeight, editor.editing.view.document.getRoot());
                 }
-                // if(this.editorWidth) {
-                //     writer.setStyle( 'width', this.editorWidth, editor.editing.view.document.getRoot());
-                // }
             } );
-            // editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
-            //     if(this.editorType === 'classic') {
-            //         editor.ui.view.stickyPanel.element.children[0].style.display="none";
-            //         editor.ui.view.stickyPanel.element.children[1].classList.remove("ck-sticky-panel__content_sticky");
-            //         editor.ui.view.stickyPanel.element.children[1].style = "";
-            //     }
-            // } );
+
             window.vaadinCKEditor.sourceEditObserver(editor, this.required, this.invalid);
 
             editor.ui.focusTracker.on( 'change:isFocused', ( evt, data, isFocused ) => {
-                if(this.editorType === 'classic') {
-                    editor.ui.view.stickyPanel.element.children[0].style.display="none";
-                    editor.ui.view.stickyPanel.element.children[1].classList.remove("ck-sticky-panel__content_sticky");
-                    editor.ui.view.stickyPanel.element.children[1].style = "";
+                if(this.editorType==='classic') {
+                    window.vaadinCKEditor.activateScroll(editor);
                 }
+
                 if(evt.source.focusedElement && typeof evt.source.focusedElement !== 'undefined') {
                     let sourceEdit = evt.source.focusedElement?.offsetParent;
                     if(sourceEdit && sourceEdit.className === 'ck-source-editing-area') {
@@ -242,30 +232,27 @@ export class VaadinCKEditor extends LitElement {
                         window.vaadinCKEditor.setAndCheck(editor, sourceEditValue, this.required, this.invalid);
                     }
                 }
-
-                // let poweredBy = document.querySelector(".ck-powered-by-balloon");
-                // poweredBy?.remove();
             } );
 
-            // editor.model.document.on( 'change:data', (event, batch) => {
-                // window.vaadinCKEditor.serverMap[editor.id].setEditorData(editor.getData());
-                // window.vaadinCKEditor.showIndicator(editor,''===editor.getData() && this.required);
-                // window.vaadinCKEditor.showError(editor,this.invalid || (''===editor.getData() && this.required));
-                // if (typeof editor.ui.view.stickyPanel !== 'undefined'
-                //     && typeof editor.ui.view.stickyPanel.isSticky !== 'undefined') {
-                //     editor.ui.view.stickyPanel.isSticky = true;
-                // }
-                // console.log('*================' + window.document.documentElement.scrollTop);
-            // } );
             editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
-                let editorData = editor.getData();
-                let indicated = window.vaadinCKEditor.empty.includes(editorData) && this.required;
-                window.vaadinCKEditor.focusedColor(editor, isFocused);
-                window.vaadinCKEditor.serverMap[editor.id].setEditorData(editorData);
-                window.vaadinCKEditor.showIndicator(editor, indicated);
-                window.vaadinCKEditor.showError(editor,this.invalid || indicated);
-                // let poweredBy = document.querySelector(".ck-powered-by-balloon");
-                // poweredBy?.remove();
+                if(!this.sync) {
+                    let editorData = editor.getData();
+                    window.vaadinCKEditor.focusedColor(editor, isFocused);
+                    window.vaadinCKEditor.serverMap[editor.id].setEditorData(editorData);
+                    this.checkEditorData(editor);
+                }
+            } );
+
+            editor.model.document.selection.on('change:range', (evt, data) => {
+                const selection = editor.model.document.selection;
+                this.position = selection.getFirstPosition();
+            });
+
+            editor.model.document.on( 'change:data', (event, batch) => {
+                if( this.sync ) {
+                    window.vaadinCKEditor.serverMap[editor.id].setEditorData(editor.getData());
+                    this.checkEditorData(editor);
+                }
             } );
 
             editor.on( 'change:isReadOnly', ( evt, propertyName, isReadOnly ) => {
@@ -305,9 +292,25 @@ export class VaadinCKEditor extends LitElement {
         } );
     }
 
+    checkEditorData(editor){
+        let indicated = window.vaadinCKEditor.empty.includes(editor.getData()) && this.required;
+        window.vaadinCKEditor.showIndicator(editor, indicated);
+        window.vaadinCKEditor.showError(editor,this.invalid || indicated);
+    };
+
     updateData(editorId, value) {
         if(window.vaadinCKEditor.editorMap && window.vaadinCKEditor.editorMap[editorId]) {
             window.vaadinCKEditor.editorMap[editorId].setData(value);
+        }
+    }
+
+    insertText(editorId, text) {
+        if(window.vaadinCKEditor.editorMap && window.vaadinCKEditor.editorMap[editorId]) {
+            let editor = window.vaadinCKEditor.editorMap[editorId];
+            editor.model.change(writer => {
+                writer.insertText(text, this.position);
+                this.checkEditorData(editor);
+            });
         }
     }
 
@@ -317,80 +320,6 @@ export class VaadinCKEditor extends LitElement {
         }
     }
 
-    // showIndicator(shown) {
-    //     let labelId = 'label_'+this.editorId;
-    //     let newStyle = this.contains('#'+labelId+'::after');
-    //     if(!newStyle) {
-    //         document.head.appendChild(shown?this.opacity(1):this.opacity(0));
-    //     } else {
-    //         newStyle.style.opacity = shown ? 1 : 0;
-    //     }
-    // }
-    //
-    // showError(shown) {
-    //     let errorId = 'error_'+this.editorId;
-    //     let errorStyle = this.contains('#'+errorId);
-    //     if(!errorStyle) {
-    //         document.head.appendChild(shown?this.display('block'):this.display('none'));
-    //     } else {
-    //         errorStyle.style.display = shown ? 'block' : 'none';
-    //     }
-    // }
-    //
-    // focusedColor(isFocused) {
-    //     let id = 'label_'+this.editorId;
-    //     let newColor = this.contains('#'+id);
-    //     if(!newColor) {
-    //         document.head.appendChild(isFocused? this.color('var(--lumo-primary-text-color)'):
-    //             this.color('var(--lumo-secondary-text-color)'));
-    //     } else {
-    //         newColor.style.color=isFocused?'var(--lumo-primary-text-color)':'var(--lumo-secondary-text-color)';
-    //     }
-    // }
-    //
-    // contains(style) {
-    //     const styleSheets = Array.from(document.styleSheets).filter(
-    //         (styleSheet) => !styleSheet.href || styleSheet.href.startsWith(window.location.origin)
-    //     );
-    //     for (let styleSheet of styleSheets) {
-    //         if (styleSheet instanceof CSSStyleSheet && styleSheet.cssRules) {
-    //             for(let cssRule of styleSheet.cssRules) {
-    //                 if(style===cssRule.selectorText) {
-    //                     return cssRule;
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return false;
-    // }
-    //
-    // opacity(value) {
-    //     let labelId = 'label_'+this.editorId;
-    //     let newLabelAfter = document.createElement('style');
-    //     newLabelAfter.innerHTML = `#`+labelId+`::after{ opacity:`+value+` }`;
-    //     return newLabelAfter;
-    // }
-    //
-    // color(value) {
-    //     let labelId = 'label_'+this.editorId;
-    //     let newColor = document.createElement('style');
-    //     newColor.innerHTML = `#`+labelId+`{ color :`+value+` }`;
-    //     return newColor;
-    // }
-    //
-    // display(value) {
-    //     let errorId = 'error_'+this.editorId;
-    //     let errorStyle = document.createElement('style');
-    //     errorStyle.innerHTML = `#`+errorId+`{ display :`+value+` }`;
-    //     return errorStyle;
-    // }
-
-//     ${this.editorWidth !== 'auto'? html`
-//                 <style>
-//                     .ck.ck-editor {
-//                         width: ${this.editorWidth};
-//      }
-//      </style>`: html``}
     render() {
         return html`
             <label part="label" id="label_${this.editorId}">${this.label} </label>

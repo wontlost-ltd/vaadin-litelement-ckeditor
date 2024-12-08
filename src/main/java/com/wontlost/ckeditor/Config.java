@@ -59,6 +59,7 @@ public class Config {
             Toolbar.indent,
             Toolbar.outdent,
             Toolbar.lineHeight,
+            Toolbar.showBlocks,
             Toolbar.code,
             Toolbar.sourceEditing,
             Toolbar.codeBlock,
@@ -378,13 +379,25 @@ public class Config {
         configs.put(ConfigType.cloudServices, cloudServices);
     }
 
-    public void setUiViewportOffset(Double top, Double left, Double bottom, Double right) {
+    /**
+     * Viewport offset can be used to constrain balloons or other UI elements into an element smaller than the viewport. This can be useful if there are any other absolutely positioned elements that may interfere with editor UI.
+     * @param viewportOffsets [top, right, bottom, left]
+     */
+    public void setUiViewportOffset(Double... viewportOffsets) {
         JsonObject ui = Json.createObject();
         JsonObject viewportOffset = Json.createObject();
-        viewportOffset.put("top", top);
-        viewportOffset.put("left", left);
-        viewportOffset.put("bottom", bottom);
-        viewportOffset.put("right", right);
+        if (viewportOffsets.length > 0 && viewportOffsets[0] != null) {
+            viewportOffset.put("top", viewportOffsets[0]);
+        }
+        if (viewportOffsets.length > 1 && viewportOffsets[1] != null) {
+            viewportOffset.put("right", viewportOffsets[1]);
+        }
+        if (viewportOffsets.length > 2 && viewportOffsets[2] != null) {
+            viewportOffset.put("bottom", viewportOffsets[2]);
+        }
+        if (viewportOffsets.length > 3 && viewportOffsets[3] != null) {
+            viewportOffset.put("left", viewportOffsets[3]);
+        }
         ui.put("viewportOffset", viewportOffset);
         configs.put(ConfigType.ui, ui);
     }

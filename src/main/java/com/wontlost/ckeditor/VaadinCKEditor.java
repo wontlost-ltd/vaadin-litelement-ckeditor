@@ -21,8 +21,8 @@ import java.util.logging.Logger;
  * Used in @VaadinCKEditorBuilder.
  */
 @Tag("vaadin-ckeditor")
-@JsModule("./vaadin-ckeditor-utils.js")
-@JsModule("./vaadin-ckeditor.js")
+@JsModule("./vaadin-ckeditor-utils.min.js")
+@JsModule("./vaadin-ckeditor.min.js")
 @JsModule("./translations/af.js")
 @JsModule("./translations/ar.js")
 @JsModule("./translations/ast.js")
@@ -93,7 +93,7 @@ import java.util.logging.Logger;
 @JsModule("./translations/zh-cn.js")
 @CssImport("./styles.css")
 @CssImport("./ckeditor.css")
-@NpmPackage(value = "lit", version = "^2.6.1")
+@NpmPackage(value = "lit", version = "^3.2.1")
 public class VaadinCKEditor extends CustomField<String> implements HasConfig {
 
     private String editorData;
@@ -226,6 +226,10 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
         getElement().setProperty("ghsEnabled", enabled);
     }
 
+    public void isSynchronizd(boolean sync) {
+        getElement().setProperty("sync", sync);
+    }
+
     public void setReadOnlyWithToolbarAction(boolean readOnly) {
         setReadOnly(readOnly);
         setHideToolbar(readOnly);
@@ -254,11 +258,12 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
     }
 
     /**
-     * @param autosave enable autosave function on editor, should be used with setSaveEditorData together.
-     *                 Otherwise it'll be ignored.
+     * @param autosave enable autosave function on editor, should be used with setSaveEditorData together. Otherwise it'll be ignored.
+     *                waitingTime is the time waiting for saving data after editor data changed.
      */
-    void setAutosave(boolean autosave) {
+    void setAutosave(boolean autosave, int waitingTime) {
         getElement().setProperty("autosave", autosave);
+        getElement().setProperty("waitingTime", waitingTime);
     }
 
     @Override
@@ -273,6 +278,10 @@ public class VaadinCKEditor extends CustomField<String> implements HasConfig {
 
     public String sanitizeHtml(String editorData, SanitizeType type){
         return Jsoup.clean(editorData, type.getValue());
+    }
+
+    public void insertText(String text) {
+        getId().ifPresent(id -> getElement().executeJs("this.insertText($0, $1)", id, text));
     }
 
     /**
