@@ -18,6 +18,32 @@ const createMockServer = () => ({
     handleFileUpload: vi.fn(),
 });
 
+/**
+ * 等待 server.handleFileUpload 至少被调用 count 次，并返回第 index 次调用的 uploadId。
+ *
+ * upload() 内部在调用 handleFileUpload 之前要先 await FileReader（fileToBase64），
+ * 这段耗时由 jsdom 的 I/O 调度决定、无上界；若用固定 setTimeout 等待，在机器负载高时
+ * mock.calls 可能仍为空，导致读取 calls[i][0] 抛 "Cannot read properties of undefined"。
+ * 这里改为轮询真实条件（调用已发生）而非猜测时长，消除测试的时序依赖。
+ */
+async function waitForUploadCall(
+    server: ReturnType<typeof createMockServer>,
+    index = 0,
+    timeoutMs = 2000
+): Promise<string> {
+    const deadline = Date.now() + timeoutMs;
+    while (server.handleFileUpload.mock.calls.length <= index) {
+        if (Date.now() > deadline) {
+            throw new Error(
+                `等待 handleFileUpload 第 ${index + 1} 次调用超时（${timeoutMs}ms），` +
+                `实际调用次数：${server.handleFileUpload.mock.calls.length}`
+            );
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1));
+    }
+    return server.handleFileUpload.mock.calls[index][0];
+}
+
 describe('UploadAdapterManager', () => {
     let manager: UploadAdapterManager;
     let logger: ReturnType<typeof createMockLogger>;
@@ -224,12 +250,9 @@ describe('UploadAdapterManager timeout mechanism', () => {
         // Start upload
         const uploadPromise = adapter.upload();
 
-        // Wait a bit, then resolve
-        await new Promise((resolve) => setTimeout(resolve, 10));
-
-        // Get the upload ID and resolve it
+        // 等待上传抵达 server 后再 resolve
+        const uploadId = await waitForUploadCall(server);
         expect(server.handleFileUpload).toHaveBeenCalled();
-        const uploadId = server.handleFileUpload.mock.calls[0][0];
         manager.resolveUpload(uploadId, 'http://example.com/test.jpg', null);
 
         // Should succeed since timeout is disabled
@@ -251,9 +274,8 @@ describe('UploadAdapterManager timeout mechanism', () => {
         const adapter = factory(mockLoader);
         const uploadPromise = adapter.upload();
 
-        // Resolve immediately
-        await new Promise((resolve) => setTimeout(resolve, 5));
-        const uploadId = server.handleFileUpload.mock.calls[0][0];
+        // 等待上传真正抵达 server 后再 resolve
+        const uploadId = await waitForUploadCall(server);
         manager.resolveUpload(uploadId, 'http://example.com/test.jpg', null);
 
         const result = await uploadPromise;
@@ -275,17 +297,14 @@ describe('UploadAdapterManager race condition prevention', () => {
 
         const adapter = factory(mockLoader);
 
-        // Start first upload
+        // Start first upload，等待其真正进入进行中状态
         const upload1 = adapter.upload();
-
-        // Wait for first upload to start
-        await new Promise((resolve) => setTimeout(resolve, 10));
+        const uploadId = await waitForUploadCall(server);
 
         // Try to start second upload on same adapter - should fail
         await expect(adapter.upload()).rejects.toThrow('Upload already in progress');
 
         // Resolve first upload to clean up
-        const uploadId = server.handleFileUpload.mock.calls[0][0];
         manager.resolveUpload(uploadId, 'http://example.com/test.jpg', null);
         await upload1;
     });
@@ -310,15 +329,13 @@ describe('UploadAdapterManager race condition prevention', () => {
         const upload1 = adapter1.upload();
         const upload2 = adapter2.upload();
 
-        // Wait for both to start
-        await new Promise((resolve) => setTimeout(resolve, 10));
+        // Wait for both to start（轮询至两次调用均已发生）
+        const uploadId1 = await waitForUploadCall(server, 0);
+        const uploadId2 = await waitForUploadCall(server, 1);
 
         // Both should have started
         expect(server.handleFileUpload).toHaveBeenCalledTimes(2);
 
-        // Resolve both
-        const uploadId1 = server.handleFileUpload.mock.calls[0][0];
-        const uploadId2 = server.handleFileUpload.mock.calls[1][0];
         manager.resolveUpload(uploadId1, 'http://example.com/1.jpg', null);
         manager.resolveUpload(uploadId2, 'http://example.com/2.jpg', null);
 
@@ -339,15 +356,13 @@ describe('UploadAdapterManager race condition prevention', () => {
 
         // First upload
         const upload1 = adapter.upload();
-        await new Promise((resolve) => setTimeout(resolve, 10));
-        const uploadId1 = server.handleFileUpload.mock.calls[0][0];
+        const uploadId1 = await waitForUploadCall(server, 0);
         manager.resolveUpload(uploadId1, 'http://example.com/1.jpg', null);
         await upload1;
 
         // Second upload on same adapter should work
         const upload2 = adapter.upload();
-        await new Promise((resolve) => setTimeout(resolve, 10));
-        const uploadId2 = server.handleFileUpload.mock.calls[1][0];
+        const uploadId2 = await waitForUploadCall(server, 1);
         manager.resolveUpload(uploadId2, 'http://example.com/2.jpg', null);
         const result = await upload2;
 
@@ -368,16 +383,14 @@ describe('UploadAdapterManager race condition prevention', () => {
 
         // First upload - fails
         const upload1 = adapter.upload();
-        await new Promise((resolve) => setTimeout(resolve, 10));
-        const uploadId1 = server.handleFileUpload.mock.calls[0][0];
+        const uploadId1 = await waitForUploadCall(server, 0);
         manager.resolveUpload(uploadId1, null, 'Upload failed');
 
         await expect(upload1).rejects.toThrow('Upload failed');
 
         // Second upload should work
         const upload2 = adapter.upload();
-        await new Promise((resolve) => setTimeout(resolve, 10));
-        const uploadId2 = server.handleFileUpload.mock.calls[1][0];
+        const uploadId2 = await waitForUploadCall(server, 1);
         manager.resolveUpload(uploadId2, 'http://example.com/2.jpg', null);
         const result = await upload2;
 
@@ -414,8 +427,9 @@ describe('UploadAdapterManager edge cases', () => {
         const upload1 = factory(mockLoader1).upload();
         const upload2 = factory(mockLoader2).upload();
 
-        // Wait a tick for the async operations to process
-        await new Promise((resolve) => setTimeout(resolve, 10));
+        // 等待两次上传都抵达 server
+        await waitForUploadCall(server, 0);
+        await waitForUploadCall(server, 1);
 
         // Server should receive different upload IDs
         expect(server.handleFileUpload).toHaveBeenCalledTimes(2);
@@ -463,8 +477,7 @@ describe('UploadAdapterManager empty file handling', () => {
         const adapter = factory(mockLoader);
         const uploadPromise = adapter.upload();
 
-        await new Promise((resolve) => setTimeout(resolve, 10));
-        const uploadId = server.handleFileUpload.mock.calls[0][0];
+        const uploadId = await waitForUploadCall(server);
         manager.resolveUpload(uploadId, 'http://example.com/test.jpg', null);
 
         const result = await uploadPromise;
@@ -503,7 +516,9 @@ describe('UploadAdapterManager abort edge cases', () => {
         const adapter = factory(mockLoader);
         const uploadPromise = adapter.upload();
 
-        await new Promise((resolve) => setTimeout(resolve, 10));
+        // 等待上传真正进入"进行中"（已抵达 server）后再 abort，
+        // 否则固定延时可能在上传尚未开始时触发，测的就不是 active upload 分支了
+        await waitForUploadCall(server);
 
         // Abort during active upload
         adapter.abort();

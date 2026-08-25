@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Vaadin Platform: 25.2.0 → 25.2.6（根 `pom.xml`、`ckeditor-vaadin-testbench/pom.xml`
+  与 `examples/spring-boot-sample/pom.xml`）。补丁版升级，无 API 变更；`vaadin-bom`
+  继续统一管理 `vaadin-core` 与 `vaadin-testbench-core` 的版本。
+- CKEditor 5（`ckeditor5`、`ckeditor5-premium-features`）：48.2.0 → 48.4.0。
+  同步更新前端 `package.json` 精确 pin、`VaadinCKEditor` 与 `VaadinCKEditorPremium`
+  上的 `@NpmPackage` 注解，以及 `VaadinCKEditorPremium.getVersion()`
+  （该值向消费端声明需要自行安装的 premium 包版本，两者必须同版本）。
+
+  验证：`tsc --noEmit` 在 48.4.0 下零报错，说明 `plugin-resolver.ts` 中导入的
+  全部插件符号在新版 umbrella 包中依然存在，无需代码适配。
+
+### Fixed
+- 修复 `upload-adapter.test.ts` 的偶发失败（既有问题，非本次升级引入；已在升级前的
+  48.2.0 基线上复现）。根因：`upload()` 在调用 `server.handleFileUpload` 之前需先
+  `await fileToBase64()`（内部是真实 `FileReader`），该耗时由 jsdom 的 I/O 调度决定、
+  无上界；而用例用固定 `setTimeout(10)` 等待后即读取 `mock.calls[0][0]`，机器负载高时
+  调用尚未发生，遂抛 `Cannot read properties of undefined`。
+
+  修复方式：新增 `waitForUploadCall()` 辅助函数，轮询"调用已发生"这一真实条件
+  （带 2s 上限与明确超时信息）替代猜测时长，共替换 8 处固定延时。其中
+  `should handle abort during active upload` 一例的固定延时还存在语义问题——延时
+  到期时上传可能尚未开始，`abort()` 命中的并非 active upload 分支，一并修正。
+
+  验证：`upload-adapter` 单文件连续 13 次通过（含 4 路 `yes` 占满 CPU 的负载场景
+  下 5 次），全量前端套件连续 5 次 171/171 通过。
+
 ## [5.3.1] - 2026-06-26
 
 ### Added

@@ -1,7 +1,7 @@
 /**
  * 嵌入媒体缩放插件的按需加载（issue #71）。
  *
- * CKEditor 48.2.0 的 MediaEmbedResize **由 umbrella `ckeditor5` 包导出**
+ * CKEditor 48.4.0 的 MediaEmbedResize **由 umbrella `ckeditor5` 包导出**
  * （umbrella 通过 `export * from '@ckeditor/ckeditor5-media-embed'` 透传，type 与 runtime 两层均可解析）。
  * 但它是**功能性 premium**：其依赖 `MediaEmbedResizeEditing` 的 `isPremiumPlugin === true`，
  * 在 GPL license 下加载会触发 CKEditor 的 license 校验报错。因此不能并入免费 PLUGIN_REGISTRY，
