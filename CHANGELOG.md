@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- 修复 Dependabot 报告的 4 个依赖漏洞，其中 2 个属运行时（随包分发、影响消费端），
+  2 个属开发期（`vitest` 传递依赖，不进入发布产物）。
+
+- **jsoup 1.18.3 → 1.23.1**（运行时，CVE-2026-71497）。该漏洞使 `Cleaner` 在处理
+  自定义 raw-text 元素时可能放行本应被清理的标记。本库 `HtmlSanitizer` 正是通过
+  `Jsoup.clean(html, Safelist)` 做 HTML 净化，属于直接受影响的代码路径，
+  故必须升级。全部 13 个 sanitizer 相关用例升级后仍通过。
+
+- **jackson-databind 移除写死的 3.1.4**（运行时，CVE-2026-59889）。修复方式不是
+  手动改成 3.1.5，而是**删除 `<version>` 声明**改由 `vaadin-bom` 管理——Vaadin 25.2.6
+  已透传 `tools.jackson:jackson-bom` 并锁定 3.1.5（即修复版本）。此前写死 3.1.4 会
+  覆盖 BOM，反而把消费端从 Vaadin 的安全基线上拉回旧版本。改为跟随 BOM 后，
+  后续 Vaadin 升级可自动获得 Jackson 安全补丁，无需再手动跟。
+
+- **postcss 8.5.15 → 8.5.26**（开发期，CVE-2026-73646 / CVE-2026-69153）。经
+  `npm ls` 确认其来源是 `vitest → vite` 的传递依赖，仅用于本地测试，不随
+  jar 分发，消费端不受影响。通过 `npm update vite`（vite 8.1.0 → 8.2.2，其
+  依赖约束为 `postcss ^8.5.26`）在 lockfile 层面修复，`package.json` 未改动，
+  `ckeditor5` 仍精确锁定 48.4.0。修复后 `npm audit` 报告 0 vulnerabilities。
+
 ## [5.3.2] - 2026-08-25
 
 ### Changed

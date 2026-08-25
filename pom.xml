@@ -59,19 +59,29 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Jackson JSON 3.x (provided - used by Vaadin 25+ for setPropertyJson) -->
+        <!--
+            Jackson JSON 3.x（provided - Vaadin 25+ 的 setPropertyJson 使用）。
+            不显式声明 version：vaadin-bom 已透传 tools.jackson:jackson-bom
+            （25.2.6 对应 3.1.5），由其统一管理版本。这样既跟随 Vaadin 的安全基线
+            自动获得补丁版本，也避免我们写死的版本反过来把消费端拉回旧版
+            （此前写死 3.1.4 即触发 CVE-2026-59889）。
+        -->
         <dependency>
             <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>3.1.4</version>
             <scope>provided</scope>
         </dependency>
 
-        <!-- HTML Sanitization -->
+        <!--
+            HTML Sanitization。1.23.1 起修复 CVE-2026-71497：Cleaner 在处理
+            自定义 raw-text 元素时可能放行本应被清理的标记，直接影响
+            HtmlSanitizer 的 Jsoup.clean(html, Safelist) 路径，故必须保持在
+            补丁版本之上（这是本库真正随包分发的运行时依赖）。
+        -->
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.18.3</version>
+            <version>1.23.1</version>
         </dependency>
 
         <!-- Jakarta Servlet API (provided - Vaadin 25+) -->
