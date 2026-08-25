@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.3.2] - 2026-08-25
+
 ### Changed
 - Vaadin Platform: 25.2.0 → 25.2.6（根 `pom.xml`、`ckeditor-vaadin-testbench/pom.xml`
   与 `examples/spring-boot-sample/pom.xml`）。补丁版升级，无 API 变更；`vaadin-bom`
@@ -277,7 +279,10 @@ See the [legacy repository](https://github.com/wontlost-ltd/vaadin-ckeditor/tree
 - **MINOR** (0.x.0): New features, backward compatible
 - **PATCH** (0.0.x): Bug fixes, no API changes
 
-[Unreleased]: https://github.com/wontlost-ltd/vaadin-ckeditor/compare/v5.2.0...HEAD
+[Unreleased]: https://github.com/wontlost-ltd/vaadin-ckeditor/compare/v5.3.2...HEAD
+[5.3.2]: https://github.com/wontlost-ltd/vaadin-ckeditor/compare/v5.3.1...v5.3.2
+[5.3.1]: https://github.com/wontlost-ltd/vaadin-ckeditor/compare/v5.3.0...v5.3.1
+[5.3.0]: https://github.com/wontlost-ltd/vaadin-ckeditor/compare/v5.2.0...v5.3.0
 [5.2.0]: https://github.com/wontlost-ltd/vaadin-ckeditor/compare/v5.1.0...v5.2.0
 [5.1.0]: https://github.com/wontlost-ltd/vaadin-ckeditor/compare/v5.0.5...v5.1.0
 [5.0.5]: https://github.com/wontlost-ltd/vaadin-ckeditor/compare/v5.0.3...v5.0.5

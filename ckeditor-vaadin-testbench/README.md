@@ -21,7 +21,7 @@ Provides `VaadinCKEditorElement` — a type-safe page object for driving the
 <dependency>
     <groupId>com.wontlost</groupId>
     <artifactId>ckeditor-vaadin-testbench</artifactId>
-    <version>5.3.1</version>
+    <version>5.3.2</version>
     <scope>test</scope>
 </dependency>
 ```

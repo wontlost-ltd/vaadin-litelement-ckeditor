@@ -32,14 +32,14 @@ A comprehensive CKEditor 5 integration for Vaadin 24+.
 <dependency>
     <groupId>com.wontlost</groupId>
     <artifactId>ckeditor-vaadin</artifactId>
-    <version>5.3.1</version>
+    <version>5.3.2</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```kotlin
-implementation("com.wontlost:ckeditor-vaadin:5.3.1")
+implementation("com.wontlost:ckeditor-vaadin:5.3.2")
 ```
 
 ### Compatibility Matrix
@@ -465,7 +465,7 @@ type-safe Vaadin TestBench page object for the `vaadin-ckeditor` component.
 <dependency>
     <groupId>com.wontlost</groupId>
     <artifactId>ckeditor-vaadin-testbench</artifactId>
-    <version>5.3.1</version>
+    <version>5.3.2</version>
     <scope>test</scope>
 </dependency>
 ```
