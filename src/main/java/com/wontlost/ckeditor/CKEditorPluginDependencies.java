@@ -450,18 +450,25 @@ public final class CKEditorPluginDependencies {
     public static Map<CKEditorPlugin, Set<CKEditorPlugin>> validateDependencies(Set<CKEditorPlugin> plugins) {
         Map<CKEditorPlugin, Set<CKEditorPlugin>> missing = new EnumMap<>(CKEditorPlugin.class);
 
+        // 必须按「传递闭包」校验，而不是只看直接依赖。
+        // 原因：resolve() 是传递解析的，若校验只查一层，就会出现
+        // STRICT 校验通过、实际插件集仍不完整的情况（两种模式对同一输入结论相左）。
+        // 做法：对每个插件取其完整依赖闭包，凡不在用户给定集合中的都算缺失，
+        // 这样 STRICT 报出的缺失项与 AUTO_RESOLVE 会补齐的项完全一致。
         for (CKEditorPlugin plugin : plugins) {
-            Set<CKEditorPlugin> deps = DEPENDENCIES.get(plugin);
-            if (deps != null) {
-                Set<CKEditorPlugin> missingDeps = EnumSet.noneOf(CKEditorPlugin.class);
-                for (CKEditorPlugin dep : deps) {
-                    if (!plugins.contains(dep)) {
-                        missingDeps.add(dep);
-                    }
+            Set<CKEditorPlugin> closure = EnumSet.noneOf(CKEditorPlugin.class);
+            resolveTransitive(plugin, closure);
+            // 闭包含插件自身，排除后才是它的依赖全集
+            closure.remove(plugin);
+
+            Set<CKEditorPlugin> missingDeps = EnumSet.noneOf(CKEditorPlugin.class);
+            for (CKEditorPlugin dep : closure) {
+                if (!plugins.contains(dep)) {
+                    missingDeps.add(dep);
                 }
-                if (!missingDeps.isEmpty()) {
-                    missing.put(plugin, missingDeps);
-                }
+            }
+            if (!missingDeps.isEmpty()) {
+                missing.put(plugin, missingDeps);
             }
         }
 

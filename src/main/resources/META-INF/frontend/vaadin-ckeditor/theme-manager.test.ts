@@ -143,11 +143,18 @@ describe('ThemeManager', () => {
         });
 
         it('should be safe to call cleanup multiple times', () => {
-            manager.cleanup();
-            manager.cleanup();
-            manager.cleanup();
+            // expect(true).toBe(true) 恒成立、等于没有断言：
+            // 即便 cleanup() 变成抛异常或状态残留也照样通过。
+            // 改为断言「重复 cleanup 不抛」+「最终状态确实已清理」。
+            expect(() => {
+                manager.cleanup();
+                manager.cleanup();
+                manager.cleanup();
+            }).not.toThrow();
 
-            expect(true).toBe(true); // No errors thrown
+            // 断言可观测的最终状态：dark 主题注入的 CSS 变量与 style 节点已被移除。
+            expect(document.documentElement.style.getPropertyValue('--ck-color-base-background')).toBe('');
+            expect(document.getElementById('vaadin-ckeditor-dark-theme')).toBeNull();
         });
     });
 

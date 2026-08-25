@@ -18,9 +18,76 @@ on:
 
 permissions:
   contents: write
+  # verify-ci 需要读取 Actions API 以确认本 commit 的 CI 结论
+  actions: read
 
 jobs:
+  # 发布门禁：Maven Central 不可撤回，因此必须先确认本 commit 的 CI 已通过，
+  # 且发布点确实在 main 上（workflow_dispatch 可从任意分支触发，需显式拦截）。
+  verify-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Assert commit is on main
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=0 2>/dev/null || git fetch origin main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::Commit $GITHUB_SHA is not an ancestor of origin/main — refusing to publish."
+            exit 1
+          fi
+          echo "Commit is on main."
+
+      - name: Assert CI passed for this commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # 轮询等待 CI 完成（tag push 与本工作流几乎同时触发，CI 可能仍在运行中）。
+          #
+          # 判定规则（review 反馈两轮）：
+          #   取该 commit 上 ci.yml 的全部 run，按 run_number 排序后**只看最新一条已结束的**：
+          #     - 最新已结束 = success            → 通过
+          #     - 最新已结束 = 其它结论            → 失败
+          #     - 尚无已结束的 run                 → 继续等待
+          #
+          # 为什么不是「任一失败即拒绝」：那样一次失败后即便修好重跑成功也永远发不出去。
+          # 为什么不是「任一成功即通过」：那样旧的成功 run 会掩盖之后的失败。
+          # 取「最新结论」两种误判都能避免——它就是该 commit 当前的真实 CI 状态。
+          #
+          # 按 head_sha 匹配是刻意为之：同一 commit 的 main run 与 tag run 跑的是完全
+          # 相同的代码，任一为最新成功结论都构成有效证据。
+          for i in $(seq 1 60); do
+            RUNS=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/ci.yml/runs?head_sha=${GITHUB_SHA}&per_page=100" \
+              --jq '[.workflow_runs[] | {status, conclusion, run_number}]')
+            # 先看有没有尚未结束的 run：若有，必须等它出结论再判断。
+            # 否则「旧 run 成功 + 更新的 run 仍在跑」会被旧结论抢先放行，
+            # 而那个在途 run 可能最终失败（review 第四轮指出）。
+            PENDING=$(echo "$RUNS" | jq '[.[] | select(.status != "completed")] | length')
+            LATEST=$(echo "$RUNS" | jq -r '[.[] | select(.status == "completed")] | sort_by(.run_number) | last | .conclusion // "none"')
+            echo "attempt $i: pending=$PENDING latest_completed=$LATEST"
+
+            if [[ "$PENDING" -eq 0 ]]; then
+              if [[ "$LATEST" == "success" ]]; then
+                echo "CI passed for $GITHUB_SHA (no runs in flight)."
+                exit 0
+              fi
+              if [[ "$LATEST" != "none" ]]; then
+                echo "::error::Latest CI run for $GITHUB_SHA concluded '$LATEST' — refusing to publish."
+                exit 1
+              fi
+            fi
+            sleep 20
+          done
+          echo "::error::Timed out waiting for CI to complete on $GITHUB_SHA."
+          exit 1
+
   publish:
+    needs: verify-ci
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -50,10 +117,6 @@ jobs:
               exit 1
             fi
             VERSION="${INPUT_VERSION}"
-            if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-              echo "::error::Invalid version format. Expected: X.Y.Z (e.g. 5.0.6)"
-              exit 1
-            fi
             TAG_NAME="v${VERSION}"
           else
             TAG_NAME="${GITHUB_REF_NAME}"
@@ -62,6 +125,14 @@ jobs:
               exit 1
             fi
             VERSION="${TAG_NAME#v}"
+          fi
+
+          # 严格 SemVer 全串校验，两条触发路径统一适用。
+          # 与 publish-testbench.yml 保持一致：此前主工作流的正则缺少 `$` 锚点，
+          # 且只在 workflow_dispatch 分支校验，形如 "5.3.2-oops" 的 tag 可以漏过这一关。
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Invalid version format: '$VERSION'. Expected X.Y.Z or X.Y.Z-suffix (e.g. 5.3.2, 5.3.2-rc1)."
+            exit 1
           fi
 
           # Verify pom.xml version matches

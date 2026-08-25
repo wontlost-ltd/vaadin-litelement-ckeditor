@@ -1532,4 +1532,52 @@ class CKEditorConfigTest {
         assertThat(json.get("bottom").asString()).isEqualTo("10mm");
         assertThat(json.has("left")).isFalse(); // null 不序列化
     }
+
+    @Test
+    @DisplayName("getToolbarStyle() 必须完整还原 per-button 样式（读-改-写不丢数据）")
+    void toolbarStyleRoundTripPreservesButtonStyles() {
+        // review (Codex): 原测试只验证 toJson() 的写入路径，
+        // 未覆盖 getToolbarStyle() 的还原路径——而后者恰好漏读了 buttonStyles，
+        // 导致 setToolbarStyle(getToolbarStyle()) 永久销毁全部按钮样式。
+        config.setToolbarStyle(CKEditorConfig.ToolbarStyle.builder()
+            .background("#ffffff")
+            .buttonStyle("Bold", CKEditorConfig.ButtonStyle.builder()
+                .background("#ff0000").iconColor("#00ff00").build())
+            .buttonStyle("Italic", CKEditorConfig.ButtonStyle.builder()
+                .hoverBackground("#0000ff").build())
+            .build());
+
+        String before = config.toJson().get("toolbarStyle").toString();
+
+        CKEditorConfig.ToolbarStyle round = config.getToolbarStyle();
+        assertThat(round.getButtonStyles().keySet()).containsExactlyInAnyOrder("Bold", "Italic");
+
+        config.setToolbarStyle(round);
+        assertThat(config.toJson().get("toolbarStyle").toString())
+            .as("读-改-写之后配置必须与原值完全一致")
+            .isEqualTo(before);
+    }
+
+    @Test
+    @DisplayName("toJson()/getConfigs()/getJsonNode() 返回的必须是深拷贝")
+    void snapshotsAreDeepCopies() {
+        // review (Codex): 原测试只验证 map 不可 clear()，
+        // 而 unmodifiableMap 挡不住「修改 map 中的可变 JsonNode 子节点」。
+        config.setToolbar(new String[]{"bold"});
+
+        ((tools.jackson.databind.node.ArrayNode) config.toJson().get("toolbar")).add("EVIL");
+        assertThat(config.toJson().get("toolbar").toString())
+            .as("修改 toJson() 的返回值不得污染内部配置")
+            .doesNotContain("EVIL");
+
+        ((tools.jackson.databind.node.ArrayNode) config.getConfigs().get("toolbar")).add("EVIL2");
+        assertThat(config.toJson().get("toolbar").toString())
+            .as("修改 getConfigs() 的返回值不得污染内部配置")
+            .doesNotContain("EVIL2");
+
+        ((tools.jackson.databind.node.ArrayNode) config.getJsonNode("toolbar")).add("EVIL3");
+        assertThat(config.toJson().get("toolbar").toString())
+            .as("修改 getJsonNode() 的返回值不得污染内部配置")
+            .doesNotContain("EVIL3");
+    }
 }

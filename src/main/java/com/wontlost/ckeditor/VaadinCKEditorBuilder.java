@@ -323,6 +323,22 @@ public class VaadinCKEditorBuilder {
     }
 
     /**
+     * 开启「客户端输入即净化」。
+     *
+     * <p>开启后，来自客户端的内容在写入模型时就会被 {@code withHtmlSanitizer} 配置的
+     * 净化器处理，因此 {@code getValue()} 与 Binder 绑定路径拿到的都是净化后的值。
+     * 默认关闭以保持既有行为。</p>
+     *
+     * @param sanitizeOnInput true 表示开启入口净化
+     * @return this builder for chaining
+     * @see VaadinCKEditor#setSanitizeOnInput(boolean)
+     */
+    public VaadinCKEditorBuilder withSanitizeOnInput(boolean sanitizeOnInput) {
+        editor.setSanitizeOnInput(sanitizeOnInput);
+        return this;
+    }
+
+    /**
      * Set upload handler for file uploads.
      *
      * @param handler the upload handler

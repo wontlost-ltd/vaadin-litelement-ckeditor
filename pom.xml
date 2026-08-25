@@ -131,6 +131,14 @@
                         <exclude>**/node_modules/**</exclude>
                         <exclude>**/package-lock.json</exclude>
                         <exclude>**/tsconfig.json</exclude>
+                        <!--
+                            测试资产不应随发布产物分发：它们 import vitest（消费方不会安装的
+                            devDependency），既是无谓体积（约占 jar 的 46%），也让消费端的
+                            Vaadin 前端构建存在扫描到不可解析 import 的风险。
+                        -->
+                        <exclude>**/*.test.ts</exclude>
+                        <exclude>**/test-mocks/**</exclude>
+                        <exclude>**/vitest.config.ts</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -169,6 +177,23 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
                         <version>3.3.1</version>
+                        <!--
+                            source-plugin 有独立的 excludes，不继承 jar-plugin 的配置。
+                            若不在此排除，本地构建（node_modules 存在于
+                            src/main/resources/.../vaadin-ckeditor/ 下）产出的 sources jar
+                            会包含约 2 万个 node_modules 文件、体积达 49MB。
+                            CI 全新 checkout 无 node_modules 故已发布产物未受影响，
+                            但本地 `mvn -Prelease deploy` 会把它推上 Central 且不可撤回，
+                            同时造成第三方许可文件混入本项目 Apache-2 sources jar 的合规问题。
+                        -->
+                        <configuration>
+                            <excludes>
+                                <exclude>**/node_modules/**</exclude>
+                                <exclude>**/*.test.ts</exclude>
+                                <exclude>**/test-mocks/**</exclude>
+                                <exclude>**/vitest.config.ts</exclude>
+                            </excludes>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>

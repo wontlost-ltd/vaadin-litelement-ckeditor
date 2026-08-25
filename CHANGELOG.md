@@ -7,6 +7,113 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **builder 配置的 `ErrorHandler` 从不触发**（严重）。`setErrorHandlerInternal()` 只写字段，
+  未像公开 setter 那样把 handler 接到 `EventDispatcher` 上，导致
+  `.withErrorHandler(h).build()` 之后 `h` 永远不会被调用——消费端的错误处理静默失效。
+  修复方式与 `contentManager`、`uploadManager` 保持一致：在 `initializeManagers()`
+  中统一从字段装配。实测：修复前 builder 路径回调 0 次 / setter 路径 1 次，修复后均为 1 次。
+- **`getToolbarStyle()` 丢失全部 per-button 样式**（严重）。重建时只读取 9 个标量字段而漏掉
+  `buttonStyles`，使 `setToolbarStyle(getToolbarStyle())` 这类「读-改-写」永久销毁按钮样式。
+  实测修复后 round-trip 完全保真。
+- **三个内置 preset 在 STRICT 依赖模式下无法构建**（严重）。补齐
+  `AI_DOCUMENT`（缺 `CLOUD_SERVICES_CORE`）、`EMAIL`（缺 `CLIPBOARD`）、
+  `NOTION`（缺 `CLIPBOARD`/`WIDGET`/`WIDGET_TOOLBAR_REPOSITORY`）。
+  实测：修复前 9 个 preset 有 3 个在 STRICT 下抛 `IllegalStateException`，修复后全部可构建。
+- `validateDependencies()` 改为按**传递闭包**报告缺失项。原实现只检查直接依赖，
+  与传递解析的 `resolve()` 在诊断范围上不一致：例如只声明 `SIMPLE_UPLOAD_ADAPTER` 时
+  原先仅报 `IMAGE_UPLOAD`，遗漏其再依赖的 `IMAGE`。
+  这是**诊断信息的完善，不是判定口径收紧**——已枚举全部插件验证：
+  「原先通过、现在被拒」的数量为 0（若直接依赖已满足，其依赖必然也在集合中）。
+- **上传去重集合只增不减**。`notifiedUploadIds` 在正常完成路径从不清理，既持续泄漏，
+  又因前端 uploadId 是每实例计数器（组件重挂载后复用）而误判重复通知，
+  表现为文件已存服务端、前端永远转圈。新增 `retireUpload()` 在终态释放登记信息。
+  实测：200 次上传后集合从 200 降为 0，且 ID 复用可正常回调。
+  注意 early-failure 路径**不**释放，以维持既有的「同一 uploadId 只通知一次」契约。
+- **编辑器重挂载后永不重建**（前端，严重）。创建逻辑绑在 `firstUpdated()`（Lit 每实例只调一次），
+  而 `disconnectedCallback` 会销毁编辑器，导致「移出 DOM 再放回」后只剩空白容器
+  （Vaadin 中 `remove()/add()`、布局间移动、Tab 切换等场景常见）。改为在
+  `connectedCallback` 中按需重建。
+- **异步创建期间断开会留下孤儿编辑器**（前端，严重）。`create()` 解析可能晚于
+  `disconnectedCallback`，而结果被无条件赋值给 `this.editor`，此时已无人负责销毁——
+  每次路由往返泄漏一个完整编辑器实例。改为 await 之后重新检查连接状态并立即销毁孤儿。
+- **标注侧栏 scroll 监听从未注销**（前端）。每次 `onEditorReady` 都会叠加监听器，
+  造成滚动卡顿与组件泄漏；相邻的 `MutationObserver` 已有防叠加处理，此处补齐。
+- **属性路径写回 `editorData` 会绕过 `apiChangeDepth`**（前端）。直接调用 `setData` 会让
+  服务端推送的内容被判定为用户输入并回传服务端（issue #38 的问题经此路径复现），
+  且跳过源码视图刷新（issue #57）。改为统一走 `updateData()`。
+- `CKEditorConfig.configs` 改为同步 Map。实测 8 线程并发写入会静默丢失约 3 万次写入且不抛异常。
+- `toJson()` / `getConfigs()` 改为返回深拷贝。此前返回值与内部配置共享可变子节点，
+  调用方修改「快照」会反向污染真实配置。
+- `firstUpdated` 中 `createEditor()` 的 unhandled rejection 兜底。
+
+以下三项由交叉审查（Codex）发现，均为上述修复的边界遗漏，已一并解决：
+- **同一 tick 内 remove→add 时重建被跳过**。销毁被延迟到 microtask，而实测回调顺序是
+  `disconnectedCallback → connectedCallback → destroy microtask`，故 `connectedCallback`
+  执行时 `editor` 尚未清空、重建守卫直接返回，随后编辑器被销毁却无人重建。
+  改为在销毁完成后补判一次（`recreateEditorOnReconnect()` 由两处共用）。
+- **「创建中断开、创建结束前又重连」漏唤醒**。孤儿销毁路径不经过 `destroyEditor()`，
+  拿不到上述 microtask 补偿；而 `connectedCallback` 早已在 `isCreating=true` 时返回。
+  改为在孤儿销毁后同样补触发一次重建判定。
+- **跨代重叠的上传会互相删除登记**。前端 uploadId 是每实例计数器，组件重挂载后复用；
+  两代同时在途时，先结束的一代会把仍在途的另一代从 `activeTasks` 中移除，
+  导致后者无法取消、状态查询失效。所有 `activeTasks.remove` 改为两参数原子删除
+  （仅当映射仍指向本次 task 时才删）；重复通知守卫的键也由裸 uploadId 改为
+  **`UploadTask` 实例本身**，从数据结构上按「代」隔离——释放时机因此不再需要
+  「该 ID 是否还有活跃任务」这类非原子判断，窗口期问题随之消失。
+- **孤儿销毁后的补偿重建时机错误**。原先用 `queueMicrotask` 触发，实测该 microtask
+  会排在外层 `async` 函数的 `finally` **之前**，届时 `isCreating` 尚未复位、
+  守卫直接返回，补偿失效、组件仍永久空白。改为置标志位、由 `finally` 在释放
+  创建锁之后消费。
+- **创建锁存在并发窗口**。`canCreateEditor()` 检查与 `isCreating = true` 之间隔着
+  `await waitForPreviousEditorCleanup()`，两个并发调用者可能都通过检查并各建一个
+  编辑器。改为先占锁再 await，并让守卫只依据 `isCreating`（`createPromise` 直到
+  await 之后才赋值，要求两者同时成立会在该窗口内放行第二个调用者）。
+- **失败路径仍会强引用整个 `UploadTask`**。handler 返回 null 或同步抛异常时
+  `notifyError` 带 task 调用，而该路径不经过 `retireUpload`，守卫集合会一直持有
+  该 task。已补充释放。
+
+### Added
+- `setSanitizeOnInput(boolean)` / `withSanitizeOnInput(boolean)`：可选的「客户端输入即净化」。
+  背景：本组件继承 `CustomField<String>`，`Binder` 读取的是 `getValue()`，
+  而 `setHtmlSanitizer()` 仅作用于 `getSanitizedValue()`——即配置了净化器 + 使用 Binder
+  的用户实际得不到任何净化。开启本开关后，客户端内容在写入模型时即被净化，
+  `getValue()`、Binder 与 `ValueChangeEvent` 均受保护；服务端自行 `setValue()` 的内容
+  视为可信来源，不受影响。**默认关闭以保持向后兼容**，并已在 `getValue()` 的 Javadoc 中
+  明确标注其返回未净化内容及对 Binder 的影响。
+
+### Changed
+- **CI 现在运行前端测试**：新增 `frontend` job 执行 `npm ci && npm run typecheck && npm test`。
+  此前 171 个 vitest 用例与 `tsc --noEmit` 从未在 CI 中运行过（Maven 只把 `.ts` 当资源复制），
+  类型错误会直到消费端 Vaadin 构建时才暴露。CI 同时开始编译 testbench 模块
+  （该模块不在根 reactor 中，此前完全无覆盖），并在发布 tag 上触发。
+- **发布增加 CI 门禁**：`publish.yml` 与 `publish-testbench.yml` 新增 `verify-ci` 前置 job，
+  断言待发布 commit 在 `main` 上且其 CI 结论为 success。Maven Central 不可撤回，
+  此前 tag 一推即发布，且 `workflow_dispatch` 可从任意分支触发。
+  同时把 testbench 工作流中更严格的全串 SemVer 校验回填到主工作流。
+- **发布产物不再包含测试资产**：`maven-jar-plugin` 补充排除 `*.test.ts`、`test-mocks/`、
+  `vitest.config.ts`（此前约占 jar 的 46%，且 import 消费端不会安装的 vitest）；
+  `maven-source-plugin` 补充独立的 excludes——它不继承 jar-plugin 配置，本地构建
+  （存在 node_modules）产出的 sources jar 达 49MB/约 2 万个文件。
+  实测 sources jar 由 49.6MB 降至 187KB。
+
+### Tests
+- 新增 `VersionSyncTest`：把 6 处版本常量的漂移变成构建失败。此前唯一约束是一句注释，
+  发布流程也只校验 tag↔pom 一对关系，实践中已发生过漏改。
+- 净化器测试补充判别性断言与 XSS 向量覆盖。原断言「`<script>` 被移除」是同义反复——
+  jsoup 在任何 Safelist 下都会移除 `<script>`，把 BASIC 误改成 `relaxed()` 也照样全绿；
+  已用变异测试确认新断言能捕获该降级。同时补齐 `onerror`/`onclick`/`javascript:`/`onload`
+  在三种策略下的剥离断言。
+- 上传大小上限与 MIME 白名单补充 `upload()` 层的行为断言（此前这两个校验分支从未被执行，
+  删掉也不会有测试失败），已用变异测试确认有效。
+- 替换 `theme-manager.test.ts` 中恒成立的 `expect(true).toBe(true)`。
+- 新增 `reconnect-decision.ts`：把「重挂载后是否应重建编辑器」的判定抽成纯函数并配 9 个单测
+  （含同 tick remove→add 与创建中断开两条完整时序），沿用本仓既有的
+  「提取纯函数以便测试」模式，避免为覆盖生命周期而 mock 整个 CKEditor。
+- 补充判别性测试：ErrorHandler 真实回调（非仅 getter）、全部 preset 在 STRICT 下可构建、
+  传递依赖缺失可被发现、toolbarStyle 读-改-写保真、三个快照方法均为深拷贝、
+  上传跨代复用与跨代重叠。多数已用变异测试验证其确能捕获对应缺陷。
+
 ### Security
 - 修复 Dependabot 报告的 4 个依赖漏洞，其中 2 个属运行时（随包分发、影响消费端），
   2 个属开发期（`vitest` 传递依赖，不进入发布产物）。

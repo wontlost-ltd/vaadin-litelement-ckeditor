@@ -69,6 +69,30 @@ describe('UploadAdapterManager', () => {
             // We verify the setter doesn't throw
             expect(() => manager.setMaxFileSize(1024)).not.toThrow();
         });
+
+        it('应当拒绝超过大小上限的文件', async () => {
+            // 此前只断言 setter 不抛异常，upload() 里的大小校验分支从未被执行过：
+            // 把该校验整段删掉，测试依然全绿。这里补上真正的行为断言。
+            manager.setMaxFileSize(10);
+
+            const factory = manager.createUploadAdapterFactory();
+            const big = new File(['x'.repeat(100)], 'big.jpg', { type: 'image/jpeg' });
+            const adapter = factory({ file: Promise.resolve(big) });
+
+            await expect(adapter.upload()).rejects.toThrow(/exceeds maximum/i);
+        });
+
+        it('应当在 upload() 阶段拒绝不在白名单内的 MIME 类型', async () => {
+            // isMimeTypeAllowed() 作为纯函数已有覆盖，但 upload() 内部的拒绝分支没有：
+            // 条件写反也不会被现有测试发现。
+            manager.setAllowedMimeTypes(['image/png']);
+
+            const factory = manager.createUploadAdapterFactory();
+            const wrong = new File(['data'], 'a.pdf', { type: 'application/pdf' });
+            const adapter = factory({ file: Promise.resolve(wrong) });
+
+            await expect(adapter.upload()).rejects.toThrow(/not allowed/i);
+        });
     });
 
     describe('MIME type validation', () => {

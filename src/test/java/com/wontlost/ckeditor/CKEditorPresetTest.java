@@ -138,4 +138,38 @@ class CKEditorPresetTest {
                 CKEditorPlugin.AUTOSAVE
             );
     }
+
+    @org.junit.jupiter.api.Test
+    @org.junit.jupiter.api.DisplayName("所有内置 preset 都必须能在 STRICT 依赖模式下构建")
+    void allPresetsBuildUnderStrictMode() {
+        // review (Codex): 依赖测试此前只覆盖直接依赖，未验证「preset 自身是否自洽」。
+        // 实际上 AI_DOCUMENT / EMAIL / NOTION 三个内置 preset 缺少必需依赖，
+        // 在 STRICT 模式下会直接抛 IllegalStateException——内置 preset 被内置模式拒绝。
+        for (CKEditorPreset preset : CKEditorPreset.values()) {
+            org.junit.jupiter.api.Assertions.assertDoesNotThrow(
+                () -> VaadinCKEditor.create()
+                    .withDependencyMode(VaadinCKEditorBuilder.DependencyMode.STRICT)
+                    .withPreset(preset)
+                    .build(),
+                "preset " + preset + " 必须在 STRICT 模式下可构建");
+        }
+    }
+
+    @org.junit.jupiter.api.Test
+    @org.junit.jupiter.api.DisplayName("传递依赖缺失必须被 STRICT 校验发现")
+    void validateDependenciesCoversTransitiveClosure() {
+        // 只声明 SIMPLE_UPLOAD_ADAPTER：它直接依赖 IMAGE_UPLOAD，
+        // 而 IMAGE_UPLOAD 又依赖 IMAGE。若校验只看一层，就会漏报 IMAGE。
+        java.util.Set<CKEditorPlugin> plugins =
+            java.util.EnumSet.of(CKEditorPlugin.SIMPLE_UPLOAD_ADAPTER);
+        java.util.Map<CKEditorPlugin, java.util.Set<CKEditorPlugin>> missing =
+            CKEditorPluginDependencies.validateDependencies(plugins);
+
+        java.util.Set<CKEditorPlugin> allMissing = java.util.EnumSet.noneOf(CKEditorPlugin.class);
+        missing.values().forEach(allMissing::addAll);
+
+        org.assertj.core.api.Assertions.assertThat(allMissing)
+            .as("必须同时报出直接依赖与传递依赖，否则 STRICT 与 AUTO_RESOLVE 结论不一致")
+            .contains(CKEditorPlugin.IMAGE_UPLOAD, CKEditorPlugin.IMAGE);
+    }
 }

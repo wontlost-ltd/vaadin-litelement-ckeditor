@@ -353,6 +353,73 @@ class UploadManagerTest {
         assertNull(lastError.get());
     }
 
+    // review (Codex): 组件重挂载导致 uploadId 跨代复用时，不得被去重守卫误拦
+    @Test
+    @DisplayName("reused uploadId from a later generation must still notify")
+    void crossGenerationIdReuseIsNotBlocked() throws Exception {
+        // review (Codex): 前端 uploadId 是每实例计数器，组件重挂载后会从 1 重新计数，
+        // 于是同一个 uploadId 会跨「代」复用。此前 notifiedUploadIds 只增不减，
+        // 第二代同名上传会被误判为重复通知而静默跳过——文件已存服务端、前端永远转圈。
+        java.util.List<String> notified = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
+        UploadHandler handler = (ctx, in) ->
+            CompletableFuture.completedFuture(new UploadHandler.UploadResult("/ok.jpg"));
+        manager = new UploadManager(handler, null, (id, url, err) -> notified.add(id));
+
+        manager.handleUpload("upload-e-1", "first.jpg", "image/jpeg", createBase64Data("a"));
+        waitUntil(() -> notified.size() == 1);
+
+        // 第二代复用同一 uploadId，必须同样得到回调
+        manager.handleUpload("upload-e-1", "second.jpg", "image/jpeg", createBase64Data("b"));
+        waitUntil(() -> notified.size() == 2);
+
+        assertEquals(2, notified.size(),
+            "复用的 uploadId 必须能再次回调，否则前端会永久等待");
+    }
+
+    @Test
+    @DisplayName("两代上传重叠时，先结束的一代不得删除另一代的登记")
+    void overlappingGenerationsDoNotEvictEachOther() throws Exception {
+        // review (Codex, 第二轮): 上一版测试只覆盖「第一代完全结束后再复用 ID」，
+        // 未覆盖两代同时在途。此时若按裸 uploadId 无条件 remove，
+        // 先结束的一代会把仍在途的另一代从 activeTasks 中删掉，
+        // 导致后者无法被取消、状态查询失效。
+        CompletableFuture<UploadHandler.UploadResult> gen1 = new CompletableFuture<>();
+        CompletableFuture<UploadHandler.UploadResult> gen2 = new CompletableFuture<>();
+        java.util.List<CompletableFuture<UploadHandler.UploadResult>> queue =
+            java.util.Collections.synchronizedList(
+                new java.util.ArrayList<>(java.util.List.of(gen1, gen2)));
+
+        manager = new UploadManager((ctx, in) -> queue.remove(0), null, (id, url, err) -> { });
+
+        manager.handleUpload("upload-x-1", "gen1.jpg", "image/jpeg", createBase64Data("a"));
+        waitUntil(() -> manager.getActiveUploadCount() == 1);
+
+        // 第二代复用同一 ID（组件重挂载后计数器归零），与第一代重叠
+        manager.handleUpload("upload-x-1", "gen2.jpg", "image/jpeg", createBase64Data("b"));
+
+        // 第一代先完成
+        gen1.complete(new UploadHandler.UploadResult("/gen1.jpg"));
+
+        // 第二代仍在途，其登记不得被第一代的退休流程删除
+        Thread.sleep(150);
+        assertNotNull(manager.getUploadTask("upload-x-1"),
+            "第一代结束后，仍在途的第二代登记必须保留");
+
+        gen2.complete(new UploadHandler.UploadResult("/gen2.jpg"));
+        waitUntil(() -> manager.getUploadTask("upload-x-1") == null);
+    }
+
+    /** 轮询等待条件成立，避免固定 sleep 带来的偶发失败。 */
+    private static void waitUntil(java.util.function.BooleanSupplier condition) throws Exception {
+        long deadline = System.currentTimeMillis() + 5000;
+        while (!condition.getAsBoolean()) {
+            if (System.currentTimeMillis() > deadline) {
+                throw new AssertionError("等待条件超时（5s）");
+            }
+            Thread.sleep(5);
+        }
+    }
+
     // review: double-notification 守卫此前在 task==null（early failure）时被绕过
     @Test
     @DisplayName("notifyResult must guard duplicates even on early-failure paths (no task)")

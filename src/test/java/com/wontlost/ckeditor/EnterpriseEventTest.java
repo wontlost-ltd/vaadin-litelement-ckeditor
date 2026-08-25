@@ -267,6 +267,34 @@ class EnterpriseEventTest {
             String result = basic.sanitize(html);
             assertFalse(result.contains("<script>"));
             assertTrue(result.contains("text"));
+
+            // 判别性断言：BASIC 必须比 RELAXED 更严格。
+            // 仅断言「<script> 被移除」是同义反复——jsoup 在任何 Safelist 下都会移除
+            // <script>，因此即便把 BASIC 误改成 relaxed()，上面两条断言依然全绿。
+            // 这里用「BASIC 不保留 table / img」把两种策略区分开，策略被放宽时立即失败。
+            assertFalse(basic.sanitize("<table><tr><td>c</td></tr></table>").contains("<table>"),
+                "BASIC must not allow <table> (RELAXED does) — guards against policy widening");
+            assertFalse(basic.sanitize("<img src=x>").contains("<img"),
+                "BASIC must not allow <img> (RELAXED does) — guards against policy widening");
+        }
+
+        @Test
+        @DisplayName("所有策略都必须剥离事件处理器与 javascript: 协议")
+        void testAllPoliciesStripXssVectors() {
+            // 这些才是净化器真正要防的攻击向量，此前完全没有断言覆盖。
+            for (SanitizationPolicy policy : new SanitizationPolicy[] {
+                    SanitizationPolicy.BASIC, SanitizationPolicy.RELAXED, SanitizationPolicy.STRICT }) {
+                HtmlSanitizer s = HtmlSanitizer.withPolicy(policy);
+
+                assertFalse(s.sanitize("<img src=x onerror=alert(1)>").contains("onerror"),
+                    policy + " must strip onerror handler");
+                assertFalse(s.sanitize("<p onclick='alert(1)'>t</p>").contains("onclick"),
+                    policy + " must strip onclick handler");
+                assertFalse(s.sanitize("<a href=\"javascript:alert(1)\">l</a>").contains("javascript:"),
+                    policy + " must strip javascript: URL");
+                assertFalse(s.sanitize("<svg onload=alert(1)></svg>").contains("onload"),
+                    policy + " must strip onload handler");
+            }
         }
 
         @Test
@@ -528,6 +556,37 @@ class EnterpriseEventTest {
         }
 
         @Test
+        @DisplayName("builder 配置的 ErrorHandler 必须真正被调用（不只是 getter 能取到）")
+        void testWithErrorHandlerIsActuallyInvoked() throws Exception {
+            // 仅断言 getter 是不够的：此前 setErrorHandlerInternal() 只写字段、
+            // 未接到 EventDispatcher 上，getter 照样返回 handler，但错误发生时
+            // 回调永远不触发（静默失效）。这里断言真实调用。
+            java.util.concurrent.atomic.AtomicInteger builderHits =
+                new java.util.concurrent.atomic.AtomicInteger();
+            java.util.concurrent.atomic.AtomicInteger setterHits =
+                new java.util.concurrent.atomic.AtomicInteger();
+
+            VaadinCKEditor viaBuilder = VaadinCKEditor.create()
+                .withPreset(CKEditorPreset.BASIC)
+                .withErrorHandler(e -> { builderHits.incrementAndGet(); return true; })
+                .build();
+
+            VaadinCKEditor viaSetter = VaadinCKEditor.create()
+                .withPreset(CKEditorPreset.BASIC)
+                .build();
+            viaSetter.setErrorHandler(e -> { setterHits.incrementAndGet(); return true; });
+
+            java.lang.reflect.Method fire = VaadinCKEditor.class.getDeclaredMethod(
+                "fireEditorError", String.class, String.class, String.class, boolean.class, String.class);
+            fire.setAccessible(true);
+            fire.invoke(viaBuilder, "EDITOR_CREATION_FAILED", "boom", "FATAL", false, "trace");
+            fire.invoke(viaSetter, "EDITOR_CREATION_FAILED", "boom", "FATAL", false, "trace");
+
+            assertEquals(1, builderHits.get(), "builder 路径的 ErrorHandler 必须被调用");
+            assertEquals(1, setterHits.get(), "setter 路径的 ErrorHandler 必须被调用");
+        }
+
+        @Test
         @DisplayName("Test withHtmlSanitizer")
         void testWithHtmlSanitizer() {
             HtmlSanitizer sanitizer = HtmlSanitizer.withPolicy(SanitizationPolicy.STRICT);
@@ -660,6 +719,62 @@ class EnterpriseEventTest {
     @Nested
     @DisplayName("HtmlSanitizer Integration Tests")
     class HtmlSanitizerIntegrationTests {
+
+        /** 反射调用 @ClientCallable 的 setEditorData，模拟来自浏览器的不可信输入。 */
+        private void feedFromClient(VaadinCKEditor editor, String html) throws Exception {
+            var m = VaadinCKEditor.class.getDeclaredMethod("setModelValue", String.class, boolean.class);
+            m.setAccessible(true);
+            m.invoke(editor, html, true);
+        }
+
+        @Test
+        @DisplayName("默认不开启入口净化时 getValue() 返回原始 HTML（保持既有行为）")
+        void testGetValueUnsanitizedByDefault() throws Exception {
+            VaadinCKEditor editor = VaadinCKEditor.create()
+                .withPreset(CKEditorPreset.BASIC)
+                .withHtmlSanitizer(HtmlSanitizer.withPolicy(SanitizationPolicy.STRICT))
+                .build();
+
+            feedFromClient(editor, "<img src=x onerror=alert(1)><p>hi</p>");
+
+            assertFalse(editor.isSanitizeOnInput(), "入口净化默认必须关闭");
+            assertTrue(editor.getValue().contains("onerror"),
+                "默认行为：getValue() 返回未净化内容（Binder 亦然）——这正是需要文档警示的点");
+            assertFalse(editor.getSanitizedValue().contains("onerror"),
+                "getSanitizedValue() 始终净化");
+        }
+
+        @Test
+        @DisplayName("开启 setSanitizeOnInput 后 getValue()/Binder 路径也被净化")
+        void testSanitizeOnInputProtectsGetValue() throws Exception {
+            VaadinCKEditor editor = VaadinCKEditor.create()
+                .withPreset(CKEditorPreset.BASIC)
+                .withHtmlSanitizer(HtmlSanitizer.withPolicy(SanitizationPolicy.STRICT))
+                .withSanitizeOnInput(true)
+                .build();
+
+            feedFromClient(editor, "<img src=x onerror=alert(1)><p>hi</p>");
+
+            assertTrue(editor.isSanitizeOnInput());
+            assertFalse(editor.getValue().contains("onerror"),
+                "开启后 getValue()（即 Binder 读取路径）必须已净化");
+            assertTrue(editor.getValue().contains("hi"), "正常文本必须保留");
+        }
+
+        @Test
+        @DisplayName("入口净化只作用于客户端输入，服务端 setValue 不被改写")
+        void testSanitizeOnInputSkipsServerSideValues() {
+            VaadinCKEditor editor = VaadinCKEditor.create()
+                .withPreset(CKEditorPreset.BASIC)
+                .withHtmlSanitizer(HtmlSanitizer.withPolicy(SanitizationPolicy.STRICT))
+                .withSanitizeOnInput(true)
+                .build();
+
+            // 服务端自行设值属可信来源，不应被净化改写
+            editor.setValue("<div class='trusted'>server</div>");
+            assertTrue(editor.getValue().contains("<div"),
+                "服务端设置的值不应被入口净化改写");
+        }
 
         @Test
         @DisplayName("Test getSanitizedValue without sanitizer")

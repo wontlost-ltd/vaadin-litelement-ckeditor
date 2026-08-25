@@ -113,8 +113,15 @@ public class UploadManager {
     private final UploadHandler.UploadConfig uploadConfig;
     private final UploadResultCallback resultCallback;
     private final Map<String, UploadTask> activeTasks = new ConcurrentHashMap<>();
-    // 已通知的 uploadId 集合：即使 early-failure 路径 task==null，也能防止同一上传重复回调（review 发现）。
-    private final Set<String> notifiedUploadIds = ConcurrentHashMap.newKeySet();
+    /**
+     * 已通知的上传守卫集合，防止同一次上传重复回调。
+     *
+     * <p>元素类型有意为 {@code Object}：正常路径存 {@link UploadTask} 实例本身，
+     * early-failure（尚未建立 task）路径退回存 {@code uploadId} 字符串。
+     * 以 task 为键可按「代」隔离——uploadId 是前端每实例计数器，组件重挂载后会复用，
+     * 两代上传可能同时在途，用裸 ID 会导致两代相互干扰。</p>
+     */
+    private final Set<Object> notifiedUploadIds = ConcurrentHashMap.newKeySet();
     private final long uploadTimeoutSeconds;
 
     /**
@@ -220,7 +227,7 @@ public class UploadManager {
             if (future == null) {
                 task.setStatus(UploadStatus.FAILED);
                 task.setErrorMessage("Upload handler returned null");
-                activeTasks.remove(uploadId);
+                activeTasks.remove(uploadId, task);
                 logger.log(Level.WARNING, "Upload {0} failed: handler returned null future", uploadId);
                 notifyError(uploadId, task, "Upload handler returned null");
                 return;
@@ -232,7 +239,7 @@ public class UploadManager {
                 errorMsg = e.getClass().getSimpleName() + " occurred during upload initialization";
             }
             task.setErrorMessage(errorMsg);
-            activeTasks.remove(uploadId);
+            activeTasks.remove(uploadId, task);
             logger.log(Level.WARNING, "Upload {0} failed: handler threw {1} - {2}",
                 new Object[]{uploadId, e.getClass().getSimpleName(), errorMsg});
             notifyError(uploadId, task, errorMsg);
@@ -270,13 +277,15 @@ public class UploadManager {
         // 重复通知防护：已通知或已取消时直接返回
         if (task.isNotified()) {
             logger.log(Level.FINE, "Upload {0} already notified, skipping duplicate callback", uploadId);
-            activeTasks.remove(uploadId);
+            activeTasks.remove(uploadId, task);
             return;
         }
 
         if (task.getStatus() == UploadStatus.CANCELLED) {
             logger.log(Level.FINE, "Upload {0} was cancelled, ignoring result", uploadId);
-            activeTasks.remove(uploadId);
+            // 取消路径同样是本次上传的终态：与 activeTasks 一起释放去重标记，
+            // 避免该 uploadId 永久占位（见文末 retireUpload 的说明）。
+            retireUpload(uploadId, task);
             return;
         }
 
@@ -302,8 +311,48 @@ public class UploadManager {
             notifyResult(uploadId, task, null, errorMsg);
         }
 
-        // 清理已完成的任务
-        activeTasks.remove(uploadId);
+        retireUpload(uploadId, task);
+    }
+
+    /**
+     * 释放一次上传占用的全部登记信息（活跃任务 + 去重标记）。
+     *
+     * <p>notifiedUploadIds 只用于防止「同一次上传被通知两次」。一旦这次上传到达终态
+     * （成功 / 失败 / 取消），其 uploadId 就不应再占位，否则：
+     * <ol>
+     *   <li>集合只增不减，长会话下持续泄漏内存；</li>
+     *   <li>前端 uploadId 形如 {@code upload-<editorId>-<每实例计数器>}，组件重挂载后
+     *       计数器归零、ID 会复用；此时旧标记仍在，新上传会被误判为重复通知而直接
+     *       跳过回调，表现为文件已存到服务端、前端却永远转圈。</li>
+     * </ol>
+     *
+     * <p>释放时机安全性：调用点均在通知已经发出之后（或该次上传已被判定为取消而
+     * 不再通知），因此不会削弱「恰好通知一次」的保证——同一 uploadId 的竞争双方
+     * 中必有一方先 add 成功并完成通知，另一方在 add 失败后直接返回。
+     */
+    private void retireUpload(String uploadId, UploadTask task) {
+        // 用两参数 remove：只有当映射仍指向「本次」task 时才删除。
+        // 前端 uploadId 是每实例计数器，组件重挂载后会复用同一个 ID；
+        // 若旧任务结束时无条件 remove(uploadId)，会把刚登记的新任务一并删掉，
+        // 造成新上传丢失登记（后续无法取消、状态查询失效）。
+        if (task != null) {
+            activeTasks.remove(uploadId, task);
+        } else {
+            activeTasks.remove(uploadId);
+        }
+
+        // 释放该 task 的去重标记。
+        // 守卫键是 task 实例本身（见 notifyResult），因此移除只影响「这一代」，
+        // 不会误伤同 ID 的其它代——这正是改用 task 作键换来的好处：
+        // 释放时机不再需要「该 ID 上是否还有活跃任务」这类非原子判断。
+        // 注意集合持有的是强引用，不释放就会一直累积（且泄漏的是整个 UploadTask），
+        // 所以这一步是必需的，不能依赖 GC。
+        if (task != null) {
+            notifiedUploadIds.remove(task);
+        }
+        // task == null 的 early-failure 路径不在此释放：
+        // UploadManagerTest#earlyFailureNotifiesExactlyOnce 要求同一 uploadId 的连续
+        // early failure 只通知一次；这类键由 cleanup() 统一清理，属异常路径、量级有限。
     }
 
     /**
@@ -362,7 +411,7 @@ public class UploadManager {
                 logger.log(Level.FINE, "Upload {0} cancelled after {1}ms",
                     new Object[]{uploadId, task.getElapsedTimeMs()});
                 notifyResult(uploadId, task, null, "Upload cancelled");
-                activeTasks.remove(uploadId);
+                retireUpload(uploadId, task);
                 return true;
             }
 
@@ -419,16 +468,36 @@ public class UploadManager {
     private void notifyError(String uploadId, UploadTask task, String error) {
         logger.log(Level.WARNING, "Upload failed for {0}: {1}", new Object[]{uploadId, error});
         notifyResult(uploadId, task, null, error);
+
+        // 有 task 的失败路径（handler 返回 null / 同步抛异常）：本次上传到此终结，
+        // 必须释放以 task 为键的守卫，否则整个 UploadTask 会被守卫集合强引用而泄漏。
+        // 释放只影响这一代，不会误伤同 ID 的其它代。
+        if (task != null) {
+            retireUpload(uploadId, task);
+        }
+        // task == null 的 early-failure 路径**不**释放：
+        // UploadManagerTest#earlyFailureNotifiesExactlyOnce 要求同一 uploadId
+        // 连续两次 early failure 只通知一次；此时守卫键是字符串 ID，
+        // 释放就会破坏该契约。这类键由 cleanup() 统一清理，
+        // 且仅为字符串、属异常路径，量级有限。
     }
 
     /**
      * Notify upload result with double notification guard
      */
     private void notifyResult(String uploadId, UploadTask task, String url, String error) {
-        // Double notification guard：以 uploadId 集合作为唯一守卫，
-        // 即使 early-failure 路径 task==null 也能防止重复回调（review 发现）。
-        // add() 原子地"首次插入返回 true"，确保每个 uploadId 只通知一次。
-        if (!notifiedUploadIds.add(uploadId)) {
+        // Double notification guard：add() 原子地「首次插入返回 true」，是唯一的闸门。
+        //
+        // 守卫键的选择很关键（review 两轮均指向此处）：
+        // - 有 task 时用 **task 实例本身** 作键。uploadId 是前端的每实例计数器，
+        //   组件重挂载后会复用，两代上传可能同时在途；若用裸 ID 作键，先结束的一代
+        //   释放标记就会误伤另一代，而不释放又会让后一代被永久拦截。
+        //   以 task 为键则天然按「代」隔离，且随 task 一起被回收，不需要显式释放。
+        // - task == null（early-failure，尚未建立 task）时退回用 uploadId 作键，
+        //   以维持「同一 ID 的连续 early failure 只通知一次」的既有契约；
+        //   这类键由 cleanup() 统一清理，属异常路径、量级有限。
+        Object notifiedKey = task != null ? task : uploadId;
+        if (!notifiedUploadIds.add(notifiedKey)) {
             logger.log(Level.FINE, "Skipping duplicate notification for upload {0}", uploadId);
             return;
         }

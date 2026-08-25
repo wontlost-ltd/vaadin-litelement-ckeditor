@@ -128,6 +128,11 @@ public class VaadinCKEditor extends CustomField<String> implements HasAriaLabel 
     private String licenseKey = DEFAULT_LICENSE_KEY;
     private ErrorHandler errorHandler;
     private HtmlSanitizer htmlSanitizer;
+    /**
+     * 是否在客户端内容写入模型时即执行净化。
+     * 默认 false —— 保持既有行为（getValue() 返回原始 HTML），避免破坏现有用户。
+     */
+    private boolean sanitizeOnInput = false;
     private UploadHandler uploadHandler;
     private UploadHandler.UploadConfig uploadConfig;
     private FallbackMode fallbackMode = FallbackMode.TEXTAREA;
@@ -207,6 +212,16 @@ public class VaadinCKEditor extends CustomField<String> implements HasAriaLabel 
             this.contentManager = new ContentManager(htmlSanitizer);
         }
 
+        // 把 errorHandler 接到 eventDispatcher 上。
+        // 公开的 setErrorHandler() 会同时写字段与 dispatcher，但 builder 走的是
+        // setErrorHandlerInternal()，只写字段；若此处不补接，builder 配置的
+        // ErrorHandler 将永远不会被 fireEditorError 调用（静默失效）。
+        // 与上面 contentManager、下面 uploadManager 的装配方式保持一致：
+        // 统一在初始化阶段从字段重建内部管理器。
+        if (errorHandler != null) {
+            eventDispatcher.setErrorHandler(errorHandler);
+        }
+
         // Initialize upload manager if upload handler is configured
         if (uploadHandler != null) {
             // Use WeakReference to avoid memory leaks
@@ -280,6 +295,33 @@ public class VaadinCKEditor extends CustomField<String> implements HasAriaLabel 
         this.editorData = value;
     }
 
+    /**
+     * 返回编辑器当前的 HTML 内容。
+     *
+     * <p><strong>⚠️ 安全提示：本方法返回的是未经净化的原始 HTML。</strong>
+     * 内容来自浏览器端，必须视为不可信输入——CKEditor 的模型过滤属于客户端控制，
+     * 攻击者可绕过它直接调用服务端 RPC 提交任意 HTML。</p>
+     *
+     * <p><strong>这一点对 Binder 尤其重要。</strong>本组件继承 {@code CustomField<String>}，
+     * 因此 {@code binder.forField(editor).bind(...)} 读取的正是本方法，
+     * 而 <em>不会</em> 经过 {@link #setHtmlSanitizer(HtmlSanitizer)} 配置的净化器。
+     * 换言之，仅调用 {@code setHtmlSanitizer(...)} 并不能让 Binder 绑定的值得到净化。</p>
+     *
+     * <p>需要净化后的内容时，请选择其一：</p>
+     * <ul>
+     *   <li>显式调用 {@link #getSanitizedValue()}；或</li>
+     *   <li>调用 {@link #setSanitizeOnInput(boolean) setSanitizeOnInput(true)}，
+     *       使来自客户端的内容在写入模型时即被净化——此时本方法返回的也是净化后的值，
+     *       Binder 路径同样受保护。</li>
+     * </ul>
+     *
+     * <p>之所以默认返回原始 HTML，是为了不破坏既有用户的行为（富文本往返场景确实
+     * 需要原始标记）；净化改为显式开启。</p>
+     *
+     * @return 编辑器 HTML 内容；未开启 {@link #setSanitizeOnInput(boolean)} 时为未净化的原始内容
+     * @see #getSanitizedValue()
+     * @see #setSanitizeOnInput(boolean)
+     */
     @Override
     public String getValue() {
         return editorData;
@@ -311,6 +353,13 @@ public class VaadinCKEditor extends CustomField<String> implements HasAriaLabel 
     protected void setModelValue(String value, boolean fromClient) {
         String oldValue = this.editorData;
         String newValue = value != null ? value : "";
+
+        // 可选的入口净化（setSanitizeOnInput(true) 时启用）。
+        // 只净化 fromClient==true 的值：客户端内容不可信，是真正的信任边界；
+        // 服务端自己 setValue 的内容视为可信，不做改写以免破坏程序化设值。
+        if (sanitizeOnInput && fromClient && htmlSanitizer != null && !newValue.isEmpty()) {
+            newValue = contentManager.getSanitizedValue(newValue);
+        }
         // Only update when value actually changes
         if (java.util.Objects.equals(oldValue, newValue)) {
             return;
@@ -753,6 +802,40 @@ public class VaadinCKEditor extends CustomField<String> implements HasAriaLabel 
         this.htmlSanitizer = sanitizer;
         // Update ContentManager so getSanitizedValue() uses the new sanitizer
         this.contentManager = new com.wontlost.ckeditor.internal.ContentManager(sanitizer);
+    }
+
+    /**
+     * 设置是否在客户端内容写入模型时立即净化。
+     *
+     * <p>默认 {@code false}：{@link #getValue()} 返回未净化的原始 HTML，净化仅在
+     * 显式调用 {@link #getSanitizedValue()} 时发生。这保持了既有行为，
+     * 但意味着 {@code Binder} 绑定路径（读取 {@code getValue()}）不会被净化。</p>
+     *
+     * <p>置为 {@code true} 后，所有来自客户端的内容在写入模型时即被
+     * {@link #setHtmlSanitizer(HtmlSanitizer)} 配置的净化器处理，
+     * 于是 {@link #getValue()}、Binder、以及 {@code ValueChangeEvent} 拿到的
+     * 都是已净化的值——即在信任边界处一次性净化，而不依赖每个调用点记得改用
+     * {@code getSanitizedValue()}。</p>
+     *
+     * <p>需要配合 {@link #setHtmlSanitizer(HtmlSanitizer)} 使用；未配置净化器时本开关无效果。
+     * 服务端自行 {@code setValue(...)} 的内容不受影响（视为可信来源）。</p>
+     *
+     * @param sanitizeOnInput true 表示在客户端输入写入模型时净化
+     * @see #setHtmlSanitizer(HtmlSanitizer)
+     * @see #getValue()
+     */
+    public void setSanitizeOnInput(boolean sanitizeOnInput) {
+        this.sanitizeOnInput = sanitizeOnInput;
+    }
+
+    /**
+     * 是否已开启客户端输入的入口净化。
+     *
+     * @return true 表示开启
+     * @see #setSanitizeOnInput(boolean)
+     */
+    public boolean isSanitizeOnInput() {
+        return sanitizeOnInput;
     }
 
     /**

@@ -490,7 +490,9 @@ public enum CKEditorPreset {
             // Document
             CKEditorPlugin.AUTOSAVE,
             CKEditorPlugin.PASTE_FROM_OFFICE,
-            // Cloud Services（AI 需要）
+            // Cloud Services（AI 需要）。CLOUD_SERVICES 依赖 CLOUD_SERVICES_CORE，
+            // 必须一并声明，否则该 preset 在 STRICT 依赖模式下无法构建。
+            CKEditorPlugin.CLOUD_SERVICES_CORE,
             CKEditorPlugin.CLOUD_SERVICES
         },
         new String[] {
@@ -545,6 +547,8 @@ public enum CKEditorPreset {
             // Core
             CKEditorPlugin.ESSENTIALS,
             CKEditorPlugin.PARAGRAPH,
+            // AUTO_IMAGE 依赖 CLIPBOARD，STRICT 模式下必须显式声明
+            CKEditorPlugin.CLIPBOARD,
             CKEditorPlugin.AUTOFORMAT,
             CKEditorPlugin.TEXT_TRANSFORMATION,
             CKEditorPlugin.AUTOSAVE,
@@ -651,6 +655,11 @@ public enum CKEditorPreset {
             // Core
             CKEditorPlugin.ESSENTIALS,
             CKEditorPlugin.PARAGRAPH,
+            // AUTO_IMAGE 依赖 CLIPBOARD；BLOCK_TOOLBAR 依赖 WIDGET 与
+            // WIDGET_TOOLBAR_REPOSITORY。STRICT 模式下三者必须显式声明。
+            CKEditorPlugin.CLIPBOARD,
+            CKEditorPlugin.WIDGET,
+            CKEditorPlugin.WIDGET_TOOLBAR_REPOSITORY,
             CKEditorPlugin.AUTOFORMAT,
             CKEditorPlugin.TEXT_TRANSFORMATION,
             CKEditorPlugin.AUTOSAVE,

@@ -3,6 +3,9 @@ name: CI
 on:
   push:
     branches: [main]
+    # 同时在发布 tag 上运行：publish.yml 由 tag 触发，若 CI 不覆盖 tag，
+    # 就无法用「CI 是否通过」作为发布门禁（详见 publish.yml 的 verify-ci job）。
+    tags: ["v*", "testbench-v*"]
   pull_request:
     branches: [main]
 
@@ -26,6 +29,11 @@ jobs:
       - name: Build and Test
         run: mvn -B -ntp clean verify
 
+      # testbench 模块不在根 reactor 中（无 <modules>、无 <parent>），
+      # 若不显式编译，CI 将完全不覆盖它，破坏性改动只会在发布时才暴露。
+      - name: Build TestBench module
+        run: mvn -B -ntp -f ckeditor-vaadin-testbench/pom.xml clean verify
+
       - name: Upload Test Reports
         if: failure()
         uses: actions/upload-artifact@v7
@@ -33,3 +41,31 @@ jobs:
           name: test-reports
           path: target/surefire-reports/
           retention-days: 7
+
+  # 前端 TypeScript 的类型检查与单元测试。
+  # 此前完全不在 CI 中运行：Maven 只是把 .ts 当资源原样复制，既不编译也不测试，
+  # 导致 171 个已写好的 vitest 用例形同虚设，类型错误会直到消费端构建才爆出来。
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/main/resources/META-INF/frontend/vaadin-ckeditor
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: src/main/resources/META-INF/frontend/vaadin-ckeditor/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
