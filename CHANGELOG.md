@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.3.3] - 2026-08-26
+
 ### Fixed
 - **builder 配置的 `ErrorHandler` 从不触发**（严重）。`setErrorHandlerInternal()` 只写字段，
   未像公开 setter 那样把 handler 接到 `EventDispatcher` 上，导致
@@ -25,10 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   原先仅报 `IMAGE_UPLOAD`，遗漏其再依赖的 `IMAGE`。
   这是**诊断信息的完善，不是判定口径收紧**——已枚举全部插件验证：
   「原先通过、现在被拒」的数量为 0（若直接依赖已满足，其依赖必然也在集合中）。
-- **上传去重集合只增不减**。`notifiedUploadIds` 在正常完成路径从不清理，既持续泄漏，
-  又因前端 uploadId 是每实例计数器（组件重挂载后复用）而误判重复通知，
-  表现为文件已存服务端、前端永远转圈。新增 `retireUpload()` 在终态释放登记信息。
-  实测：200 次上传后集合从 200 降为 0，且 ID 复用可正常回调。
+- **上传去重集合只增不减**。`notifiedUploadIds` 在正常完成路径从不清理，
+  长会话下持续泄漏。新增 `retireUpload()` 在终态释放登记信息。
+  实测：200 次上传后集合从 200 降为 0，且同一 ID 再次上传可正常回调。
   注意 early-failure 路径**不**释放，以维持既有的「同一 uploadId 只通知一次」契约。
 - **编辑器重挂载后永不重建**（前端，严重）。创建逻辑绑在 `firstUpdated()`（Lit 每实例只调一次），
   而 `disconnectedCallback` 会销毁编辑器，导致「移出 DOM 再放回」后只剩空白容器
@@ -55,12 +56,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **「创建中断开、创建结束前又重连」漏唤醒**。孤儿销毁路径不经过 `destroyEditor()`，
   拿不到上述 microtask 补偿；而 `connectedCallback` 早已在 `isCreating=true` 时返回。
   改为在孤儿销毁后同样补触发一次重建判定。
-- **跨代重叠的上传会互相删除登记**。前端 uploadId 是每实例计数器，组件重挂载后复用；
-  两代同时在途时，先结束的一代会把仍在途的另一代从 `activeTasks` 中移除，
+- **同一 uploadId 重复登记时会互相删除**。`UploadManager` 的清理按裸 `uploadId` 进行，
+  一旦同一 ID 上先后存在两个 task（服务端不校验 ID 唯一性，且 `handleUpload` 会
+  无条件覆盖登记），先结束的一方会把另一方从 `activeTasks` 中移除，
   导致后者无法取消、状态查询失效。所有 `activeTasks.remove` 改为两参数原子删除
   （仅当映射仍指向本次 task 时才删）；重复通知守卫的键也由裸 uploadId 改为
-  **`UploadTask` 实例本身**，从数据结构上按「代」隔离——释放时机因此不再需要
+  **`UploadTask` 实例本身**，按实例隔离——释放时机因此不再需要
   「该 ID 是否还有活跃任务」这类非原子判断，窗口期问题随之消失。
+
+  说明：前端当前**不会**产生重复 ID——`UploadAdapterManager` 实例在组件重挂载后
+  被复用（`if (!this.uploadManager)`），其计数器不随 `cleanup()` 重置，
+  已实测确认 `cleanup()` 前后为 `upload-ed-1` → `upload-ed-2`。
+  因此这些修复属于服务端的**纵深防御**：`handleUpload` 是 `@ClientCallable`，
+  ID 由客户端提供、服务端不应假定其唯一。
 - **孤儿销毁后的补偿重建时机错误**。原先用 `queueMicrotask` 触发，实测该 microtask
   会排在外层 `async` 函数的 `finally` **之前**，届时 `isCreating` 尚未复位、
   守卫直接返回，补偿失效、组件仍永久空白。改为置标志位、由 `finally` 在释放
@@ -72,6 +80,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **失败路径仍会强引用整个 `UploadTask`**。handler 返回 null 或同步抛异常时
   `notifyError` 带 task 调用，而该路径不经过 `retireUpload`，守卫集合会一直持有
   该 task。已补充释放。
+- **有界等待的挂起被换了个入口**。第一次修复给孤儿销毁加了超时防挂起，但随后
+  让 `waitForPreviousEditorCleanup()` 无界 `await` 同一个 promise——detached 下
+  CKEditor 的 `destroy()` 可能永不 settle，于是 `isCreating` 被永久占用、重连后
+  依旧空白。改为等待也走 `Promise.race` 超时。
+- **迟到的销毁会清空新编辑器**（DOM 所有权）。`Promise.race` 只停止等待、**不取消**
+  底层 `destroy()`；而 CKEditor 的 `ElementApiMixin.updateSourceElement()` 末尾执行
+  `setDataInElement(this.sourceElement, ...)`，其实现是 `el.innerHTML = data`
+  （见 `@ckeditor/ckeditor5-utils`）——写回目标正是我们传给 `Editor.create()` 的容器，
+  而重连复用同一节点（`editorId` 是 `@property`）。因此超时后新增
+  `detachStaleEditorContainer()`：用同 id、同 class 的**新节点**替换容器，
+  陈旧实例持有的成为游离节点，其写回不再影响页面。
+  新容器的 class 取自常量 `EDITOR_CONTENT_CLASS`（同时用于 render() 的三处模板），
+  而非沿用 `stale.className`——后者可能已被 CKEditor 注入运行时 class。
+- **换节点后 Lit 未重新绑定**。仅调用 `requestUpdate()` 不够：Lit 3 的模板实例在首次
+  克隆时就绑定了 `AttributePart`，不会重新扫描被外部 `replaceChild` 的节点。
+  实测此后把 `editorId` 改为新值，Lit 会写到**已游离的旧节点**上。该路径可达
+  （`setId()` 是公开 API）。改为先 `render(nothing, renderRoot)` 丢弃旧模板实例
+  再触发更新，实测动态更新可正确落到页面节点。
+- **`destroyPromise` 的清空未按身份比对**。`destroyEditor()` 中无条件置 null，
+  会抹掉后登记的孤儿销毁，重新打开上述所有权漏洞。已改为按身份比对。
 
 ### Added
 - `setSanitizeOnInput(boolean)` / `withSanitizeOnInput(boolean)`：可选的「客户端输入即净化」。
@@ -407,7 +435,8 @@ See the [legacy repository](https://github.com/wontlost-ltd/vaadin-ckeditor/tree
 - **MINOR** (0.x.0): New features, backward compatible
 - **PATCH** (0.0.x): Bug fixes, no API changes
 
-[Unreleased]: https://github.com/wontlost-ltd/vaadin-ckeditor/compare/v5.3.2...HEAD
+[Unreleased]: https://github.com/wontlost-ltd/vaadin-ckeditor/compare/v5.3.3...HEAD
+[5.3.3]: https://github.com/wontlost-ltd/vaadin-ckeditor/compare/v5.3.2...v5.3.3
 [5.3.2]: https://github.com/wontlost-ltd/vaadin-ckeditor/compare/v5.3.1...v5.3.2
 [5.3.1]: https://github.com/wontlost-ltd/vaadin-ckeditor/compare/v5.3.0...v5.3.1
 [5.3.0]: https://github.com/wontlost-ltd/vaadin-ckeditor/compare/v5.2.0...v5.3.0

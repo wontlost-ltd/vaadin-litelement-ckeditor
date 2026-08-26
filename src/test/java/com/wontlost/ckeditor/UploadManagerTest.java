@@ -357,9 +357,9 @@ class UploadManagerTest {
     @Test
     @DisplayName("reused uploadId from a later generation must still notify")
     void crossGenerationIdReuseIsNotBlocked() throws Exception {
-        // review (Codex): 前端 uploadId 是每实例计数器，组件重挂载后会从 1 重新计数，
-        // 于是同一个 uploadId 会跨「代」复用。此前 notifiedUploadIds 只增不减，
-        // 第二代同名上传会被误判为重复通知而静默跳过——文件已存服务端、前端永远转圈。
+        // handleUpload 是 @ClientCallable，uploadId 由客户端提供、服务端不校验唯一性。
+        // 此前 notifiedUploadIds 只增不减，同一 ID 的后续上传会被误判为重复通知而
+        // 静默跳过——文件已存服务端、前端永远转圈。属服务端纵深防御。
         java.util.List<String> notified = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
         UploadHandler handler = (ctx, in) ->
             CompletableFuture.completedFuture(new UploadHandler.UploadResult("/ok.jpg"));

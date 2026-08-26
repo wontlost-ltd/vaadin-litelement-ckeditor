@@ -118,8 +118,8 @@ public class UploadManager {
      *
      * <p>元素类型有意为 {@code Object}：正常路径存 {@link UploadTask} 实例本身，
      * early-failure（尚未建立 task）路径退回存 {@code uploadId} 字符串。
-     * 以 task 为键可按「代」隔离——uploadId 是前端每实例计数器，组件重挂载后会复用，
-     * 两代上传可能同时在途，用裸 ID 会导致两代相互干扰。</p>
+     * 以 task 为键可按实例隔离。handleUpload 是 @ClientCallable，uploadId 由客户端提供、
+     * 服务端不应假定其唯一；一旦同一 ID 上先后存在两个 task，用裸 ID 作键会让两者相互干扰。</p>
      */
     private final Set<Object> notifiedUploadIds = ConcurrentHashMap.newKeySet();
     private final long uploadTimeoutSeconds;
@@ -321,9 +321,9 @@ public class UploadManager {
      * （成功 / 失败 / 取消），其 uploadId 就不应再占位，否则：
      * <ol>
      *   <li>集合只增不减，长会话下持续泄漏内存；</li>
-     *   <li>前端 uploadId 形如 {@code upload-<editorId>-<每实例计数器>}，组件重挂载后
-     *       计数器归零、ID 会复用；此时旧标记仍在，新上传会被误判为重复通知而直接
-     *       跳过回调，表现为文件已存到服务端、前端却永远转圈。</li>
+     *   <li>uploadId 由客户端提供，服务端不校验唯一性；若同一 ID 被再次登记，
+     *       残留的旧标记会让新上传被误判为重复通知而跳过回调，
+     *       表现为文件已存到服务端、前端却永远转圈。</li>
      * </ol>
      *
      * <p>释放时机安全性：调用点均在通知已经发出之后（或该次上传已被判定为取消而
@@ -332,8 +332,8 @@ public class UploadManager {
      */
     private void retireUpload(String uploadId, UploadTask task) {
         // 用两参数 remove：只有当映射仍指向「本次」task 时才删除。
-        // 前端 uploadId 是每实例计数器，组件重挂载后会复用同一个 ID；
-        // 若旧任务结束时无条件 remove(uploadId)，会把刚登记的新任务一并删掉，
+        // uploadId 由客户端提供、服务端不校验唯一性；若同一 ID 上先后存在两个 task，
+        // 旧任务结束时无条件 remove(uploadId) 会把刚登记的新任务一并删掉，
         // 造成新上传丢失登记（后续无法取消、状态查询失效）。
         if (task != null) {
             activeTasks.remove(uploadId, task);
@@ -489,10 +489,10 @@ public class UploadManager {
         // Double notification guard：add() 原子地「首次插入返回 true」，是唯一的闸门。
         //
         // 守卫键的选择很关键（review 两轮均指向此处）：
-        // - 有 task 时用 **task 实例本身** 作键。uploadId 是前端的每实例计数器，
-        //   组件重挂载后会复用，两代上传可能同时在途；若用裸 ID 作键，先结束的一代
-        //   释放标记就会误伤另一代，而不释放又会让后一代被永久拦截。
-        //   以 task 为键则天然按「代」隔离，且随 task 一起被回收，不需要显式释放。
+        // - 有 task 时用 **task 实例本身** 作键。uploadId 来自客户端、服务端不保证唯一，
+        //   同一 ID 上可能先后存在两个 task；若用裸 ID 作键，先结束的一个释放标记
+        //   就会误伤另一个，而不释放又会让后一个被永久拦截。
+        //   以 task 为键则天然按实例隔离。
         // - task == null（early-failure，尚未建立 task）时退回用 uploadId 作键，
         //   以维持「同一 ID 的连续 early failure 只通知一次」的既有契约；
         //   这类键由 cleanup() 统一清理，属异常路径、量级有限。

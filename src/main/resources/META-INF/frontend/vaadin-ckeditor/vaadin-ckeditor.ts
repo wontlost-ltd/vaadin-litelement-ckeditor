@@ -4,7 +4,7 @@
  * A modular CKEditor 5 integration for Vaadin using the official ckeditor5 npm package.
  * Plugins are loaded dynamically based on configuration from the Java backend.
  */
-import { LitElement, html, css, PropertyValues } from 'lit';
+import { LitElement, html, css, render, nothing, PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 // Import modular components
@@ -67,6 +67,13 @@ const DESTROY_IDLE_TIMEOUT_MS = 100;
  * 因此必须设上界，避免创建锁与补偿重建被永久阻塞。
  */
 const ORPHAN_DESTROY_TIMEOUT_MS = 2000;
+/**
+ * 编辑器容器的 class。
+ * 与 render() 中 `<div id="${editorId}" class="...">` 保持一致——
+ * detachStaleEditorContainer() 重建容器时用它还原「干净」状态，
+ * 不能沿用旧节点的 className（那上面可能已被 CKEditor 注入运行时 class）。
+ */
+const EDITOR_CONTENT_CLASS = 'editor-content';
 /** Opacity value used to trigger container repaint without visible flicker */
 const REPAINT_OPACITY = '0.99';
 /** Maximum polling attempts for minimap iframe injection */
@@ -338,7 +345,7 @@ export class VaadinCKEditor extends LitElement {
     private $server?: VaadinServer;
 
     // Version info — keep in sync with VaadinCKEditor.java VERSION constant
-    private readonly version = '5.3.2';
+    private readonly version = '5.3.3';
 
     constructor() {
         super();
@@ -873,10 +880,76 @@ export class VaadinCKEditor extends LitElement {
         // 写回内容——而重连复用的正是同一个 DOM 节点（editorId 是 @property，不变）。
         // 若不等它就创建新实例，迟到的销毁会把新编辑器的 DOM 清空。
         // 直接以 destroyPromise 是否存在为准，可同时覆盖常规销毁与孤儿销毁两条路径。
-        if (this.destroyPromise) {
-            logger.debug(' Waiting for previous editor cleanup...');
-            await this.destroyPromise;
+        if (!this.destroyPromise) {
+            return;
         }
+        logger.debug(' Waiting for previous editor cleanup...');
+
+        // 等待必须有上界。
+        // detached 状态下 CKEditor 的 destroy() 可能永不 settle（destroyEditor 中已有
+        // 该结论，孤儿路径正因此加了超时）。若这里再无界 await 同一个 promise，
+        // 挂起只是从「孤儿销毁」搬到了「补偿创建」：isCreating 被永久占用，
+        // 重连后依旧空白——等于把第 4 轮修掉的问题换个入口重新引入。
+        const timedOut = Symbol('cleanup-timeout');
+        const result = await Promise.race([
+            this.destroyPromise.then(() => undefined),
+            new Promise<typeof timedOut>((resolve) =>
+                setTimeout(() => resolve(timedOut), ORPHAN_DESTROY_TIMEOUT_MS)),
+        ]);
+
+        if (result === timedOut) {
+            // 放弃等待，但必须先切断旧实例对 DOM 的所有权：
+            // 迟到的 destroy() 会向 source element 写回，而新实例复用同一节点。
+            // 这里把容器整个换成一个全新的空节点，旧销毁即便稍后完成，
+            // 触碰到的也只是已被摘下的游离节点，不会影响新编辑器。
+            logger.debug(' Previous cleanup timed out - detaching stale container to protect the new editor');
+            this.detachStaleEditorContainer();
+        }
+    }
+
+    /**
+     * 用一个同 id 的全新空容器替换当前编辑器容器，切断旧编辑器实例对该 DOM 的所有权。
+     *
+     * <p>仅在「上一次销毁超时、但仍可能在后台完成」时调用：旧实例持有的是被替换下来的
+     * 那个游离节点，其迟到的写回不会再影响页面上的新编辑器。</p>
+     */
+    private detachStaleEditorContainer(): void {
+        const stale = this.querySelector(`[id="${CSS.escape(this.editorId)}"]`) as HTMLElement | null;
+        if (!stale || !stale.parentNode) {
+            return;
+        }
+
+        // 必须替换**容器节点对象本身**，只清空子节点是不够的：
+        // CKEditor 的 ElementApiMixin.updateSourceElement() 在销毁末尾执行
+        // setDataInElement(this.sourceElement, ...)，而后者是 `el.innerHTML = data`
+        // （见 @ckeditor/ckeditor5-utils）。这里的 sourceElement 正是我们传给
+        // Editor.create() 的这个容器。若沿用同一个对象，迟到的销毁会直接把
+        // 新编辑器的内容整片抹掉。
+        //
+        // 换成一个同 id、同 class 的新节点后，陈旧实例持有的是被摘下的游离节点，
+        // 它的 innerHTML 写回不再影响页面。
+        const fresh = document.createElement(stale.tagName.toLowerCase());
+        fresh.id = this.editorId;
+        // 用模板声明的固定 class，而不是 stale.className——后者可能已被 CKEditor
+        // 注入运行时 class（如 ck / ck-editor__editable 等），继承过来会污染新实例。
+        fresh.className = EDITOR_CONTENT_CLASS;
+        stale.parentNode.replaceChild(fresh, stale);
+
+        // 让 Lit 重新接管。
+        //
+        // 仅调用 requestUpdate() 是不够的：Lit 3 的模板实例在首次克隆时就绑定了
+        // AttributePart，不会因为一次重渲染而重新扫描被外部 replaceChild 掉的节点。
+        // 实测（jsdom + 本仓 lit 版本）：此后把 editorId 改成新值，Lit 会把它写到
+        // **已游离的旧节点**上，页面上的新节点仍保留旧 id —— 因为 setId() 是公开 API，
+        // editorId 确实可能在运行期变化，这条路径是可达的。
+        //
+        // 先把 renderRoot 渲染成 nothing，丢弃旧模板实例，再触发一次更新重新建立
+        // part 绑定；实测这样后续动态更新会正确落到页面上的节点。
+        const root = this.renderRoot as HTMLElement | undefined;
+        if (root) {
+            render(nothing, root);
+        }
+        this.requestUpdate();
     }
 
     /**
@@ -2027,8 +2100,17 @@ export class VaadinCKEditor extends LitElement {
 
         // Clean up destroyPromise after the async IIFE settles,
         // so callers who awaited the returned promise see it resolve correctly.
-        this.destroyPromise.finally(() => {
-            this.destroyPromise = null;
+        //
+        // 必须按身份比对后再清空：destroyPromise 现在也承载「孤儿销毁」的登记
+        // （见 createEditorInstance 中的 orphan 分支）。若在此无条件置 null，
+        // 当本次销毁 settle 时恰好已有一个更新的孤儿销毁登记在案，就会把它抹掉，
+        // 使 waitForPreviousEditorCleanup() 不再等待——重新打开「迟到的销毁
+        // 清空新编辑器 DOM」这个所有权漏洞。
+        const settled = this.destroyPromise;
+        void settled.finally(() => {
+            if (this.destroyPromise === settled) {
+                this.destroyPromise = null;
+            }
         });
 
         logger.debug(' destroyEditor() returning promise');
@@ -2066,7 +2148,7 @@ export class VaadinCKEditor extends LitElement {
                     <div class="editor-container__editor-wrapper">
                         <div class="editor-container__sidebar" id="editor-outline" role="navigation" aria-label="Document Outline" ?hidden="${!this.documentOutlineEnabled}"></div>
                         <div class="editor-container__editor">
-                            <div id="${this.editorId}" class="editor-content"></div>
+                            <div id="${this.editorId}" class="${EDITOR_CONTENT_CLASS}"></div>
                         </div>
                         <div class="editor-container__sidebar editor-container__sidebar_ckeditor-ai" id="ai-sidebar-container" role="complementary" aria-label="AI Assistant" ?hidden="${!this.aiSidebarEnabled}"></div>
                         <div class="minimap-container" role="region" aria-label="Document Minimap" ?hidden="${!this.minimapEnabled}"></div>
@@ -2097,7 +2179,7 @@ export class VaadinCKEditor extends LitElement {
                      style="${heightStyle}">
                     <div class="editor-container__editor-wrapper">
                         <div class="editor-container__editor">
-                            <div id="${this.editorId}" class="editor-content"></div>
+                            <div id="${this.editorId}" class="${EDITOR_CONTENT_CLASS}"></div>
                         </div>
                         <div class="annotation-sidebar-wrapper" role="complementary" aria-label="Comments and Annotations">
                             <div class="presence-list-container" id="presence-list-container"></div>
@@ -2116,7 +2198,7 @@ export class VaadinCKEditor extends LitElement {
 
         return html`
             <div class="editor-container">
-                <div id="${this.editorId}" class="editor-content"></div>
+                <div id="${this.editorId}" class="${EDITOR_CONTENT_CLASS}"></div>
             </div>
         `;
     }

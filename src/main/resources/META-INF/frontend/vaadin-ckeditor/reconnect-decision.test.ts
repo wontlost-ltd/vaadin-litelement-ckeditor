@@ -154,3 +154,86 @@ describe('销毁所有权隔离（结构性回归防护）', () => {
         expect(destroyPromise).toBeNull();
     });
 });
+
+describe('destroyPromise 登记的身份归属（结构性回归防护）', () => {
+    // destroyPromise 现在同时承载「常规销毁」与「孤儿销毁」两种登记。
+    // 清空时必须按身份比对：若无条件置 null，先 settle 的一方会抹掉
+    // 后登记的另一方，使创建流程不再等待迟到的销毁，
+    // 重新打开「迟到销毁清空新编辑器 DOM」的所有权漏洞。
+
+    it('先 settle 的销毁不得抹掉更新的登记', async () => {
+        let destroyPromise: Promise<void> | null = null;
+
+        // 常规销毁：很快 settle
+        const normal = new Promise<void>((resolve) => setTimeout(resolve, 5));
+        destroyPromise = normal;
+        void normal.finally(() => {
+            if (destroyPromise === normal) destroyPromise = null;   // 身份比对
+        });
+
+        // 孤儿销毁：随后登记，耗时更长
+        const orphan = new Promise<void>((resolve) => setTimeout(resolve, 40));
+        destroyPromise = orphan;
+        void orphan.finally(() => {
+            if (destroyPromise === orphan) destroyPromise = null;
+        });
+
+        await normal;
+        await new Promise((r) => setTimeout(r, 5));
+        // normal settle 后，orphan 的登记必须仍在
+        expect(destroyPromise).toBe(orphan);
+
+        await orphan;
+        await new Promise((r) => setTimeout(r, 5));
+        expect(destroyPromise).toBeNull();
+    });
+
+    it('无条件清空会抹掉更新的登记（反例，证明身份比对是必要的）', async () => {
+        let destroyPromise: Promise<void> | null = null;
+
+        const normal = new Promise<void>((resolve) => setTimeout(resolve, 5));
+        destroyPromise = normal;
+        void normal.finally(() => { destroyPromise = null; });       // 无身份比对
+
+        const orphan = new Promise<void>((resolve) => setTimeout(resolve, 40));
+        destroyPromise = orphan;
+
+        await normal;
+        await new Promise((r) => setTimeout(r, 5));
+        // 孤儿登记被误抹 —— 这正是需要避免的行为
+        expect(destroyPromise).toBeNull();
+    });
+});
+
+describe('清理等待必须有上界（结构性回归防护）', () => {
+    // detached 下 CKEditor 的 destroy() 可能永不 settle。
+    // 若创建流程无界 await 它，挂起只是从「孤儿销毁」搬到「补偿创建」：
+    // isCreating 被永久占用、重连后依旧空白。
+    // 契约：等待必须能超时返回，超时后再通过换掉容器节点保证 DOM 安全。
+
+    const TIMEOUT_MS = 30;
+
+    async function waitWithBound(destroyPromise: Promise<void> | null): Promise<'done' | 'timeout'> {
+        if (!destroyPromise) return 'done';
+        const timedOut = Symbol('t');
+        const r = await Promise.race([
+            destroyPromise.then(() => undefined),
+            new Promise<typeof timedOut>((res) => setTimeout(() => res(timedOut), TIMEOUT_MS)),
+        ]);
+        return r === timedOut ? 'timeout' : 'done';
+    }
+
+    it('永不 settle 的销毁不得阻塞创建流程', async () => {
+        const never = new Promise<void>(() => { /* 永不 settle */ });
+        await expect(waitWithBound(never)).resolves.toBe('timeout');
+    });
+
+    it('正常结束的销毁应当被完整等待', async () => {
+        const quick = new Promise<void>((res) => setTimeout(res, 5));
+        await expect(waitWithBound(quick)).resolves.toBe('done');
+    });
+
+    it('无待处理销毁时立即返回', async () => {
+        await expect(waitWithBound(null)).resolves.toBe('done');
+    });
+});
