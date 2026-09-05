@@ -58,6 +58,17 @@
             <artifactId>vaadin-dev</artifactId>
             <scope>runtime</scope>
             <optional>true</optional>
+            <exclusions>
+                <!-- 排除 Copilot：本 sample 是 E2E 夹具，不是开发目标，用不到可视化编辑。
+                     且它是独立 Maven 项目（parent 为 Spring Boot BOM，根 pom 无 <modules>），
+                     Copilot 的源码路径探测依赖 IDE 插件，命令行运行时拿到空列表，
+                     会在浏览器打开 UI 后抛 "Unable to deduce project folder using source paths: []"。
+                     该异常不影响编辑器功能，但会污染日志、干扰 issue 排查。 -->
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>copilot</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -71,6 +82,33 @@
     </build>
 
     <profiles>
+        <!-- 热部署（frontendHotdeploy）复现档：以 Vite dev server 实时转译前端源码，
+             而非使用预编译的 dev bundle。用于复现 issue #120 一类只在 dev server
+             模式下出现的问题（例如 @oxc-project/runtime 辅助模块 404）。
+             不并入默认档，避免 E2E 每次启动都要付 dev server 的开销。 -->
+        <profile>
+            <id>hotdeploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>vaadin-maven-plugin</artifactId>
+                        <version>${vaadin.version}</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-frontend</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <frontendHotdeploy>true</frontendHotdeploy>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <!-- Production build: bake the frontend bundle into the jar so Playwright doesn't
              pay the first-boot npm install cost. -->
         <profile>

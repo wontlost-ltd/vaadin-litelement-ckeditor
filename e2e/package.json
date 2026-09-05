@@ -8,7 +8,8 @@
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
-    "report": "playwright show-report"
+    "report": "playwright show-report",
+    "probe:devmode": "node tools/devmode-probe.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.60.0",
