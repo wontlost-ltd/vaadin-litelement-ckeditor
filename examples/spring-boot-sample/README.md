@@ -1,6 +1,6 @@
 # Sample app — Vaadin CKEditor E2E fixture
 
-Minimal Spring Boot 4 + Vaadin 25.1 host application used as a fixture for
+Minimal Spring Boot 4 + Vaadin 25.2 host application used as a fixture for
 Playwright E2E smoke tests under [`e2e/`](../../e2e/). **Not published.**
 
 ## Routes
@@ -14,12 +14,17 @@ Playwright E2E smoke tests under [`e2e/`](../../e2e/). **Not published.**
 | `/dark` | `DarkThemeView` | Forces Lumo dark theme; verifies v48 AI token injection |
 | `/upload` | `UploadView` | Wires a `StubUploadHandler` that returns base64 data URLs |
 | `/collab-seed` | `CollabSeedView` | Exercises `stripInitialDataIfChannelSeeded` with `cloudServices` + `collaboration.channelId` + `initialData` |
+| `/binding` | `BindingView` | 值双向绑定与只读切换；把服务端 `getValue()` / 事件计数投影到 DOM 供断言 |
 
 ## Run locally
 
 ```bash
 # Dev mode (auto-rebuild, but first boot triggers npm install of ckeditor5)
 mvn spring-boot:run
+
+# Dev mode with frontendHotdeploy=true (Vite dev server transpiles TS on the fly,
+# instead of using a prebuilt dev bundle — enables CSS/TS hot reload)
+mvn -Photdeploy spring-boot:run
 
 # Production build (frontend bundle baked into the jar)
 mvn -Pproduction -DskipTests package

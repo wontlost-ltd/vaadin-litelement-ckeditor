@@ -13,9 +13,40 @@ in a real browser to catch issues that unit tests miss.
 | `upload-adapter.spec.ts` | Image upload via toolbar reaches Java `UploadHandler` and editor displays inserted `<img>` |
 | `ai-config-migration.spec.ts` | Top-level `initialData` migrates to `root.initialData` and editor reports `state === 'ready'` |
 | `collab-strip-initial-data.spec.ts` | `stripInitialDataIfChannelSeeded` writes localStorage seed key on first visit |
+| `value-binding.spec.ts` | 值双向绑定（客户端输入回传服务端、`setValue` 下发、`setValue(null)` 归一化）与只读切换 |
 | `visual-regression.spec.ts` | Pixel-level baselines for the 4 EditorTypes + dark theme (Linux/CI only) |
 
 Each spec runs against Chromium and Firefox.
+
+## 开发模式诊断工具
+
+Playwright 套件跑的是 **production jar**，覆盖不到 dev 模式特有的前端问题
+（如 [#120](https://github.com/wontlost-ltd/vaadin-ckeditor/issues/120)：
+`frontendHotdeploy=true` 时 UI 无限加载）。`tools/devmode-probe.mjs` 补上这一层：
+它依次以三种前端模式启动 sample，验证 4 种编辑器能否挂载并接受输入。
+
+```bash
+npm run probe:devmode                  # 依次跑 hotdeploy / prebuilt / default
+npm run probe:devmode -- hotdeploy     # 只跑指定模式
+npm run probe:devmode -- --json        # 机器可读输出
+```
+
+| 模式 | 含义 | 预期 Vite |
+|------|------|-----------|
+| `hotdeploy` | `frontendHotdeploy=true`，Vite 实时转译 TS | 启动 |
+| `prebuilt` | 使用预编译 `dev.bundle` | 不启动 |
+| `default` | Vaadin 25 默认行为 | 视版本而定 |
+
+判读要点：`/VAADIN/@id/` 是 Vite dev server 专属路径前缀。
+
+- Vite 未启动时该路径返回 **404 属于预期**，不是缺陷
+- **Vite 已启动但该路径仍 404** 才是异常，说明请求没被 dev server 接住
+  （常见成因：context path 代理未匹配、Vite 中途退出、前端产物与运行模式错配）
+
+工具会显式标记这一矛盾，并在编辑器不可用时以退出码 1 结束。
+
+> 前置条件：先在仓库根执行 `mvn -DskipTests install`。工具直接用
+> `mvn spring-boot:run` 启动 sample，首次运行会触发 npm install，可能耗时数分钟。
 
 ## Local run
 
