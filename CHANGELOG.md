@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.4.0] - 2026-09-06
 
 ### Changed
 - **CKEditor 5（`ckeditor5`、`ckeditor5-premium-features`）：48.4.0 → 48.5.0**。

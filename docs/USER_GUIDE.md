@@ -987,7 +987,7 @@ Use `$0.editorId` to identify an editor; treat `editor.id` as CKEditor's own.
 
 | Version | CKEditor 5 | Vaadin | Notes           |
 |---------|------------|--------|-----------------|
-| Unreleased | 48.5.0 | 25.2.6 | CKEditor 48.5.0; fix destroy() infinite recursion on reparent (issue #122); fix upload-adapter leak; DevTools inspection guide |
+| 5.4.0   | 48.5.0 | 25.2.6 | CKEditor 48.5.0; fix destroy() infinite recursion on reparent (issue #122); fix upload-adapter leak; DevTools inspection guide |
 | 5.3.3   | 48.4.0 | 25.2.6 | Builder ErrorHandler, toolbar style round-trip, STRICT preset deps, editor remount/orphan fixes |
 | 5.3.2   | 48.4.0 | 25.2.6 | Dependency upgrades (Vaadin 25.2.6, CKEditor 48.4.0) |
 | 5.3.1   | 48.2.0 | 25.2.0 | Caret/focus API, resizable media embed, CKFinder; **breaking:** `LINE_HEIGHT` removed |
