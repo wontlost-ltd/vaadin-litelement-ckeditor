@@ -212,6 +212,25 @@ config.setMention(
 ## Debug
 
 ```javascript
-// Enable in browser console
+// Enable in browser console, then reload the page
 window.VAADIN_CKEDITOR_DEBUG = true;
 ```
+
+### Inspect from DevTools
+
+Select the `<vaadin-ckeditor>` element (it becomes `$0`), then:
+
+```javascript
+$0.editorId                 // component id (matches setId())
+$0.editor                   // live CKEditor 5 instance
+$0.editor.getData()         // current content
+
+// by id
+document.querySelector('vaadin-ckeditor#my-id').editor;
+
+// list every editor on the page
+[...document.querySelectorAll('vaadin-ckeditor')].map(h => [h.editorId, h.editor]);
+```
+
+`editor.id` is CKEditor's own internal id, not the component id — use
+`$0.editorId`. See the User Guide for details.

@@ -942,12 +942,57 @@ Enable debug logging in browser:
 window.VAADIN_CKEDITOR_DEBUG = true;
 ```
 
+The flag is read once when the connector module loads, so set it **before** the
+editor initialises — typically: set it, then reload the page.
+
+### Manual Inspection from DevTools
+
+When you need to inspect a live editor, select the `<vaadin-ckeditor>` element in
+the Elements panel (it becomes `$0` in the Console) and work from there. The
+component uses Light DOM, so nothing is hidden behind a shadow root.
+
+```javascript
+$0.editorId            // component id — matches setId() and the inner <div id>
+$0.editor              // the live CKEditor 5 instance
+$0.editor.getData()    // current content as HTML
+$0.editor.setData('<p>hi</p>');
+$0.editor.model        // CKEditor model, for deeper inspection
+```
+
+`editor` is declared `private` in TypeScript, but that is a compile-time
+restriction only — the property is a plain field at runtime and is fully
+accessible from the console, including in production builds.
+
+To go the other way, from a known id to the instance:
+
+```javascript
+document.querySelector('vaadin-ckeditor#my-editor-id').editor;
+```
+
+On a page with several editors, list them all with their ids:
+
+```javascript
+[...document.querySelectorAll('vaadin-ckeditor')].map(h => [h.editorId, h.editor]);
+```
+
+Note that `editor.id` is **not** the component id. CKEditor assigns each instance
+an internal identifier when it registers the editor in its own `Context`, and the
+connector deliberately leaves that value alone — overwriting it corrupts
+CKEditor's internal bookkeeping and makes `destroy()` recurse indefinitely.
+Use `$0.editorId` to identify an editor; treat `editor.id` as CKEditor's own.
+
 ---
 
 ## Version History
 
 | Version | CKEditor 5 | Vaadin | Notes           |
 |---------|------------|--------|-----------------|
+| Unreleased | 48.4.0 | 25.2.6 | Fix destroy() infinite recursion on reparent (issue #122); fix upload-adapter leak; DevTools inspection guide |
+| 5.3.3   | 48.4.0 | 25.2.6 | Builder ErrorHandler, toolbar style round-trip, STRICT preset deps, editor remount/orphan fixes |
+| 5.3.2   | 48.4.0 | 25.2.6 | Dependency upgrades (Vaadin 25.2.6, CKEditor 48.4.0) |
+| 5.3.1   | 48.2.0 | 25.2.0 | Caret/focus API, resizable media embed, CKFinder; **breaking:** `LINE_HEIGHT` removed |
+| 5.3.0   | 48.2.0 | 25.2.0 | Dependency upgrades (Vaadin 25.2.0, CKEditor 48.2.0) |
+| 5.2.0   | 48.1.1 | 25.1.6 | Vaadin 25.1.6, CKEditor 48.1.1; Spring Boot 4.0.4+ recommended |
 | 5.1.0   | 47.4.0 | 25.0.5 | EMAIL/NOTION presets, AI plugins, slimmed build |
 | 5.0.5   | 47.4.0 | 25.0.5 | Premium plugins, upload improvements |
 | 5.0.3   | 47.4.0 | 25.0.4 | CI/CD workflows |

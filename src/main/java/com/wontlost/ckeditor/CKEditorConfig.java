@@ -244,8 +244,8 @@ public class CKEditorConfig {
      * 启用/禁用嵌入媒体（视频等）的拖拽缩放（issue #71）。
      *
      * <p>启用后，选中嵌入媒体会显示四角缩放手柄，可按比例调整宽度。底层由 CKEditor 的
-     * {@code MediaEmbedResize} 插件实现——该插件由 umbrella {@code ckeditor5} 包导出
-     * （48.4.0 通过 {@code export *} 透传 {@code @ckeditor/ckeditor5-media-embed}），
+     * {@code MediaEmbedResize} 插件实现——前端按需从 umbrella {@code ckeditor5} 包取用
+     * （实测 48.4.0 的 umbrella 产物中不含该符号，届时静默降级为不可缩放），
      * 但属功能性 premium（其 {@code MediaEmbedResizeEditing} 依赖 {@code isPremiumPlugin=true}），
      * 故前端在启用时才按需从 {@code ckeditor5} 动态加载，加载失败（如缺商业 license）静默降级，
      * 无需消费端额外配置。缩放数据以 {@code media_resized} class + 内联

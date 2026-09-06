@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+### Fixed
+- **换父容器时 `destroy()` 无限递归卡死标签页**（前端，严重，issue #122）。
+  连接器在 `Editor.create()` 完成后覆盖了 editor 实例的 `.id`，但该实例在**构造期间**
+  就已注册进自己的私有 Context：`Context#_addEditor` → `Collection#add` →
+  `_getItemIdBeforeAdding()` 发现新实例没有 `.id`，会自动生成 `uid()` **写回实例**
+  并以该值为键存入 `_itemMap`。事后覆盖 `.id` 使实例与其在 `_itemMap` 中的键脱钩：
+  `destroy()` → `Context#_removeEditor()` → `editors.has(editor)` 失配 → `remove()`
+  从不执行 → 编辑器永远留在 `context.editors` → `_contextOwner === editor` 成立而
+  调用 `Context#destroy()` → 后者遍历仍含该编辑器的 `editors` 再次 `destroy()`
+  → 无限递归。该递归跨 `await` 边界（`Context#destroy` 用 `Promise.all`），
+  因此表现为微任务饥饿、主线程被占满，而**不是** `RangeError` 栈溢出。
+  触发场景：编辑器在**保持连接**的前提下被换父（如 Vaadin 在同一次往返内做
+  `SplitLayout` 槽位重分配），此路径会真正调用 `editor.destroy()`。
+  修复方式是移除该赋值——`editor.id` 在整个代码库中从无读取方，属死代码；
+  组件侧 `editorId`（DOM id、只读锁 id、上传 id）契约完全不变，无迁移步骤。
+  已对照 CKEditor 48.4.0 源码逐行核实根因，并新增单测与 E2E 双重回归。
+- **上传适配器猴补丁从不还原导致编辑器泄漏**（前端，严重）。
+  `setupCustomUploadAdapter()` 把自建工厂写到 CKEditor `FileRepository` 插件的
+  `createUploadAdapter` 上，该工厂闭包捕获了 `this`（Lit 元素），形成
+  「插件 → 闭包 → 组件 → 整棵 DOM 子树」的引用链，而全仓无任何还原代码。
+  由于 `destroyEditor()` 在组件已断开时会跳过 `editor.destroy()`（交给 GC），
+  CKEditor 自身不拆卸插件，这条链会把整个编辑器钉住——每次路由往返泄漏一个实例。
+  修复：捕获原值并登记还原动作到 `listenerCleanups`，该数组在 `destroyEditor()` 的
+  `isDisconnected` 提前 return **之前**被无条件遍历执行。还原成 `undefined` 是安全的：
+  CKEditor 的 `createLoader()` 有 `if (!this.createUploadAdapter)` 守卫，仅告警返回 null。
+  该缺陷与 issue #122 正交，由全仓扫描顺带查出。
+
+### Documentation
+- 修正 `MediaEmbedResize` 可用性的描述（`media-embed-resize.ts`、`CKEditorConfig#setMediaEmbedResizable`）。
+  原注释称该插件"由 umbrella `ckeditor5` 包导出，type 与 runtime 两层均可解析"，
+  但实测 **48.4.0 的 umbrella 产物中不含该符号**（`dist/index.d.ts` 与
+  `dist/ckeditor5.js` 两层皆无）。这意味着 `loadMediaEmbedResizePlugin()` 的
+  `?? null` 分支是常态而非异常路径——启用 `setMediaEmbedResizable(true)` 会静默降级为不可缩放。
+  代码行为本身正确（优雅降级、不阻断编辑器创建），故仅修文档。
+
+### Added
+- DevTools 手工排查指引（`docs/USER_GUIDE.md`、`docs/QUICK_REFERENCE.md`）：
+  `$0.editorId` / `$0.editor` / `getData()` / 按 id 反查 / 列出页面全部编辑器。
+  并说明 `editor` 虽在 TypeScript 中声明为 `private`，但那只是编译期约束，
+  运行时（含生产构建）可正常访问；以及 `editor.id` 是 CKEditor 内部 id，
+  识别编辑器应使用 `$0.editorId`。全部片段已在生产构建上实机验证。
+- 澄清 `window.VAADIN_CKEDITOR_DEBUG` 在模块加载时求值一次，需**先设置再刷新页面**。
+
 ## [5.3.3] - 2026-08-26
 
 ### Fixed
