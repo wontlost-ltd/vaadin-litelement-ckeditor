@@ -32,14 +32,14 @@ A comprehensive CKEditor 5 integration for Vaadin 24+.
 <dependency>
     <groupId>com.wontlost</groupId>
     <artifactId>ckeditor-vaadin</artifactId>
-    <version>5.3.3</version>
+    <version>5.4.0</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```kotlin
-implementation("com.wontlost:ckeditor-vaadin:5.3.3")
+implementation("com.wontlost:ckeditor-vaadin:5.4.0")
 ```
 
 ### Compatibility Matrix
@@ -47,8 +47,8 @@ implementation("com.wontlost:ckeditor-vaadin:5.3.3")
 | 依赖 | 版本 | 备注 |
 |---|---|---|
 | Vaadin Platform | 25.2.6+ | 25.x 系列 |
-| CKEditor 5 (`ckeditor5`) | 48.4.0 | npm 精确版本 |
-| `ckeditor5-premium-features` | 48.4.0 | 与 `ckeditor5` 必须同版本 |
+| CKEditor 5 (`ckeditor5`) | 48.5.0 | npm 精确版本 |
+| `ckeditor5-premium-features` | 48.5.0 | 与 `ckeditor5` 必须同版本 |
 | Java | 21+ | Vaadin 25 baseline |
 | Jackson (`tools.jackson.core`) | 3.1.3+ | 由消费端提供 |
 | Jakarta Servlet API | 6.1.0+ | Vaadin 25.2 支持矩阵 |
@@ -465,7 +465,7 @@ type-safe Vaadin TestBench page object for the `vaadin-ckeditor` component.
 <dependency>
     <groupId>com.wontlost</groupId>
     <artifactId>ckeditor-vaadin-testbench</artifactId>
-    <version>5.3.3</version>
+    <version>5.4.0</version>
     <scope>test</scope>
 </dependency>
 ```
