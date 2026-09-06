@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+### Changed
+- **CKEditor 5（`ckeditor5`、`ckeditor5-premium-features`）：48.4.0 → 48.5.0**。
+  minor 版本升级，官方 changelog 的 48.5.0 段落**未列出任何 breaking change**
+  （其余 MINOR BREAKING CHANGES 小节均属更早版本）。新增内容集中在 premium 侧：
+  AI Chat 的 GHS 感知与 Context Library、Revision History 的 `showAISource`；
+  免费侧仅表格缺陷修复（列宽在有纵向滚动条时缩水、嵌套表最后一列 resize 撑满父表、
+  GHS 保留 `content-table`/`layout-table` 类）。
+  同步更新四处版本锚点：前端 `package.json`、`@NpmPackage` 注解（`VaadinCKEditor`、
+  `VaadinCKEditorPremium`）、`getPremiumVersion()` 返回值、示例应用 `package.json`。
+  已复核 issue #122 的修复前提在 48.5.0 下依然成立：`Context#_removeEditor` 实现逐字未变，
+  `Collection#add` 仍会为无 `.id` 的实例自动生成 `uid()` 并写回（实测 `has()` 在覆盖 id 后
+  仍失配），故该修复继续必要且有效。`npm audit` 报告 0 vulnerabilities。
+
 ### Fixed
 - **换父容器时 `destroy()` 无限递归卡死标签页**（前端，严重，issue #122）。
   连接器在 `Editor.create()` 完成后覆盖了 editor 实例的 `.id`，但该实例在**构造期间**
@@ -38,10 +51,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Documentation
 - 修正 `MediaEmbedResize` 可用性的描述（`media-embed-resize.ts`、`CKEditorConfig#setMediaEmbedResizable`）。
   原注释称该插件"由 umbrella `ckeditor5` 包导出，type 与 runtime 两层均可解析"，
-  但实测 **48.4.0 的 umbrella 产物中不含该符号**（`dist/index.d.ts` 与
+  但实测 **48.4.0 与 48.5.0 的 umbrella 产物中均不含该符号**（`dist/index.d.ts` 与
   `dist/ckeditor5.js` 两层皆无）。这意味着 `loadMediaEmbedResizePlugin()` 的
   `?? null` 分支是常态而非异常路径——启用 `setMediaEmbedResizable(true)` 会静默降级为不可缩放。
-  代码行为本身正确（优雅降级、不阻断编辑器创建），故仅修文档。
+  这是既有描述失准，非本次升级引入；代码行为本身正确（优雅降级、不阻断编辑器创建），故仅修文档。
 
 ### Added
 - DevTools 手工排查指引（`docs/USER_GUIDE.md`、`docs/QUICK_REFERENCE.md`）：
