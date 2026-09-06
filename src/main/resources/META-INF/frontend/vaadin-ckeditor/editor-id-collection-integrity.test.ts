@@ -27,7 +27,7 @@ import { Collection } from '@ckeditor/ckeditor5-utils';
  * 而不是复刻一份同构逻辑；只建模上游行为的测试无法防止缺陷在生产路径上复发。
  */
 
-/** 复刻 ckeditor5-core 的 Context#_removeEditor / Context#destroy（48.4.0 逐行对照）。 */
+/** 复刻 ckeditor5-core 的 Context#_removeEditor / Context#destroy（48.5.0 逐行对照）。 */
 class ContextLike {
     editors = new Collection<Record<string, unknown>>();
     _contextOwner: unknown = null;
