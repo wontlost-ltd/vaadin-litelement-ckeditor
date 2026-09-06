@@ -1644,7 +1644,18 @@ export class VaadinCKEditor extends LitElement {
 
             if (fileRepository) {
                 // Set up custom upload adapter factory
+                const originalFactory = fileRepository.createUploadAdapter;
                 fileRepository.createUploadAdapter = this.getUploadAdapterFactory();
+
+                // 该工厂闭包捕获了 this（Lit 元素），若不还原就会形成
+                // FileRepository 插件 -> 闭包 -> 组件 -> 整棵 DOM 子树 的引用链。
+                // destroyEditor() 在组件已断开时会跳过 editor.destroy()（交给 GC），
+                // 此时 CKEditor 自身不拆卸插件，这条链会把整个编辑器钉住，
+                // 每次路由往返泄漏一个实例。登记到 listenerCleanups——
+                // 它在 destroyEditor() 的 isDisconnected 提前 return **之前**无条件执行。
+                this.listenerCleanups.push(() => {
+                    fileRepository.createUploadAdapter = originalFactory;
+                });
                 logger.debug('Custom upload adapter configured for server-side file handling');
             }
         } catch {
