@@ -1082,8 +1082,19 @@ export class VaadinCKEditor extends LitElement {
         const initTimeMs = endTime - startTime;
         logger.info(`Editor created in ${initTimeMs.toFixed(0)}ms`);
 
-        // Set editor ID for reference
-        (this.editor as unknown as { id: string }).id = this.editorId;
+        // 此处**不得**给 editor 实例赋 .id（issue #122）。
+        // Editor 在构造期间就已被注册进它自己的私有 Context：
+        // Context#_addEditor -> Collection#add -> _getItemIdBeforeAdding()，
+        // 后者发现新实例没有 .id，于是自动生成 uid() **写到实例上**，并以该值
+        // 为键存入内部 _itemMap。此后再覆盖 .id，实例便与它在 _itemMap 中的键脱钩：
+        //   destroy() -> Context#_removeEditor() -> editors.has(editor)
+        //   -> _itemMap.has(被覆盖的 id) === false -> remove() 从不执行
+        // 编辑器因此永远留在 context.editors 里，而 _removeEditor 仍会走到
+        // `this._contextOwner === editor` 分支调用 Context#destroy()，后者遍历
+        // 仍含该编辑器的 editors 再次调用 destroy() —— 形成无限递归，占满主线程并卡死标签页。
+        // 若将来确实需要在实例侧标识编辑器，请使用 WeakMap<Editor, string>，
+        // 不要在 CKEditor 拥有的对象上挂属性（Collection 的 idProperty 可自定义，
+        // 换个属性名同样可能撞上这一类问题）。
 
         return initTimeMs;
     }
