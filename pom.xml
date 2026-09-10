@@ -69,6 +69,8 @@
         <dependency>
             <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+            <!-- Vaadin bom no more declares this in 25.3 series -->
+            <version>3.1.5</version>
             <scope>provided</scope>
         </dependency>
 
